@@ -1,0 +1,109 @@
+/**
+ * Mein Chatserver
+ * ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ * Licensed Materials - Property of mein-chatserver.de.
+ * © Copyright 2024. All Rights Reserved.
+ *
+ * @version 1.0.0
+ * @author  Adrian Preuß
+ */
+
+[data-view="login"] {
+	flex-direction: row;
+	background-image: var(--login-background-image);
+	background-repeat: no-repeat;
+	background-size: cover;
+}
+
+[data-view="login"] main {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	padding: 10px;
+}
+
+[data-view="login"] main ui-panel ui-form {
+	display: flex;
+}
+
+[data-view="login"] main ui-panel ui-form label,
+[data-view="login"] main ui-panel ui-form input,
+[data-view="login"] main ui-panel ui-form select,
+[data-view="login"] main ui-panel ui-form button {
+	display: block;
+	flex: 1 1 100%;
+	width: 100%;
+	margin: 1px;
+}
+
+[data-view="login"] aside {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+}
+
+[data-view="login"] aside ui-entry {
+	padding: 5px;
+	font-size: 90%;
+	cursor: pointer;
+}
+
+[data-view="login"] aside ui-entry:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+[data-view="login"] aside ui-entry:active,
+[data-view="login"] aside ui-entry:focus {
+	background: rgba(0, 0, 128, 0.8);
+	color: #FFFFFF;
+}
+
+[data-view="login"] aside ui-entry small {
+	color: #7C6980;
+	font-size: 90%;
+}
+
+[data-view="login"] aside .content:empty {
+	display: flex;
+	text-align: center;
+	align-content: center;
+	flex-direction: row;
+}
+
+[data-view="login"] aside .content:empty::before,
+[data-view="login"] aside .content:empty::after {
+	display: inline-block;
+	color: #FFFFFF;
+	font-size: 90%;
+	text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
+	align-self: center;
+	flex: 1;
+	align-content: center;
+	
+}
+
+[data-view="login"] aside .content:empty::before {
+	content: attr(data-state);
+	text-align: center;
+	padding: 0;
+}
+
+[data-view="login"] aside .content[data-state=""]:empty::before {
+	content: "Verbinde";
+	text-align: right;
+	padding: 0 0 0 50px;
+}
+
+[data-view="login"] aside .content:empty::after {
+	content: "";
+	display: none;
+    width: 5px;
+    animation: dots 3s linear infinite;
+	text-align: left;
+}
+
+[data-view="login"] aside .content[data-state=""]:empty::after {
+	display: block;
+}

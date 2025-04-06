@@ -1,0 +1,105 @@
+/**
+ * Mein Chatserver
+ * ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ * Licensed Materials - Property of mein-chatserver.de.
+ * © Copyright 2024. All Rights Reserved.
+ *
+ * @version 1.0.0
+ * @author  Adrian Preuß
+ */
+
+body[data-view="room"] {
+	cursor: default;
+	display: flex;
+	flex-direction: row;
+	background-color: var(--room-background);
+	color: var(--room-foreground);
+}
+
+body[data-view="room"] main {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+}
+
+body[data-view="room"] main ui-output {
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	border-top: 1px solid #808080;
+	border-left: 1px solid #808080;
+	overflow-x: hidden;
+	overflow-y: scroll;
+}
+
+body[data-view="room"] main ui-output ui-text {
+	padding: 0px 5px;
+}
+
+body[data-view="room"] main ui-output ui-text[data-type="action"] {
+	color: var(--room-blue);
+}
+
+body[data-view="room"] main ui-output ui-text[data-type="public"] a.sender {
+	font-weight: bold;
+}
+
+body[data-view="room"] main ui-output ui-text[data-type="private"] a.sender {
+	font-weight: bold;
+	color: var(--room-red);
+}
+
+body[data-view="room"] main ui-input {
+	flex: 0;
+}
+
+body[data-view="room"] main ui-input input {
+	width: 100%;
+	height: 100%;
+	font-size: 90%;
+	padding: 5px 5px;
+}
+
+body[data-view="room"] aside {
+	position: relative;
+	flex: 0 200px;
+	overflow-x: hidden;
+	overflow-y: scroll;
+	border-top: 1px solid #808080;
+	border-left: 1px solid #808080;
+	display: flex;
+	flex-direction: column;
+}
+
+body[data-view="room"] aside::after {
+	content: "";
+	position: sticky;
+	display: block;
+	top: 0;
+	left: 0;
+	right: 0;
+	bottom: 0;
+	z-index: 1;
+	margin-top: -101%;
+	width: 100%;
+	height: 100%;
+	pointer-events: none;
+	border-top: 1px solid #000000;
+	border-left: 1px solid #000000;
+	overflow: hidden;
+}
+
+body[data-view="room"] aside ui-entry {
+	padding: 2px 6px;
+}
+
+body[data-view="room"] aside ui-entry:hover {
+	background: rgba(255, 255, 255, 0.3);
+}
+
+body[data-view="room"] aside ui-entry[data-active="true"],
+body[data-view="room"] aside ui-entry:active,
+body[data-view="room"] aside ui-entry:focus {
+	background: rgba(0, 0, 128, 0.8);
+	color: #FFFFFF;
+}

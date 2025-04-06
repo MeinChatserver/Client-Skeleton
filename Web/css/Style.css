@@ -1,0 +1,28 @@
+/**
+ * Mein Chatserver
+ * ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ * Licensed Materials - Property of mein-chatserver.de.
+ * © Copyright 2024. All Rights Reserved.
+ *
+ * @version 1.0.0
+ * @author  Adrian Preuß
+ */
+
+/* Default Colors */
+:root {
+	/* Login */
+	--login-background-image:	url('backgrounds/style_1.png');
+	--login-background:			#444444;
+	--login-foreground:			#FEFEFE;
+	--login-foreground-list:	#111111;
+	--login-background-list:	#DDDDDD;
+	
+	/* Room */
+	--room-red:					#8E0E0E;
+	--room-green:				#0E8E0E;
+	--room-blue:				#0E0E8E;
+	
+	--room-background:			#BEBEBE;
+	--room-background-image:	url('rooms/chat.png');
+	--room-foreground:			#000000;
+}

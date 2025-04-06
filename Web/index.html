@@ -1,0 +1,67 @@
+<!--
+	Mein Chatserver
+	▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+	Licensed Materials - Property of mein-chatserver.de.
+	© Copyright 2024. All Rights Reserved.
+	
+	@version 1.0.0
+	@author  Adrian Preuß
+-->
+<!DOCTYPE html>
+<html lang="de">
+	<head>
+		<title>Client</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
+		<link rel="stylesheet" type="text/css" href="css/Style.css" />
+		<link rel="stylesheet" type="text/css" href="css/Components.css" />
+		<link rel="stylesheet" type="text/css" href="css/Client.css" />
+		<link rel="stylesheet" type="text/css" href="css/Login.css" />
+	</head>
+	<body data-view="login">
+		<!-- Browser Support -->
+		<browser-compatiblity>
+			<div>🧩</div>
+			<p>Your web browser does not support <strong>ECMAScript 6</strong>.</p>
+			<p>Please update your web browser or install a newer version.</p>
+			<a target="_blank" href="https://www.google.com/intl/de_de/chrome/">
+				<img src="browsers/chrome.svg" />
+				<span>google Chrome</span>
+			</a>
+			<a target="_blank" href="https://www.mozilla.org/de/firefox/new/">
+				<img src="browsers/firefox.svg" />
+				<span>Mozilla Firefox</span>
+			</a>
+			<a target="_blank" href="https://www.opera.com/de">
+				<img src="browsers/opera.svg" />
+				<span>Opera</span>
+			</a>
+		</browser-compatiblity>
+		
+		<!-- Template: Chatroom -->
+		<template name="room">
+			<main>
+				<ui-output></ui-output>
+				<ui-input>
+					<input type="text" name="message" placeholder="" />
+				</ui-input>
+			</main>
+			<aside></aside>
+		</template>
+		
+		<script type="text/javascript">
+			window.Defaults = {
+				port:		2710,
+				style:		{
+						background:			"#8D99B9",
+						foreground:			"#FFFFFF",
+						backgroundList:		"#EBEFFF",
+						foregroundList:		"#7180B7",
+						backgroundImage:	"backgrounds/style_1.png"
+				},
+				suggestion: 'Flirt'
+			};
+		</script>
+		<script type="module" src="Client.js"></script>
+	</body>
+</html>
