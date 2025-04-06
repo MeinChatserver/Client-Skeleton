@@ -13,23 +13,28 @@ package Protocol;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Configuration implements IPacket {
+public class Rank implements IPacket {
     @JsonProperty("id")
     public String ID;
 
-    @JsonProperty("suggestion")
-    public String Suggestion;
+    @JsonProperty("name")
+    public String Name;
     
-    public Configuration(
+    @JsonProperty("color")
+    public String Color;
+    
+    public Rank(
     	@JsonProperty("id") String id,
-    	@JsonProperty("suggestion") String suggestion
+    	@JsonProperty("name") String name,
+    	@JsonProperty("color") String color
 	) {    	
-        this.ID			= id;
-        this.Suggestion	= suggestion;
+        this.ID		= id;
+        this.Name	= name;
+        this.Color	= color;
     }
     
     @JsonIgnore
     public String getOperation() {
-    	return "CONFIGURATION";
+    	return "RANK";
     }
 }

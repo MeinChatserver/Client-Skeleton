@@ -13,23 +13,28 @@ package Protocol;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class Configuration implements IPacket {
+public class User implements IPacket {
     @JsonProperty("id")
-    public String ID;
+    public int ID;
 
-    @JsonProperty("suggestion")
-    public String Suggestion;
+    @JsonProperty("username")
+    public String Username;
     
-    public Configuration(
-    	@JsonProperty("id") String id,
-    	@JsonProperty("suggestion") String suggestion
+    @JsonProperty("rank")
+    public int Rank;
+    
+    public User(
+    		@JsonProperty("id") int id,
+    		@JsonProperty("username") String username,
+    		@JsonProperty("rank") int rank
 	) {    	
         this.ID			= id;
-        this.Suggestion	= suggestion;
+        this.Username	= username;
+        this.Rank		= rank;
     }
     
     @JsonIgnore
     public String getOperation() {
-    	return "CONFIGURATION";
+    	return "USER";
     }
 }
