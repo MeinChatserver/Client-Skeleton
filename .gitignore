@@ -1,2 +1,6 @@
+# General
+/bin
+
+# Java
 /Java/target/*
 !/Java/target/*.jar
