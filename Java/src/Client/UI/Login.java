@@ -17,6 +17,8 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -28,6 +30,7 @@ import Client.Client;
 import Client.ICallback;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
+import Protocol.RoomMessage;
 
 @SuppressWarnings("serial")
 public class Login extends JPanel {
@@ -83,18 +86,33 @@ public class Login extends JPanel {
 		this.label_username.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.panel_top.add(this.label_username, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 		this.panel_top.add(this.input_username, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-	
+		this.input_username.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				input_password.requestFocus();
+			}
+		});
+		
 		/* Form: Password */
 		this.label_password.setText("Passwort:");
 		this.label_password.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.panel_top.add(this.label_password, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 		this.panel_top.add(this.input_password, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
-
+		this.input_password.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				input_chatroom.requestFocus();
+			}
+		});
+		
 		/* Form: Chatroom */
 		this.label_chatroom.setText("Chatraum:");
 		this.label_chatroom.setHorizontalAlignment(SwingConstants.RIGHT);
 		this.panel_top.add(this.label_chatroom, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		this.panel_top.add(this.input_chatroom, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
+		this.input_chatroom.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				button_login.doClick();
+			}
+		});
 		
 		this.panel_buttons.setLayout(new BorderLayout());
 		this.panel_top.add(this.panel_buttons, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
