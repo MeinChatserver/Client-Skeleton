@@ -12,13 +12,11 @@ package Client.UI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -27,6 +25,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 import Client.Client;
+import Client.ICallback;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
 
@@ -102,7 +101,7 @@ public class Login extends JPanel {
 		
 		/* Form: Button "Lost Password?" */
 		this.button_lost_password.setText("Password vergessen?");
-		this.panel_buttons.add(this.button_lost_password, BorderLayout.WEST);
+		//this.panel_buttons.add(this.button_lost_password, BorderLayout.WEST);
 		
 		/* Form: Button "Register" */
 		this.button_register.setText("Neu registrieren");
@@ -112,7 +111,12 @@ public class Login extends JPanel {
 		this.panel_middle.setBorder(new EmptyBorder(10, 10, 10, 10));
 		this.panel_middle.setLayout(new BorderLayout());
 		this.chatrooms.setBackground(Color.red);
-		this.chatrooms.setLayout(null);
+		this.chatrooms.onSelect(new ICallback() {
+            @Override
+            public void execute(String message) {
+            	setSuggestion(message);
+            }
+        });
 		this.panel_middle.add(this.chatrooms, BorderLayout.CENTER);
 		
 		/* Bottom */
@@ -149,6 +153,24 @@ public class Login extends JPanel {
 	}
 
 	private void onLogin(ActionEvent event) {
+		if(!this.client.isConnected()) {
+			this.button_login.setText("Verbinde."); // @ToDo I18N
+			this.client.connect(false);
+			return;
+		}
+		
 		this.client.send(new Protocol.Login(this.input_username.getText(), this.input_password.getPassword(), this.input_chatroom.getText()));
+	}
+
+	public void setConnected() {
+		this.button_login.setText("Einloggen"); // @ToDo I18N
+	}
+
+	public void setDisconnected() {
+		this.button_login.setText("Erneut verbinden"); // @ToDo I18N		
+	}
+
+	public void showLoginButton() {
+		this.button_login.setText("Einloggen");
 	}
 }

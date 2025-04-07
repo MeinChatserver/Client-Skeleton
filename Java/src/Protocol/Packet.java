@@ -13,12 +13,19 @@ package Protocol;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
+import Protocol.Helper.ObjectDeserializer;
+import Protocol.Helper.ObjectSerializer;
 
 public class Packet {
 	@JsonProperty("operation")
 	public String operation;
 	
 	@JsonProperty("data")
+	@JsonSerialize(using = ObjectSerializer.class)
+	@JsonDeserialize(using = ObjectDeserializer.class)
 	public Object data;
 	
 	@JsonCreator
