@@ -12,12 +12,16 @@ package Client.UI;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
+import java.net.URI;
+import java.util.Base64;
 
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -124,6 +128,22 @@ public class Login extends JPanel {
 		/* Form: Button "Register" */
 		this.button_register.setText("Neu registrieren");
 		this.panel_buttons.add(this.button_register, BorderLayout.EAST);
+		this.button_register.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					URI uri = new URI("https://" + client.getHostname() + "/Register");
+
+			        if (Desktop.isDesktopSupported()) {
+			            Desktop desktop = Desktop.getDesktop();
+						desktop.browse(uri);
+			        } else {
+			            System.out.println("Desktop not supported");
+			        }
+				} catch(Exception e1) {
+					e1.printStackTrace();
+				}
+			}
+		});
 		
 		/* Middle */
 		this.panel_middle.setBorder(new EmptyBorder(10, 10, 10, 10));

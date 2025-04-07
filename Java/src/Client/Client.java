@@ -69,6 +69,10 @@ public class Client implements Runnable {
         new Thread(this).start();
     }
 
+    public String getHostname() {
+    	return this.hostname;
+    }
+    
     public void send(IPacket clazz) {
     	if(!this.isConnected()) {
 			return;
