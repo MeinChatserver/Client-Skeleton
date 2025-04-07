@@ -23,10 +23,12 @@ import javax.swing.JTextField;
 
 import Client.Client;
 import Client.ICallback;
+import Client.WindowManager;
 import Client.UI.Components.List;
 import Protocol.Rank;
 import Protocol.Room;
 import Protocol.RoomMessage;
+import Protocol.User;
 import Protocol.WindowClose;
 import Protocol.WindowInit;
 
@@ -47,12 +49,11 @@ public class Window extends JFrame {
         });
 		
 		JPanel panel_output = new JPanel();
-		panel_output.setBackground(Color.red);
-		this.userlist.setBackground(Color.blue);
+		//panel_output.setBackground(Color.red);
 		this.userlist.onSelect(new ICallback() {
             @Override
             public void execute(String message) {
-            	
+            	// Click on User
             }
         });
 		
@@ -71,14 +72,20 @@ public class Window extends JFrame {
 		this.add(panel_output, BorderLayout.CENTER);
 		this.add(this.userlist, BorderLayout.EAST);
 		this.add(panel_input, BorderLayout.SOUTH);
+		this.update();
 	}
 
 	public void init() {
 		this.setVisible(true);
 		this.client.send(new WindowInit(this.getName()));
 	}
+	
+	public void update() {
+		this.revalidate();
+	}
 
 	public void close() {
+		WindowManager.remove(this.getName());
 		this.client.send(new WindowClose(this.getName()));
 		this.dispose();
 	}
@@ -86,14 +93,26 @@ public class Window extends JFrame {
 	public void setConnected() {
 		panel_input.setText("");
 		panel_input.setEnabled(true);
+		this.update();
 	}
 
 	public void setDisconnected() {
 		panel_input.setText("Verbindung getrennt. Bitte verbinde dich neu..."); // @ToDo I18N
 		panel_input.setEnabled(false);
+		this.update();
 	}
 
 	public void setStyle(Room room, Rank[] ranks) {
 		// TODO
+		this.update();
+	}
+
+	public void addUser(User user) {
+		this.removeUser(user);
+		this.userlist.addEntry(user.getName());
+	}
+	
+	public void removeUser(User user) {
+		this.userlist.removeEntry(user.getName());
 	}
 }

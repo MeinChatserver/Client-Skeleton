@@ -33,6 +33,10 @@ public class User implements IPacket {
         this.Rank		= rank;
     }
     
+    public String getName() {
+    	return this.Username;
+    }
+    
     @JsonIgnore
     public String getOperation() {
     	return "USER";

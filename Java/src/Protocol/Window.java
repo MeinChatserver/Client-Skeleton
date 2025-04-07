@@ -43,6 +43,10 @@ public class Window implements IPacket {
         this.title	= title;
     }
     
+    public Room getRoom() {
+    	return this.room;
+    }
+    
     @JsonIgnore
     public String getOperation() {
     	return "WINDOW_ROOM";

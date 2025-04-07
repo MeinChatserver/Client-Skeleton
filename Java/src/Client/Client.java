@@ -37,6 +37,9 @@ import Protocol.Handshake;
 import Protocol.IPacket;
 import Protocol.Packet;
 import Protocol.Room;
+import Protocol.RoomUserAdd;
+import Protocol.RoomUserRemove;
+import Protocol.User;
 
 public class Client implements Runnable {
 	private JFrame window	= new JFrame();
@@ -98,7 +101,7 @@ public class Client implements Runnable {
         	this.socket	= new Socket(this.hostname, this.port);
         	this.output	= this.socket.getOutputStream();
         	this.input	= this.socket.getInputStream();
-
+        	
             this.onConnected();
         } catch(SocketException e) {
         	this.onClose("DISCONNECTED");
@@ -121,10 +124,12 @@ public class Client implements Runnable {
     		}
     		
             if(this.input != null) {
+            	this.socket.shutdownInput();
             	this.input.close();
             }
             
             if(this.output != null) {
+            	this.socket.shutdownOutput();
             	this.output.close();
             }
             
@@ -135,7 +140,7 @@ public class Client implements Runnable {
             	
             	this.socket = null;
             }
-        } catch (IOException e) {
+        } catch(IOException e) {
         	this.onError(e);
         }
     }
@@ -219,6 +224,8 @@ public class Client implements Runnable {
     }
     
     protected void onReceive(Packet packet, String json, String response) throws JsonMappingException, JsonProcessingException {
+    	Window window;
+    	
     	switch(packet.operation) {
     		case "CONFIGURATION":
     			Configuration config	= objects.readerFor(Configuration.class).readValue(json);
@@ -263,14 +270,36 @@ public class Client implements Runnable {
     			this.login.update();
    			break;
     		case "WINDOW_ROOM":
-    			Protocol.Window window	= objects.readerFor(Protocol.Window.class).readValue(json);
+    			Protocol.Window data	= objects.readerFor(Protocol.Window.class).readValue(json);
     			
-    			Window frame = WindowManager.create(this, window.name, window.width, window.height);
-				frame.setTitle(window.title);
-				frame.setStyle(window.room, window.ranks);				
+    			Window frame = WindowManager.create(this, data.name, data.width, data.height);
+				frame.setTitle(data.title);
+				frame.setStyle(data.room, data.ranks);
+				
+				for(User user : data.getRoom().getUsers()) {
+					frame.addUser(user);
+				}
+				
 				frame.requestFocus();
-    			System.out.println(window);
    			break;
+    		case "ROOM_USER_ADD":
+    			RoomUserAdd user	= objects.readerFor(RoomUserAdd.class).readValue(json);
+    			
+    			window = WindowManager.get(user.getRoom());
+    			
+    			if(window != null) {
+    				window.addUser(user.getUser());
+    			}
+    		break;
+    		case "ROOM_USER_REMOVE":
+				RoomUserRemove user2	= objects.readerFor(RoomUserRemove.class).readValue(json);
+    			
+				window = WindowManager.get(user2.getRoom());
+    			
+    			if(window != null) {
+    				window.removeUser(user2.getUser());
+    			}
+    		break;
     		case "POPUP":
     			final JOptionPane optionPane	= new JOptionPane(((String) packet.data), JOptionPane.QUESTION_MESSAGE, JOptionPane.CLOSED_OPTION);
     			final JDialog dialog			= new JDialog();

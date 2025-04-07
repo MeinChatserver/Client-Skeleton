@@ -13,15 +13,15 @@ package Client.UI.Components;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import Client.ICallback;
 
 @SuppressWarnings("serial")
 public class List extends JPanel {
-	private JPanel elements					= new JPanel(new GridBagLayout());
-	private HashMap<String, Entry> entries	= new HashMap<String, Entry>();
+	private JPanel elements							= new JPanel(new GridBagLayout());
+	private LinkedHashMap<String, Entry> entries	= new LinkedHashMap<String, Entry>();
 	private ICallback onSelect;
 	
 	public List() {

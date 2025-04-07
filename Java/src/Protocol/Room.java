@@ -27,7 +27,7 @@ public class Room implements IPacket {
     private Style style;
     
     @JsonProperty("users")
-    private List<Object> users;
+    private List<User> users;
     
     public Room() {}
 
@@ -50,6 +50,10 @@ public class Room implements IPacket {
 
     public void setName(String name) {
         this.name = name;
+    }
+    
+    public List<User> getUsers() {
+    	return this.users;
     }
 
     @Override

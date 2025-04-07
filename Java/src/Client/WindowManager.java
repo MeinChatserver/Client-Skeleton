@@ -11,11 +11,12 @@
 package Client;
 
 import java.awt.Dimension;
-import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
+
 import Client.UI.Window;
 
 public class WindowManager {
-	private static HashMap<String, Window> frames	= new HashMap<String, Window>();
+	private static ConcurrentHashMap<String, Window> frames	= new ConcurrentHashMap<String, Window>();
 
 	public static Window create(Client client, String name, int width, int height) {
 		if(exists(name)) {
@@ -35,13 +36,24 @@ public class WindowManager {
 		return frames.containsKey(name);
 	}
 	
+	public static void remove(String name) {
+		frames.entrySet().stream().forEach(entry -> {
+		    Window window = ((Window) entry.getValue());
+		    
+		    if(window.getName().equals(name)) {
+		    	frames.remove(entry.getKey());
+		    }
+		});
+	}
+	
 	public static Window get(String name) {
 		return frames.get(name);
 	}
 	
 	public static void closeAll() {
-		frames.entrySet().stream().forEach(window -> {
-		    ((Window) window).close();
+		frames.entrySet().stream().forEach(entry -> {
+			Window window = ((Window) entry.getValue());
+		    window.close();
 		});
 		
 		frames.clear();
@@ -52,14 +64,14 @@ public class WindowManager {
 	}
 
 	public static void setConnected() {
-		frames.entrySet().stream().forEach(window -> {
-		    ((Window) window).setConnected();
+		frames.entrySet().stream().forEach(entry -> {
+		    ((Window) entry.getValue()).setConnected();
 		});
 	}
 
 	public static void setDisconnected() {
-		frames.entrySet().stream().forEach(window -> {
-		    ((Window) window).setDisconnected();
+		frames.entrySet().stream().forEach(entry -> {
+		    ((Window) entry.getValue()).setDisconnected();
 		});
 	}
 }
