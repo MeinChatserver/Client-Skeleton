@@ -38,7 +38,6 @@ import Protocol.CategoryChange;
 import Protocol.LoginStyle;
 import Protocol.Room;
 
-@SuppressWarnings("serial")
 public class Login extends Panel {
 	private Client client;
 	
