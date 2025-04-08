@@ -30,8 +30,8 @@ public class Packet {
 	
 	@JsonCreator
 	public Packet(
-			@JsonProperty("operation") String operation,
-			@JsonProperty("data") Object data
+		@JsonProperty("operation") String operation,
+		@JsonProperty("data") Object data
 	) {
 		 this.operation	= operation;
 		 this.data		= data;

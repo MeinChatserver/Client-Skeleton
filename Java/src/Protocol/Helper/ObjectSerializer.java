@@ -20,7 +20,11 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 public class ObjectSerializer extends JsonSerializer<Object> {    
 	@Override
     public void serialize(Object value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        if(value instanceof String) {
+		System.out.println(value);
+		
+		if(value == null) {
+        	gen.writeNull();
+		} else if(value instanceof String) {
             gen.writeString((String) value);
         } else if(value instanceof ArrayNode) {
             gen.writeTree((ArrayNode) value);

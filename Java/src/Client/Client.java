@@ -21,6 +21,10 @@ import java.net.SocketException;
 import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
@@ -39,16 +43,19 @@ import Protocol.MessageAction;
 import Protocol.MessagePrivate;
 import Protocol.MessagePublic;
 import Protocol.Packet;
+import Protocol.Ping;
+import Protocol.Pong;
 import Protocol.Room;
 import Protocol.RoomUserAdd;
 import Protocol.RoomUserRemove;
 import Protocol.User;
 
 public class Client implements Runnable {
-	private JFrame window	= new JFrame();
-	private Login login		= new Login(this);
-    private String Client   = "JavaClient";
-    private String Version  = "V1.0";
+	private JFrame window				= new JFrame();
+	private Login login					= new Login(this);
+    private String Client   			= "JavaClient";
+    private String Version  			= "V1.0";
+    ScheduledExecutorService ping		= Executors.newScheduledThreadPool(1);
     private String hostname;
     private int port;
     private Socket socket;
@@ -216,6 +223,8 @@ public class Client implements Runnable {
     
     protected void onClose(String error) {
     	// Reset Ping
+    	this.ping.shutdownNow();
+    	
     	this.disconnect(false);
     	WindowManager.setDisconnected();
 		this.login.setDisconnected();
@@ -243,16 +252,15 @@ public class Client implements Runnable {
     			this.login.setSuggestion(config.Suggestion);
     			
     			// Create Ping
-    			/*this.Ping = setInterval(() => {
-						this.send({
-							operation: 'PING'
-						});
-					}, 10000);*/
+    			this.ping.scheduleAtFixedRate(new Runnable() {
+					@Override
+					public void run() {
+						send(new Ping());
+					}
+    			}, 0, 10, TimeUnit.SECONDS);
     		break;
     		case "PING":
-    			/*this.send({
-						operation:	'PONG'
-					});*/
+    			send(new Pong());
     		break;
     		case "PONG":
     			// @ToDo

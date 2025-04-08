@@ -53,7 +53,7 @@ public class List extends JPanel {
 	}
 	
 	public void addEntry(String name, String text) {
-		if (name == null || name.trim().isEmpty()) {
+		if(name == null || name.trim().isEmpty()) {
 	        return;
 	    }
 		

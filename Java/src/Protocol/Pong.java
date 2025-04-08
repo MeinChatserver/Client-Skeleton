@@ -14,18 +14,18 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
-public class Disconnect implements IPacket {
-    public Disconnect() {
+public class Pong implements IPacket {
+    public Pong() {
     	/* Do Nothing */
 	}
 
 	@Override
     public String toString() {
-        return "[Disconnect]";
+        return "[Pong]";
     }
 
 	@Override
 	public String getOperation() {
-		return "DISCONNECT";
+		return "PONG";
 	}
 }
