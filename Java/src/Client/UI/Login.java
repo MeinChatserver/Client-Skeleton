@@ -79,8 +79,8 @@ public class Login extends JPanel {
 		this.panel_top.setLayout(form);
 		form.columnWidths	= new int[] {0, 0, 0, 0};
 		form.rowHeights		= new int[] {0, 0, 0, 0, 0};
-		form.columnWeights	= new double[] {0, 0, 1, 1};
-		form.rowWeights		= new double[] {0, 0, 0, 0, 1};
+		form.columnWeights	= new double[] {0, 0, 1};
+		form.rowWeights		= new double[] {0, 0, 0, 1};
 		
 		/* Form: Username */
 		this.label_username.setText("Benutzername:");
