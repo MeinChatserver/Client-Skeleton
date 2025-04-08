@@ -2,9 +2,7 @@ package Client.UI;
 
 import java.awt.Color;
 import java.io.InputStream;
-
 import javax.swing.Icon;
-
 import jiconfont.IconCode;
 import jiconfont.IconFont;
 import jiconfont.swing.IconFontSwing;
@@ -2087,7 +2085,6 @@ public class Bootstrap {
 			}
 			
 			@Override
-			
 			public InputStream getFontInputStream() {
 				return this.getClass().getResourceAsStream("/fonts/bootstrap-icons.ttf");
 			}
