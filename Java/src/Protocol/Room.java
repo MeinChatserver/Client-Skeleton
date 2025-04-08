@@ -55,6 +55,10 @@ public class Room implements IPacket {
     public List<User> getUsers() {
     	return this.users;
     }
+    
+    public Style getStyle() {
+    	return this. style;
+    }
 
     @Override
     public String toString() {

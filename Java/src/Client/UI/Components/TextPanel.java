@@ -1,19 +1,20 @@
 package Client.UI.Components;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.event.ComponentEvent;
+import java.awt.event.ComponentListener;
 import java.util.LinkedHashMap;
-
-import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
-public class TextPanel extends JPanel {
-	private JPanel elements							= new JPanel(new GridBagLayout());
-	private JScrollPane scrollbar					= new JScrollPane(this.elements);
-	private final JPanel spacer						= new JPanel();
+public class TextPanel extends Panel {
+	private Panel elements							= new Panel(new GridBagLayout());
+	private JScrollPane scrollbar					= new JScrollPane();
+	private final Panel spacer						= new Panel();
 	private LinkedHashMap<String, Entry> entries	= new LinkedHashMap<String, Entry>();
 	
 	public enum Type {
@@ -23,9 +24,33 @@ public class TextPanel extends JPanel {
     }
 	
 	public TextPanel() {
+		super();
 		this.setLayout(new BorderLayout());
-		this.scrollbar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		this.add(this.scrollbar, BorderLayout.CENTER);
+		
+		this.scrollbar.setViewportView(this.elements);
+		this.scrollbar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		this.scrollbar.setHorizontalScrollBar(new Scrollbar(JScrollBar.HORIZONTAL));
+		this.scrollbar.setVerticalScrollBar(new Scrollbar(JScrollBar.VERTICAL));
+		
+		this.scrollbar.addComponentListener(new ComponentListener() {
+			@Override
+			public void componentResized(ComponentEvent e) {}
+
+			@Override
+			public void componentMoved(ComponentEvent e) {}
+
+			@Override
+			public void componentShown(ComponentEvent e) {
+				scrollbar.setBackground(getBackground());
+			}
+
+			@Override
+			public void componentHidden(ComponentEvent e) {}
+        });
+		
+		this.scrollbar.revalidate();
+		this.scrollbar.repaint(); 
 	}
 	
 	private GridBagConstraints createGrid(boolean last) {
@@ -97,10 +122,18 @@ public class TextPanel extends JPanel {
 		
 		this.addEntry("message_" + this.entries.size(), "<html><div style=\"" + style + "\">" + text + "</div></html>");
 		
-	    
 	    /* Scrolling */
 		if(current + visible >= max - 10) {
 			scroller.setValue(max);
+		}
+	}
+	
+	@Override
+	public void setBackground(Color color) {
+		super.setBackground(color);
+		
+		if(this.scrollbar != null) {
+			this.scrollbar.setBackground(color);
 		}
 	}
 }

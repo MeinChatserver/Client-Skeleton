@@ -6,6 +6,7 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.LayoutManager2;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 
 @SuppressWarnings("serial")
 public class Panel extends JPanel {
@@ -62,6 +63,8 @@ public class Panel extends JPanel {
         if(component instanceof Container) {
             for(Component child : ((Container) component).getComponents()) {
             	if(child instanceof Panel) {
+            		child.setBackground(color);
+            	} else if(child instanceof JScrollPane) {
             		child.setBackground(color);
             	}
             	

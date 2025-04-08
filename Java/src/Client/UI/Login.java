@@ -11,8 +11,10 @@
 package Client.UI;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Desktop;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -41,6 +43,7 @@ public class Login extends Panel {
 	private Client client;
 	
 	/* Panels */
+	private Panel panel_header 		= new Panel();
 	private Panel panel_top 		= new Panel();
 	private Panel panel_middle 		= new Panel();
 	private Panel panel_bottom		= new Panel();
@@ -72,10 +75,24 @@ public class Login extends Panel {
 		this.button_lost_password = new Link();
 		this.button_login = new JButton();
 		
+		Panel panel_icons = new Panel();
+		Link button = new Link(Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.WHITE), Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.RED));
+		button.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("OPEN CON SETT");
+			}
+		});
+		panel_icons.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		panel_icons.setBorder(new EmptyBorder(5, 10, 0, 10));
+		panel_icons.add(button);
+		this.panel_header.setLayout(new BorderLayout());
+		this.panel_header.add(panel_icons, BorderLayout.NORTH);
+		this.panel_header.add(this.panel_top, BorderLayout.CENTER);
+		
 		/* Top */
 		GridBagLayout form = new GridBagLayout();
 		this.panel_top.setMinimumSize(new Dimension(80, 385));
-		this.panel_top.setBorder(new EmptyBorder(15, 15, 15, 15));
+		this.panel_top.setBorder(new EmptyBorder(15, 15, 5, 15));
 		form.columnWidths	= new int[] {0, 0, 0, 0};
 		form.rowHeights		= new int[] {0, 0, 0, 0, 0};
 		form.columnWeights	= new double[] {0, 0, 1};
@@ -116,11 +133,23 @@ public class Login extends Panel {
 		});
 		
 		this.panel_buttons.setLayout(new BorderLayout());
+		this.panel_buttons.setBorder(new EmptyBorder(10, 0, 0, 0));
 		this.panel_top.add(this.panel_buttons, new GridBagConstraints(1, 3, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		
 		/* Form: Button "Lost Password?" */
 		this.button_lost_password.setText("Password vergessen?");
 		//this.panel_buttons.add(this.button_lost_password, BorderLayout.WEST);
+		this.button_lost_password.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				try {
+					URI uri = new URI("https://" + client.getHostname() + "/Password");
+
+			        if(Desktop.isDesktopSupported()) {
+			            Desktop.getDesktop().browse(uri);
+			        }
+				} catch(Exception e1) {}
+			}
+		});
 		
 		/* Form: Button "Register" */
 		this.button_register.setText("Neu registrieren");
@@ -132,18 +161,14 @@ public class Login extends Panel {
 
 			        if(Desktop.isDesktopSupported()) {
 			            Desktop.getDesktop().browse(uri);
-			        } else {
-			            System.out.println("Desktop not supported");
 			        }
-				} catch(Exception e1) {
-					e1.printStackTrace();
-				}
+				} catch(Exception e1) {}
 			}
 		});
 		
 		/* Middle */
 		this.panel_middle.setMinimumSize(new Dimension(80, 385));
-		this.panel_middle.setBorder(new EmptyBorder(15, 15, 15, 15));
+		this.panel_middle.setBorder(new EmptyBorder(0, 15, 0, 15));
 		form				= new GridBagLayout();
 		form.columnWidths	= new int[] {0, 0, 0, 0};
 		form.rowHeights		= new int[] {0, 0, 0, 0, 0};
@@ -174,7 +199,7 @@ public class Login extends Panel {
 		this.panel_middle.add(this.chatrooms, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		
 		/* Bottom */
-		this.panel_bottom.setBorder(new EmptyBorder(10, 10, 10, 10));
+		this.panel_bottom.setBorder(new EmptyBorder(5, 10, 10, 10));
 		this.panel_bottom.setLayout(new BorderLayout());
 
 		/* Button "Login" */
@@ -183,9 +208,8 @@ public class Login extends Panel {
 		this.panel_bottom.add(this.button_login, BorderLayout.CENTER);
 		
 		/* General */
-		this.setMinimumSize(new Dimension(80, 385));
 		this.setLayout(new BorderLayout());
-		this.add(this.panel_top, BorderLayout.NORTH);
+		this.add(this.panel_header, BorderLayout.NORTH);
 		this.add(this.panel_middle, BorderLayout.CENTER);
 		this.add(this.panel_bottom, BorderLayout.SOUTH);
 	}

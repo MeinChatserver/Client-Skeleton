@@ -19,6 +19,7 @@ import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
 import Client.Client;
 import Client.ICallback;
+import Client.Utils;
 import Client.WindowManager;
 import Client.UI.Components.Input;
 import Client.UI.Components.List;
@@ -38,6 +39,8 @@ public class Window extends JFrame {
 	private Input panel_input		= new Input();
 	
 	public Window(Client client) {
+		super();
+		
 		this.client = client;
 		
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -80,7 +83,7 @@ public class Window extends JFrame {
 	}
 
 	public void addPublicMessage(User user, String text) {
-		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong>" + user.getName() + ":</strong> " + text);
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong>" + user.getName() + ":</strong> " + Utils.escapeHTML(text));
 	}
 	
 	public void addPrivateMessage(String username, User[] users, String text) {
@@ -94,11 +97,11 @@ public class Window extends JFrame {
 			target = " an " + ""; //String.join(", ", users);
 		}
 		
-		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + username + " (privat" + target + "):</strong> " + text);
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + username + " (privat" + target + "):</strong> " + Utils.escapeHTML(text));
 	}
 	
 	public void addActionMessage(String text) {
-		this.panel_output.addMessage(TextPanel.Type.ACTION, text);
+		this.panel_output.addMessage(TextPanel.Type.ACTION, Utils.escapeHTML(text));
 	}
 	
 	public void init() {
@@ -108,6 +111,15 @@ public class Window extends JFrame {
 	
 	public void update() {
 		this.revalidate();
+	}
+
+	public void update(Room room, Rank[] ranks) {
+		// TODO
+		System.out.println(room.getStyle());
+		
+		this.panel_output.setBackground(room.getStyle().getBackgroundColor());
+		this.userlist.setBackground(room.getStyle().getBackgroundColor());
+		this.update();
 	}
 
 	public void close() {
@@ -126,11 +138,6 @@ public class Window extends JFrame {
 		this.update();
 	}
 
-	public void setStyle(Room room, Rank[] ranks) {
-		// TODO
-		this.update();
-	}
-
 	public void addUser(User user) {
 		this.removeUser(user);
 		this.userlist.addEntry(user.getName(), user.getName());
@@ -138,5 +145,9 @@ public class Window extends JFrame {
 	
 	public void removeUser(User user) {
 		this.userlist.removeEntry(user.getName());
+	}
+	
+	public void clearUsers() {
+		this.userlist.clearEntrys();
 	}
 }

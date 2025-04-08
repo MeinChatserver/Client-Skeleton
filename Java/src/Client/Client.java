@@ -24,11 +24,9 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
 import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JOptionPane;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -46,22 +44,23 @@ import Protocol.Packet;
 import Protocol.Ping;
 import Protocol.Pong;
 import Protocol.Room;
+import Protocol.RoomUpdate;
 import Protocol.RoomUserAdd;
 import Protocol.RoomUserRemove;
 import Protocol.User;
 
 public class Client implements Runnable {
-	private JFrame window				= new JFrame();
-	private Login login					= new Login(this);
-    private String Client   			= "JavaClient";
-    private String Version  			= "V1.0";
-    ScheduledExecutorService ping		= Executors.newScheduledThreadPool(1);
+	private JFrame window					= new JFrame();
+	private Login login						= new Login(this);
+    private String Client   				= "JavaClient";
+    private String Version  				= "V1.0";
+    private ScheduledExecutorService ping	= Executors.newScheduledThreadPool(1);
+    private ObjectMapper objects			= new ObjectMapper();
     private String hostname;
     private int port;
     private Socket socket;
     private OutputStream output;
     private InputStream input;
-    private ObjectMapper objects = new ObjectMapper();
     
     public Client(String hostname, int port) {
         this.hostname   = hostname;
@@ -71,8 +70,9 @@ public class Client implements Runnable {
 
         this.window.setTitle("Chat " + this.Client + " (" + this.Version + ")");
         this.window.setContentPane(this.login);
-        this.window.setMinimumSize(new Dimension(385, 385));
-        this.window.setSize(385, 385);
+        this.window.setSize(new Dimension(300, 450));
+        this.window.setPreferredSize(new Dimension(300, 450));
+		this.window.setMinimumSize(new Dimension(300, 450));
         this.window.pack();
         this.window.setVisible(true);
         
@@ -272,8 +272,7 @@ public class Client implements Runnable {
     		break;
     		case "ROOMS_CATEGORIES":
     			List<Category> categories	= objects.readValue(json, objects.getTypeFactory().constructCollectionType(List.class, Category.class));
-    			System.out.println(categories);
-   			
+    			
     			this.login.clearCategories();
     			this.login.addCategory(new Category(0, "Alle Chaträume"));
     			
@@ -297,7 +296,9 @@ public class Client implements Runnable {
     			
     			Window frame = WindowManager.create(this, data.name, data.width, data.height);
 				frame.setTitle(data.title);
-				frame.setStyle(data.room, data.ranks);
+				frame.update(data.room, data.ranks);
+				
+				frame.clearUsers();
 				
 				for(User user : data.getRoom().getUsers()) {
 					frame.addUser(user);
@@ -305,6 +306,21 @@ public class Client implements Runnable {
 				
 				frame.requestFocus();
    			break;
+    		case "ROOM_UPDATE":
+    			RoomUpdate update	= objects.readerFor(RoomUpdate.class).readValue(json);
+    			
+				window = WindowManager.get(update.getName());
+    			
+    			if(window != null) {
+    				window.update(update, null);
+    				
+    				window.clearUsers();
+    				
+    				for(User user : update.getUsers()) {
+    					window.addUser(user);
+    				}
+    			}
+    		break;
     		case "ROOM_USER_ADD":
     			RoomUserAdd user	= objects.readerFor(RoomUserAdd.class).readValue(json);
     			
