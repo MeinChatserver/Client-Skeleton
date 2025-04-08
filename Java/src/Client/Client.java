@@ -268,7 +268,7 @@ public class Client implements Runnable {
     			this.login.clearChatrooms();
     			
     			for(Room room : rooms) {
-    				this.login.addChatroom(room.getName());
+    				this.login.addChatroom(room);
     			}
     			
     			this.login.update();

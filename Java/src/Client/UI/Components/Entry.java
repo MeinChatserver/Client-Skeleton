@@ -22,14 +22,16 @@ import Client.ICallback;
 @SuppressWarnings("serial")
 public class Entry extends JPanel {
 	private String name			= null;
+	private String text			= null;
 	private ICallback callback	= null;
 	
-	public Entry(String name) {
+	public Entry(String name, String text) {
 		this.name = name;
+		this.text = text;
 		
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-		this.add(new JLabel(this.name));
+		this.add(new JLabel(this.text));
 		this.addMouseListener(new MouseAdapter() {
 			@Override
             public void mouseClicked(MouseEvent e) {

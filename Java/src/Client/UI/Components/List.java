@@ -50,12 +50,12 @@ public class List extends JPanel {
 		this.update();
 	}
 	
-	public void addEntry(String name) {
+	public void addEntry(String name, String text) {
 		if (name == null || name.trim().isEmpty()) {
 	        return;
 	    }
 		
-		Entry panel = new Entry(name);
+		Entry panel = new Entry(name, text);
 		panel.onClick(this.onSelect);
 		this.entries.put(name, panel);
 		this.elements.remove(this.spacer);

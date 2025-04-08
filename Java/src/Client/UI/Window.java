@@ -107,7 +107,7 @@ public class Window extends JFrame {
 
 	public void addUser(User user) {
 		this.removeUser(user);
-		this.userlist.addEntry(user.getName());
+		this.userlist.addEntry(user.getName(), user.getName());
 	}
 	
 	public void removeUser(User user) {

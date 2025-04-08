@@ -31,6 +31,7 @@ import Client.Client;
 import Client.ICallback;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
+import Protocol.Room;
 
 @SuppressWarnings("serial")
 public class Login extends JPanel {
@@ -182,8 +183,8 @@ public class Login extends JPanel {
 		this.chatrooms.clearEntrys();
 	}
 	
-	public void addChatroom(String name) {
-		this.chatrooms.addEntry(name);
+	public void addChatroom(Room room) {
+		this.chatrooms.addEntry(room.getName(), room.getName() + " (" + room.getUsers().size() + ")");
 	}
 
 	private void onLogin(ActionEvent event) {
