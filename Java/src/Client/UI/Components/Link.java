@@ -16,6 +16,7 @@ import java.awt.*;
 @SuppressWarnings("serial")
 public class Link extends JButton {
 	public Link() {
+		super();
 		this.setContentAreaFilled(false);
 		this.setBorderPainted(false); 
 		this.setBorder(BorderFactory.createEmptyBorder());

@@ -16,24 +16,22 @@ import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import Client.ICallback;
 
 @SuppressWarnings("serial")
-public class Entry extends JPanel {
-	private boolean hover		= true;
-	private boolean hovering	= false;
-	private boolean clicking	= false;
-	private String name			= null;
-	private String text			= null;
-	private ICallback callback	= null;
-	private JLabel label		= null;
+public class Entry extends Panel {
+	private boolean hover			= true;
+	private boolean hovering		= false;
+	private boolean clicking		= false;
+	private String name				= null;
+	private String text				= null;
+	private ICallback callback		= null;
+	private Label label				= null;
 	
 	public Entry(String name, String text) {
 		this.name		= name;
 		this.text		= text;
-		this.label		= new JLabel(this.text);
+		this.label		= new Label(this.text);
 
 		this.add(this.label);
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -50,7 +48,7 @@ public class Entry extends JPanel {
                 if(hover) {
                 	hovering = true;
             		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
-            		repaint();
+            		update();
                 }
             }
 			
@@ -59,7 +57,7 @@ public class Entry extends JPanel {
                 if(hover) {
                 	hovering = false;
 					label.setForeground(null);
-            		repaint();
+					update();
                 }
             }
 			
@@ -68,7 +66,7 @@ public class Entry extends JPanel {
 				if(hover) {
 					clicking = true;
 					label.setForeground(Color.white);
-            		repaint();
+					update();
 				}
             }
 
@@ -77,7 +75,7 @@ public class Entry extends JPanel {
             	if(hover) {
             		clicking = false;
 					label.setForeground(null);
-            		repaint();
+					update();
             	}
             }
         });
@@ -87,6 +85,8 @@ public class Entry extends JPanel {
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         
+        //g.clearRect(0, 0, this.getWidth(), this.getHeight());
+        
         if(hovering) {
         	if(clicking) {
         		g.setColor(new Color(0, 0, 128, 204));
@@ -94,7 +94,7 @@ public class Entry extends JPanel {
         		g.setColor(new Color(255, 255, 255, 77));
         	}
         	
-            g.fillRect(0, 0, getWidth(), getHeight());
+            g.fillRect(0, 0, this.getWidth(), this.getHeight());
         }
     }
 	

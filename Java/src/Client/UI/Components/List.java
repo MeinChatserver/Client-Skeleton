@@ -11,17 +11,17 @@
 package Client.UI.Components;
 
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.LinkedHashMap;
-import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import Client.ICallback;
 
 @SuppressWarnings("serial")
-public class List extends JPanel {
-	private JPanel elements							= new JPanel(new GridBagLayout());
-	private final JPanel spacer						= new JPanel();
+public class List extends Panel {
+	private Panel elements							= new Panel(new GridBagLayout());
+	private final Panel spacer						= new Panel();
 	private LinkedHashMap<String, Entry> entries	= new LinkedHashMap<String, Entry>();
 	private JScrollPane scrollbar					= new JScrollPane(this.elements);
 	private ICallback onSelect;
@@ -30,6 +30,7 @@ public class List extends JPanel {
 		this.setLayout(new BorderLayout());
 		this.scrollbar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		this.add(this.scrollbar, BorderLayout.CENTER);
+		this.update();
 	}
 
 	private GridBagConstraints createGrid(boolean last) {
@@ -75,12 +76,14 @@ public class List extends JPanel {
 	    }
 	}
 	
-	public void update() {
-        this.validate();
-        this.repaint();
-	}
-	
 	public void onSelect(ICallback callback) {
         this.onSelect = callback;
     }
+	
+	@Override
+	public void setBackground(Color color) {		
+		super.setBackground(color);
+		
+		this.update();
+	}
 }

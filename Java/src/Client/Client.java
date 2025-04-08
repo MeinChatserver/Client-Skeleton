@@ -214,7 +214,10 @@ public class Client implements Runnable {
 		this.login.setConnected();
 		
     	WindowManager.setConnected();
-		// Reset Ping    	
+    	
+		// Reset Ping
+    	//this.ping.shutdownNow();
+    	
 		System.out.println("Connected...");
     	
     	// Send Handshake
@@ -229,7 +232,7 @@ public class Client implements Runnable {
     	WindowManager.setDisconnected();
 		this.login.setDisconnected();
     	
-		// create Timeout
+		// create Timeout for reconnect
 		
 		System.err.println("Socket: onClose = " + error);
     }
@@ -250,8 +253,10 @@ public class Client implements Runnable {
     			
     			this.login.showLoginButton();
     			this.login.setSuggestion(config.Suggestion);
+    			this.login.setStyle(config.Style);
     			
     			// Create Ping
+    			//this.ping.shutdownNow();
     			this.ping.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {

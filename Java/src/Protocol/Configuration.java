@@ -20,12 +20,17 @@ public class Configuration implements IPacket {
     @JsonProperty("suggestion")
     public String Suggestion;
     
+    @JsonProperty("style")
+    public LoginStyle Style;
+    
     public Configuration(
     	@JsonProperty("id") String id,
-    	@JsonProperty("suggestion") String suggestion
+    	@JsonProperty("suggestion") String suggestion,
+    	@JsonProperty("style") LoginStyle style
 	) {    	
         this.ID			= id;
         this.Suggestion	= suggestion;
+        this.Style		= style;
     }
     
     @JsonIgnore

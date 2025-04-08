@@ -21,8 +21,6 @@ import java.awt.event.ActionListener;
 import java.net.URI;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
@@ -31,62 +29,58 @@ import Client.Client;
 import Client.ICallback;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
+import Client.UI.Components.Label;
+import Client.UI.Components.Panel;
 import Protocol.Category;
 import Protocol.CategoryChange;
+import Protocol.LoginStyle;
 import Protocol.Room;
 
 @SuppressWarnings("serial")
-public class Login extends JPanel {
+public class Login extends Panel {
 	private Client client;
 	
-	private JPanel panel_top;
-	private JPanel panel_middle;
-	private JPanel panel_bottom;
-	private JPanel panel_buttons;
+	/* Panels */
+	private Panel panel_top 		= new Panel();
+	private Panel panel_middle 		= new Panel();
+	private Panel panel_bottom		= new Panel();
+	private Panel panel_buttons 	= new Panel();
 	
-	private JLabel label_username;
-	private JLabel label_password;
-	private JLabel label_chatroom;
-	private JLabel label_category;
+	/* Labels */
+	private Label label_username	= new Label();
+	private Label label_password	= new Label();
+	private Label label_chatroom	= new Label();
+	private Label label_category	= new Label();
 	
 	private JTextField input_username;
 	private JPasswordField input_password;
 	private JTextField input_chatroom;
 	private JComboBox<Category> input_category;
 	
-	private List chatrooms;
+	private List chatrooms = new List();
 	private Link button_lost_password;
 	private Link button_register;
 	private JButton button_login;
 	
 	public Login(Client client) {
 		this.client = client;
-		this.panel_buttons = new JPanel();
-		this.panel_top = new JPanel();
-		this.label_username = new JLabel();
 		this.input_username = new JTextField();
-		this.label_password = new JLabel();
 		this.input_password = new JPasswordField();
-		this.label_chatroom = new JLabel();
 		this.input_chatroom = new JTextField();
-		this.label_category = new JLabel();
 		this.input_category = new JComboBox<Category>();
 		this.button_register = new Link();
 		this.button_lost_password = new Link();
-		this.panel_middle = new JPanel();
-		this.chatrooms = new List();
-		this.panel_bottom = new JPanel();
 		this.button_login = new JButton();
 		
 		/* Top */
 		GridBagLayout form = new GridBagLayout();
 		this.panel_top.setMinimumSize(new Dimension(80, 385));
 		this.panel_top.setBorder(new EmptyBorder(15, 15, 15, 15));
-		this.panel_top.setLayout(form);
 		form.columnWidths	= new int[] {0, 0, 0, 0};
 		form.rowHeights		= new int[] {0, 0, 0, 0, 0};
 		form.columnWeights	= new double[] {0, 0, 1};
 		form.rowWeights		= new double[] {0, 0, 0, 1};
+		this.panel_top.setLayout(form);
 		
 		/* Form: Username */
 		this.label_username.setText("Benutzername:");
@@ -136,9 +130,8 @@ public class Login extends JPanel {
 				try {
 					URI uri = new URI("https://" + client.getHostname() + "/Register");
 
-			        if (Desktop.isDesktopSupported()) {
-			            Desktop desktop = Desktop.getDesktop();
-						desktop.browse(uri);
+			        if(Desktop.isDesktopSupported()) {
+			            Desktop.getDesktop().browse(uri);
 			        } else {
 			            System.out.println("Desktop not supported");
 			        }
@@ -149,14 +142,14 @@ public class Login extends JPanel {
 		});
 		
 		/* Middle */
-		form = new GridBagLayout();
 		this.panel_middle.setMinimumSize(new Dimension(80, 385));
 		this.panel_middle.setBorder(new EmptyBorder(15, 15, 15, 15));
-		this.panel_middle.setLayout(form);
+		form				= new GridBagLayout();
 		form.columnWidths	= new int[] {0, 0, 0, 0};
 		form.rowHeights		= new int[] {0, 0, 0, 0, 0};
 		form.columnWeights	= new double[] {0, 0, 1};
 		form.rowWeights		= new double[] {0, 0, 0, 1};
+		this.panel_middle.setLayout(form);
 		
 		this.label_category.setText("Kategorie:");
 		this.label_category.setHorizontalAlignment(SwingConstants.RIGHT);
@@ -199,10 +192,6 @@ public class Login extends JPanel {
 	
 	public void setSuggestion(String chatroom) {
 		this.input_chatroom.setText(chatroom);
-	}
-	
-	public void update() {
-		this.chatrooms.updateUI();
 	}
 	
 	public void clearChatrooms() {
@@ -249,6 +238,13 @@ public class Login extends JPanel {
 	}
 
 	public void showLoginButton() {
-		this.button_login.setText("Einloggen");
+		this.button_login.setText("Einloggen"); // @ToDo I18N		
+	}
+
+	public void setStyle(LoginStyle style) {
+		this.setBackground(style.getBackground().getColor(), style.getBackgroundImage().getImage());
+		this.setForeground(style.getForeground().getColor());
+		this.chatrooms.getRootPane().setBackground(style.getBackgroundList().getColor());
+		this.chatrooms.setForeground(style.getForegroundList().getColor());
 	}
 }
