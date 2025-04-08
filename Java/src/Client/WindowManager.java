@@ -27,23 +27,30 @@ public class WindowManager {
 		window.setSize(new Dimension(width, height));
 		window.setName(name);
 		window.init();
-		frames.put(name, window);
-
+		
+		synchronized(frames) {
+			frames.put(name, window);
+		}
+		
 		return window;
 	}
 	
 	public static boolean exists(String name) {
-		return frames.containsKey(name);
+		synchronized(frames) {
+			return frames.containsKey(name);
+		}
 	}
 	
 	public static void remove(String name) {
-		frames.entrySet().stream().forEach(entry -> {
-		    Window window = ((Window) entry.getValue());
-		    
-		    if(window.getName().equals(name)) {
-		    	frames.remove(entry.getKey());
-		    }
-		});
+		synchronized(frames) {
+			frames.entrySet().stream().forEach(entry -> {
+			    Window window = ((Window) entry.getValue());
+			    
+			    if(window.getName().equals(name)) {
+			    	frames.remove(entry.getKey());
+			    }
+			});
+		}
 	}
 	
 	public static Window get(String name) {
@@ -53,27 +60,35 @@ public class WindowManager {
 	}
 	
 	public static void closeAll() {
-		frames.entrySet().stream().forEach(entry -> {
-			Window window = ((Window) entry.getValue());
-		    window.close();
-		});
-		
-		frames.clear();
+		synchronized(frames) {
+			frames.entrySet().stream().forEach(entry -> {
+				Window window = ((Window) entry.getValue());
+			    window.close();
+			});
+			
+			frames.clear();
+		}
 	}
 	
 	public static Window[] getAll() {
-		return (Window[]) frames.values().toArray();
+		synchronized(frames) {
+			return (Window[]) frames.values().toArray();
+		}
 	}
 
 	public static void setConnected() {
-		frames.entrySet().stream().forEach(entry -> {
-		    ((Window) entry.getValue()).setConnected();
-		});
+		synchronized(frames) {
+			frames.entrySet().stream().forEach(entry -> {
+			    ((Window) entry.getValue()).setConnected();
+			});
+		}
 	}
 
 	public static void setDisconnected() {
-		frames.entrySet().stream().forEach(entry -> {
-		    ((Window) entry.getValue()).setDisconnected();
-		});
+		synchronized(frames) {
+			frames.entrySet().stream().forEach(entry -> {
+			    ((Window) entry.getValue()).setDisconnected();
+			});
+		}
 	}
 }
