@@ -21,21 +21,21 @@ import Client.ICallback;
 @SuppressWarnings("serial")
 public class List extends JPanel {
 	private JPanel elements							= new JPanel(new GridBagLayout());
+	private final JPanel spacer						= new JPanel();
 	private LinkedHashMap<String, Entry> entries	= new LinkedHashMap<String, Entry>();
 	private ICallback onSelect;
 	
 	public List() {
-		this.elements.add(new JPanel(), this.createGrid(true));
 		this.setLayout(new BorderLayout());
 		this.add(new JScrollPane(this.elements), BorderLayout.CENTER);
 	}
 
-	private GridBagConstraints createGrid(boolean first) {
+	private GridBagConstraints createGrid(boolean last) {
 		GridBagConstraints gbc	= new GridBagConstraints();
         gbc.gridwidth			= GridBagConstraints.REMAINDER;
         gbc.weightx				= 1;
         
-        if(first) {
+        if(last) {
         	gbc.weighty			= 1;
         } else {
             gbc.fill			= GridBagConstraints.HORIZONTAL;
@@ -51,10 +51,16 @@ public class List extends JPanel {
 	}
 	
 	public void addEntry(String name) {
+		if (name == null || name.trim().isEmpty()) {
+	        return;
+	    }
+		
 		Entry panel = new Entry(name);
 		panel.onClick(this.onSelect);
-		this.entries.put(name, panel);       
-        this.elements.add(panel, this.createGrid(false), 0);
+		this.entries.put(name, panel);
+		this.elements.remove(this.spacer);
+        this.elements.add(panel, this.createGrid(false));
+		this.elements.add(this.spacer, this.createGrid(true));
         this.update();
 	}
 	

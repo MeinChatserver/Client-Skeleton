@@ -19,10 +19,7 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 import java.net.URI;
-import java.util.Base64;
-
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -34,7 +31,6 @@ import Client.Client;
 import Client.ICallback;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
-import Protocol.RoomMessage;
 
 @SuppressWarnings("serial")
 public class Login extends JPanel {
