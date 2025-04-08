@@ -29,8 +29,8 @@ public class Handshake implements IPacket {
     public Handshake(String client, String version) {
         this.Client     = client;
         this.Version    = version;
-        this.Location   = "-";
-        this.UserAgent  = "Java/" + System.getProperty("java.version");
+        this.Location   = System.getProperty("os.name") + "/" + System.getProperty("os.version") + " (" + System.getProperty("os.arch") + ")";
+        this.UserAgent  = System.getProperty("java.runtime.name") + "/" + System.getProperty("java.version") + " (" + System.getProperty("sun.arch.data.model") + "bit)";
     }
     
     @JsonIgnore
