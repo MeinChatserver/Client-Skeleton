@@ -23,11 +23,13 @@ public class List extends JPanel {
 	private JPanel elements							= new JPanel(new GridBagLayout());
 	private final JPanel spacer						= new JPanel();
 	private LinkedHashMap<String, Entry> entries	= new LinkedHashMap<String, Entry>();
+	private JScrollPane scrollbar					= new JScrollPane(this.elements);
 	private ICallback onSelect;
 	
 	public List() {
 		this.setLayout(new BorderLayout());
-		this.add(new JScrollPane(this.elements), BorderLayout.CENTER);
+		this.scrollbar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+		this.add(this.scrollbar, BorderLayout.CENTER);
 	}
 
 	private GridBagConstraints createGrid(boolean last) {

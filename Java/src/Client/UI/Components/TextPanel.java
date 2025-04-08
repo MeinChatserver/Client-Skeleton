@@ -24,6 +24,7 @@ public class TextPanel extends JPanel {
 	
 	public TextPanel() {
 		this.setLayout(new BorderLayout());
+		this.scrollbar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
 		this.add(this.scrollbar, BorderLayout.CENTER);
 	}
 	
