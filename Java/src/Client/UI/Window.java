@@ -17,12 +17,12 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
-import javax.swing.JPanel;
 import javax.swing.JTextField;
 import Client.Client;
 import Client.ICallback;
 import Client.WindowManager;
 import Client.UI.Components.List;
+import Client.UI.Components.TextPanel;
 import Protocol.Rank;
 import Protocol.Room;
 import Protocol.RoomMessage;
@@ -34,6 +34,7 @@ import Protocol.WindowInit;
 public class Window extends JFrame {
 	private Client client = null;
 	private List userlist = new List();
+	private TextPanel panel_output = new TextPanel();
 	private JTextField panel_input = new JTextField();
 	
 	public Window(Client client) {
@@ -46,8 +47,6 @@ public class Window extends JFrame {
             }
         });
 		
-		JPanel panel_output = new JPanel();
-		//panel_output.setBackground(Color.red);
 		this.userlist.onSelect(new ICallback() {
             @Override
             public void execute(String message) {
@@ -57,7 +56,7 @@ public class Window extends JFrame {
 		
 		this.userlist.setPreferredSize(new Dimension(250, this.getHeight()));
 		
-		panel_input.addActionListener(new ActionListener() {
+		this.panel_input.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// @ToDo Check selected users
 				client.send(new RoomMessage(getName(), panel_input.getText()));
@@ -67,12 +66,35 @@ public class Window extends JFrame {
 		});
 		
 		this.setLayout(new BorderLayout());
-		this.add(panel_output, BorderLayout.CENTER);
+		this.add(this.panel_output, BorderLayout.CENTER);
 		this.add(this.userlist, BorderLayout.EAST);
-		this.add(panel_input, BorderLayout.SOUTH);
+		this.add(this.panel_input, BorderLayout.SOUTH);
 		this.update();
+		this.panel_input.requestFocus();
 	}
 
+	public void addPublicMessage(User user, String text) {
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong>" + user.getName() + ":</strong> " + text);
+	}
+	
+	public void addPrivateMessage(String username, User[] users, String text) {
+		String target = "";
+		
+		if(username == null) {
+			username = "System";
+		}
+
+		if(username != "System" && users.length >= 1) {
+			target = " an " + ""; //String.join(", ", users);
+		}
+		
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + username + " (privat" + target + "):</strong> " + text);
+	}
+	
+	public void addActionMessage(String text) {
+		this.panel_output.addMessage(TextPanel.Type.ACTION, text);
+	}
+	
 	public void init() {
 		this.setVisible(true);
 		this.client.send(new WindowInit(this.getName()));
@@ -89,14 +111,14 @@ public class Window extends JFrame {
 	}
 
 	public void setConnected() {
-		panel_input.setText("");
-		panel_input.setEnabled(true);
+		this.panel_input.setText("");
+		this.panel_input.setEnabled(true);
 		this.update();
 	}
 
 	public void setDisconnected() {
-		panel_input.setText("Verbindung getrennt. Bitte verbinde dich neu..."); // @ToDo I18N
-		panel_input.setEnabled(false);
+		this.panel_input.setText("Verbindung getrennt. Bitte verbinde dich neu..."); // @ToDo I18N
+		this.panel_input.setEnabled(false);
 		this.update();
 	}
 

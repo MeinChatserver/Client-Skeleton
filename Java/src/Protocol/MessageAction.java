@@ -12,36 +12,30 @@ package Protocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RoomUserAdd implements IPacket {
-	@JsonProperty("room")
-    private String room;
-
-    @JsonProperty("user")
-    private User user;
-    
-    public RoomUserAdd(
+public class MessageAction extends Message {
+    public MessageAction(
     	@JsonProperty("room") String room,
-    	@JsonProperty("user") User user
+    	@JsonProperty("text") String text
     ) {
-		this.room = room;
-		this.user = user;
+    	super(room, text);
 	}
     
-   public String getRoom() {
-	   return this.room;
-   }
-   
-   public User getUser() {
-	   return this.user;
-   }
+    public String getRoom() {
+    	return this.room;
+    }
+    
 
+    public String getText() {
+    	return this.text;
+    }
+    
 	@Override
     public String toString() {
-        return "[Add User Room=" + room + ", User=" + user + " ]";
+        return "[Message Type=ACTION Room=" + room + ", Text=" + text + " ]";
     }
 
 	@Override
 	public String getOperation() {
-		return "ROOM_USER_ADD";
+		return "MESSAGE_ACTION";
 	}
 }

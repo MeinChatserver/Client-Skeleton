@@ -21,6 +21,7 @@ import Client.ICallback;
 
 @SuppressWarnings("serial")
 public class Entry extends JPanel {
+	private boolean hover		= true;
 	private String name			= null;
 	private String text			= null;
 	private ICallback callback	= null;
@@ -30,7 +31,6 @@ public class Entry extends JPanel {
 		this.text = text;
 		
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
-		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 		this.add(new JLabel(this.text));
 		this.addMouseListener(new MouseAdapter() {
 			@Override
@@ -42,22 +42,31 @@ public class Entry extends JPanel {
 			
 			@Override
             public void mouseEntered(MouseEvent e) {
-                setBackground(Color.CYAN);
+                if(hover) {
+                	setBackground(Color.CYAN);
+            		setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+                }
             }
 			
 			@Override
             public void mouseExited(MouseEvent e) {
-                setBackground(null);
+                if(hover) {
+                	setBackground(null);
+                }
             }
 			
 			@Override
             public void mousePressed(MouseEvent e) {
-				setBackground(Color.GREEN);
+				if(hover) {
+					setBackground(Color.GREEN);
+				}
             }
 
             @Override
             public void mouseReleased(MouseEvent e) {
-            	setBackground(null);
+            	if(hover) {
+            		setBackground(null);
+            	}
             }
         });
 	}
@@ -69,4 +78,8 @@ public class Entry extends JPanel {
 	public void onClick(ICallback callback) {
         this.callback = callback;
     }
+
+	public void hover(boolean hover) {
+		this.hover = hover;
+	}
 }

@@ -35,6 +35,9 @@ import Protocol.Configuration;
 import Protocol.Disconnect;
 import Protocol.Handshake;
 import Protocol.IPacket;
+import Protocol.MessageAction;
+import Protocol.MessagePrivate;
+import Protocol.MessagePublic;
 import Protocol.Packet;
 import Protocol.Room;
 import Protocol.RoomUserAdd;
@@ -230,6 +233,8 @@ public class Client implements Runnable {
     protected void onReceive(Packet packet, String json, String response) throws JsonMappingException, JsonProcessingException {
     	Window window;
     	
+    	System.err.println("[RECEIVE] " + packet.operation + ", " + json);
+    	
     	switch(packet.operation) {
     		case "CONFIGURATION":
     			Configuration config	= objects.readerFor(Configuration.class).readValue(json);
@@ -303,6 +308,81 @@ public class Client implements Runnable {
     			
     			if(window != null) {
     				window.removeUser(user2.getUser());
+    			}
+    		break;
+    		case "MESSAGE_PUBLIC":
+    			MessagePublic publicMessage		= objects.readerFor(MessagePublic.class).readValue(json);
+    			String room3					= null;
+    			
+    			if(publicMessage.getRoom() != null) {
+    				room3 = publicMessage.getRoom();
+					
+					if(room3.equals("-")) {
+						room3 = null;
+					}
+				}
+    			
+    			if(room3 == null) {
+    				// @ToDo
+    				/*WindowManager.getAll().forEach((frame) => {
+						frame.addMessage('private', packet.data);
+					});*/
+    			} else {
+	    			window = WindowManager.get(room3);
+	    			
+	    			if(window != null) {
+	    				window.addPublicMessage(publicMessage.getSender(), publicMessage.getText());
+	    			}
+    			}
+    		break;
+    		case "MESSAGE_PRIVATE":
+    			MessagePrivate privateMessage	= objects.readerFor(MessagePrivate.class).readValue(json);
+    			String room						= null;
+    			
+    			if(privateMessage.getRoom() != null) {
+					room = privateMessage.getRoom();
+					
+					if(room.equals("-")) {
+						room = null;
+					}
+				}
+    			
+    			if(room == null) {
+    				// @ToDo
+    				/*WindowManager.getAll().forEach((frame) => {
+						frame.addMessage('private', packet.data);
+					});*/
+    			} else {
+	    			window = WindowManager.get(room);
+	    			
+	    			if(window != null) {
+	    				window.addPrivateMessage(privateMessage.getSender(), privateMessage.getUsers(), privateMessage.getText());
+	    			}
+    			}
+    		break;
+    		case "MESSAGE_ACTION":
+    			MessageAction actionMessage		= objects.readerFor(MessageAction.class).readValue(json);
+    			String room2					= null;
+    			
+    			if(actionMessage.getRoom() != null) {
+					room2 = actionMessage.getRoom();
+					
+					if(room2.equals("-")) {
+						room2 = null;
+					}
+				}
+    			
+    			if(room2 == null) {
+    				// @ToDo
+    				/*WindowManager.getAll().forEach((frame) => {
+						frame.addMessage('private', packet.data);
+					});*/
+    			} else {
+	    			window = WindowManager.get(room2);
+	    			
+	    			if(window != null) {
+	    				window.addActionMessage(actionMessage.getText());
+	    			}
     			}
     		break;
     		case "POPUP":

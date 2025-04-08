@@ -47,7 +47,9 @@ public class WindowManager {
 	}
 	
 	public static Window get(String name) {
-		return frames.get(name);
+		synchronized(frames) {
+			return frames.get(name);			
+		}
 	}
 	
 	public static void closeAll() {
