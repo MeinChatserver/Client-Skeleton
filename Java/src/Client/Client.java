@@ -256,11 +256,12 @@ public class Client implements Runnable {
     			List<Category> categories	= objects.readValue(json, objects.getTypeFactory().constructCollectionType(List.class, Category.class));
     			System.out.println(categories);
    			
-    			// @ToDo
+    			this.login.clearCategories();
+    			this.login.addCategory(new Category(0, "Alle Chaträume"));
     			
-    			/*Login.clearCategories();
-					Login.addCategory({ id: 0, name: 'Alle Chaträume' });
-					packet.data.forEach(Login.addCategory.bind(Login));*/
+    			for(Category category : categories) {
+    				this.login.addCategory(category);
+    			}
     		break;
     		case "ROOMS":
     			List<Room> rooms	= objects.readValue(json, objects.getTypeFactory().constructCollectionType(List.class, Room.class));

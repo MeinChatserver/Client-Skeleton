@@ -21,6 +21,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URI;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
@@ -31,6 +32,8 @@ import Client.Client;
 import Client.ICallback;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
+import Protocol.Category;
+import Protocol.CategoryChange;
 import Protocol.Room;
 
 @SuppressWarnings("serial")
@@ -45,10 +48,12 @@ public class Login extends JPanel {
 	private JLabel label_username;
 	private JLabel label_password;
 	private JLabel label_chatroom;
+	private JLabel label_category;
 	
 	private JTextField input_username;
 	private JPasswordField input_password;
 	private JTextField input_chatroom;
+	private JComboBox<Category> input_category;
 	
 	private List chatrooms;
 	private Link button_lost_password;
@@ -65,6 +70,8 @@ public class Login extends JPanel {
 		this.input_password = new JPasswordField();
 		this.label_chatroom = new JLabel();
 		this.input_chatroom = new JTextField();
+		this.label_category = new JLabel();
+		this.input_category = new JComboBox<Category>();
 		this.button_register = new Link();
 		this.button_lost_password = new Link();
 		this.panel_middle = new JPanel();
@@ -143,16 +150,34 @@ public class Login extends JPanel {
 		});
 		
 		/* Middle */
-		this.panel_middle.setBorder(new EmptyBorder(10, 10, 10, 10));
-		this.panel_middle.setLayout(new BorderLayout());
-		this.chatrooms.setBackground(Color.red);
+		form = new GridBagLayout();
+		this.panel_middle.setMinimumSize(new Dimension(80, 385));
+		this.panel_middle.setBorder(new EmptyBorder(15, 15, 15, 15));
+		this.panel_middle.setLayout(form);
+		form.columnWidths	= new int[] {0, 0, 0, 0};
+		form.rowHeights		= new int[] {0, 0, 0, 0, 0};
+		form.columnWeights	= new double[] {0, 0, 1};
+		form.rowWeights		= new double[] {0, 0, 0, 1};
+		
+		this.label_category.setText("Kategorie:");
+		this.label_category.setHorizontalAlignment(SwingConstants.RIGHT);
+		this.panel_middle.add(this.label_category, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
+		this.panel_middle.add(this.input_category, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
+		this.input_category.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				Category obj = (Category) input_category.getSelectedItem();
+				
+				client.send(new CategoryChange(obj.getID()));
+			}
+		});
+		
 		this.chatrooms.onSelect(new ICallback() {
             @Override
             public void execute(String message) {
             	setSuggestion(message);
             }
         });
-		this.panel_middle.add(this.chatrooms, BorderLayout.CENTER);
+		this.panel_middle.add(this.chatrooms, new GridBagConstraints(0, 3, 3, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		
 		/* Bottom */
 		this.panel_bottom.setBorder(new EmptyBorder(10, 10, 10, 10));
@@ -185,6 +210,23 @@ public class Login extends JPanel {
 	
 	public void addChatroom(Room room) {
 		this.chatrooms.addEntry(room.getName(), room.getName() + " (" + room.getUsers().size() + ")");
+	}
+	
+	public void clearCategories() {
+		this.input_category.removeAllItems();
+	}
+	
+	public void addCategory(Category category) {
+		this.input_category.addItem(new Category() {
+		    @Override
+		    public String toString() {
+		        return category.getName();
+		    }
+
+		    public int getID() {
+		        return category.getID();
+		    }
+		});
 	}
 
 	private void onLogin(ActionEvent event) {
