@@ -17,10 +17,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import javax.swing.JFrame;
-import javax.swing.JTextField;
 import Client.Client;
 import Client.ICallback;
 import Client.WindowManager;
+import Client.UI.Components.Input;
 import Client.UI.Components.List;
 import Client.UI.Components.TextPanel;
 import Protocol.Rank;
@@ -32,18 +32,25 @@ import Protocol.WindowInit;
 
 @SuppressWarnings("serial")
 public class Window extends JFrame {
-	private Client client = null;
-	private List userlist = new List();
-	private TextPanel panel_output = new TextPanel();
-	private JTextField panel_input = new JTextField();
+	private Client client			= null;
+	private List userlist			= new List();
+	private TextPanel panel_output	= new TextPanel();
+	private Input panel_input		= new Input();
 	
 	public Window(Client client) {
 		this.client = client;
 		
 		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
+            @Override
             public void windowClosing(WindowEvent e) {
             	close();
+            }
+            
+            @Override
+            public void windowActivated(WindowEvent e) {
+        		panel_input.setText("");
+        		panel_input.requestFocus();
             }
         });
 		
@@ -55,7 +62,7 @@ public class Window extends JFrame {
         });
 		
 		this.userlist.setPreferredSize(new Dimension(250, this.getHeight()));
-		
+		this.panel_input.setPlaceholder("Gebe eine Nachricht ein...");
 		this.panel_input.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
 				// @ToDo Check selected users
@@ -70,7 +77,6 @@ public class Window extends JFrame {
 		this.add(this.userlist, BorderLayout.EAST);
 		this.add(this.panel_input, BorderLayout.SOUTH);
 		this.update();
-		this.panel_input.requestFocus();
 	}
 
 	public void addPublicMessage(User user, String text) {
@@ -111,14 +117,12 @@ public class Window extends JFrame {
 	}
 
 	public void setConnected() {
-		this.panel_input.setText("");
-		this.panel_input.setEnabled(true);
+		this.panel_input.setDisabled(false, "Gebe eine Nachricht ein...");
 		this.update();
 	}
 
 	public void setDisconnected() {
-		this.panel_input.setText("Verbindung getrennt. Bitte verbinde dich neu..."); // @ToDo I18N
-		this.panel_input.setEnabled(false);
+		this.panel_input.setDisabled(true, "Verbindung getrennt. Bitte verbinde dich neu..."); // @ToDo I18N
 		this.update();
 	}
 
