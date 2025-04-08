@@ -166,7 +166,9 @@ public class Login extends JPanel {
 			public void actionPerformed(ActionEvent e) {
 				Category obj = (Category) input_category.getSelectedItem();
 				
-				client.send(new CategoryChange(obj.getID()));
+				if(obj != null) {
+					client.send(new CategoryChange(obj.getID()));
+				}
 			}
 		});
 		
