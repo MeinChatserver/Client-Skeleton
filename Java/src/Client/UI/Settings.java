@@ -24,6 +24,7 @@ import javax.swing.border.EmptyBorder;
 
 import Client.Client;
 import Client.UI.Components.Button;
+import Client.UI.Components.Dialog;
 import Client.UI.Components.Label;
 import Client.UI.Components.Panel;
 import Client.UI.Components.Window;
@@ -93,7 +94,7 @@ public class Settings extends Window {
 					client.setServer(input_hostname.getText(), Integer.parseInt(input_port.getText()));
 					close();
 				} catch(Exception error) {
-					error.printStackTrace();
+					new Dialog("Problem", "Die Eingaben sind ungültig!");
 				}
 			}
 		});

@@ -11,8 +11,6 @@
 package Client;
 
 import java.awt.Dimension;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -25,9 +23,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import javax.swing.JDialog;
-import javax.swing.JOptionPane;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -35,6 +30,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import Client.UI.Chatroom;
 import Client.UI.Login;
 import Client.UI.Settings;
+import Client.UI.Components.Dialog;
 import Client.UI.Components.Window;
 import Protocol.Category;
 import Protocol.Configuration;
@@ -435,22 +431,7 @@ public class Client implements Runnable {
 				}
 			break;
 			case "POPUP":
-				final JOptionPane optionPane = new JOptionPane(((String) packet.data), JOptionPane.QUESTION_MESSAGE, JOptionPane.CLOSED_OPTION);
-				final JDialog dialog = new JDialog();
-
-				optionPane.addPropertyChangeListener(new PropertyChangeListener() {
-					public void propertyChange(PropertyChangeEvent e) {
-						if(dialog.isVisible() && (e.getSource() == optionPane) && (e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY))) {
-							dialog.dispose();
-						}
-					}
-				});
-
-				dialog.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
-				dialog.setTitle("POPUP");
-				dialog.setContentPane(optionPane);
-				dialog.pack();
-				dialog.setVisible(true);
+				new Dialog("Problem", (String) packet.data);
 			break;
 			default:
 				System.err.println("[RECEIVE] Unknown Operation: " + packet.operation + ", " + json);
