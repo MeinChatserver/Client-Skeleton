@@ -13,6 +13,10 @@ package Protocol;
 public class Color implements IPacket {
 	private String Color = null;
 
+	public Color(boolean value) {
+
+	}
+
 	public Color(String color) {
 		this.Color = color;
 	}

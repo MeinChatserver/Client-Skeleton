@@ -15,17 +15,19 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
 import Client.ICallback;
+import Client.IEntry;
 
 public class List extends Panel {
 	private Panel elements = new Panel(new GridBagLayout());
 	private final Panel spacer = new Panel();
-	private LinkedHashMap<String, Entry> entries = new LinkedHashMap<>();
+	private ConcurrentHashMap<String, Entry> entries = new ConcurrentHashMap<>();
 	private JScrollPane scrollbar = new JScrollPane();
 	private ICallback onSelect;
 
@@ -60,11 +62,20 @@ public class List extends Panel {
 	}
 
 	public void addEntry(String name, String text) {
+		this.addEntry(name, text, null);
+	}
+
+	public void addEntry(String name, String text, IEntry callback) {
 		if(name == null || name.trim().isEmpty()) {
 			return;
 		}
 
 		Entry panel = new Entry(name, text);
+
+		if(callback != null) {
+			callback.execute(panel);
+		}
+
 		panel.onClick(this.onSelect);
 		this.entries.put(name, panel);
 		this.elements.remove(this.spacer);
@@ -91,5 +102,11 @@ public class List extends Panel {
 		super.setBackground(color);
 
 		this.update();
+	}
+
+	public void setColors(Map<String, Protocol.Color> ranks) {
+		for(Map.Entry<String, Entry> entry : this.entries.entrySet()) {
+			Entry e = (Entry) entry.getValue();
+		}
 	}
 }

@@ -23,6 +23,8 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import Protocol.RoomOutput;
+
 public class TextPanel extends Panel {
 	private Panel elements = new Panel(new GridBagLayout());
 	private JScrollPane scrollbar = new JScrollPane();
@@ -126,13 +128,11 @@ public class TextPanel extends Panel {
 
 		switch(type) {
 			case PUBLIC:
-
+			case PRIVATE:
+				style += "color: #000000;";
 			break;
 			case ACTION:
 				style += "color: #0000FF;";
-			break;
-			case PRIVATE:
-
 			break;
 		}
 
@@ -151,5 +151,9 @@ public class TextPanel extends Panel {
 		if(this.scrollbar != null) {
 			this.scrollbar.setBackground(color);
 		}
+	}
+
+	public void setColors(RoomOutput output) {
+		// TODO Auto-generated method stub
 	}
 }

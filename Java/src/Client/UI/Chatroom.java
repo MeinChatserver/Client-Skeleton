@@ -117,11 +117,10 @@ public class Chatroom extends JFrame {
 	}
 
 	public void update(Room room, Rank[] ranks) {
-		// TODO
-		System.out.println(room.getStyle());
-
+		this.panel_output.setColors(room.getStyle().getOutput());
 		this.panel_output.setBackground(room.getStyle().getBackgroundColor());
 		this.userlist.setBackground(room.getStyle().getBackgroundColor());
+		this.userlist.setColors(room.getStyle().getRanks());
 		this.update();
 	}
 

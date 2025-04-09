@@ -10,35 +10,40 @@
 
 package Protocol;
 
-import java.awt.Color;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Style {
 	@JsonProperty("output")
-	private Object output;
+	private RoomOutput output;
 
 	@JsonProperty("background")
 	private RoomBackground background;
 
 	@JsonProperty("ranks")
-	private Map<Object, Object> ranks;
+	@JsonFormat(shape = JsonFormat.Shape.STRING)
+	private Map<String, Color> ranks;
 
 	public Style() {
 	}
 
-	public Style(Object output, RoomBackground background, Map<Object, Object> ranks) {
+	public Style(Object output, RoomBackground background, Map<String, Color> ranks) {
 
 	}
 
-	public Map<Object, Object> getRanks() {
+	public RoomOutput getOutput() {
+		return this.output;
+	}
+
+	public Map<String, Color> getRanks() {
 		return ranks;
 	}
 
-	public void setRanks(Map<Object, Object> ranks) {
+	public void setRanks(Map<String, Color> ranks) {
 		this.ranks = ranks;
 	}
 
@@ -47,7 +52,7 @@ public class Style {
 		return "[Style]";
 	}
 
-	public Color getBackgroundColor() {
+	public java.awt.Color getBackgroundColor() {
 		return this.background.getColor();
 	}
 }
