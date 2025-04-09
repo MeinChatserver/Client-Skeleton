@@ -9,7 +9,7 @@ The project using `Maven` as Build-Tool.
 
 # Example
 ```bash
-java -jar Client.jar -host demo.mein-chatserver.de -port 2710 -settings false
+java -jar Client.jar --host demo.mein-chatserver.de --port 2710 --settings false
 ```
 
 # Screenshot
