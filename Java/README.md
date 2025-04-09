@@ -9,6 +9,15 @@ The project using `Maven` as Build-Tool.
 
 # Example
 ```bash
+usage: Client.jar [Options]
+ -d,--hostname <arg>   Hostname, Domain oder IP-Adresse zu dem verbunden
+                       werden soll
+ -h,--help             Zeigt diese Hilfe an
+ -p,--port <arg>       Port des Servers zu dem verbunden werden soll
+ -s,--settings <bol>   Deaktiviert die Einstellungen um nachträglich den
+                       Server zu ändern
+```
+```bash
 java -jar Client.jar --host demo.mein-chatserver.de --port 2710 --settings false
 ```
 
