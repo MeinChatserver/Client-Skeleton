@@ -27,12 +27,14 @@ public class Entry extends Panel {
 	private String text = null;
 	private ICallback callback = null;
 	private Label label = null;
+	private Color color = Color.BLACK;
 
 	public Entry(String name, String text) {
 		this.name = name;
 		this.text = text;
 		this.label = new Label(this.text);
 
+		this.label.setForeground(this.color);
 		this.add(this.label);
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.addMouseListener(new MouseAdapter() {
@@ -56,7 +58,7 @@ public class Entry extends Panel {
 			public void mouseExited(MouseEvent e) {
 				if(hover) {
 					hovering = false;
-					label.setForeground(null);
+					label.setForeground(color);
 					update();
 				}
 			}
@@ -65,7 +67,7 @@ public class Entry extends Panel {
 			public void mousePressed(MouseEvent e) {
 				if(hover) {
 					clicking = true;
-					label.setForeground(Color.white);
+					label.setForeground(Color.WHITE);
 					update();
 				}
 			}
@@ -74,7 +76,7 @@ public class Entry extends Panel {
 			public void mouseReleased(MouseEvent e) {
 				if(hover) {
 					clicking = false;
-					label.setForeground(null);
+					label.setForeground(color);
 					update();
 				}
 			}
@@ -109,5 +111,11 @@ public class Entry extends Panel {
 
 	public void hover(boolean hover) {
 		this.hover = hover;
+	}
+
+	public void setColor(Color color) {
+		this.color = color;
+		this.label.setForeground(this.color);
+		this.label.revalidate();
 	}
 }

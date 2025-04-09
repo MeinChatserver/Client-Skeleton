@@ -107,6 +107,9 @@ public class List extends Panel {
 	public void setColors(Map<String, Protocol.Color> ranks) {
 		for(Map.Entry<String, Entry> entry : this.entries.entrySet()) {
 			Entry e = (Entry) entry.getValue();
+
+			// TODO
+			e.setColor(Color.RED);
 		}
 	}
 }
