@@ -54,9 +54,10 @@ import Protocol.RoomUserRemove;
 import Protocol.User;
 
 public class Client implements Runnable {
+	private Thread thread = new Thread(this);
 	private Window window = new Window(this);
 	private Settings settings;
-	private Login login = new Login(this);
+	private Login login;
 	private boolean connected = false;
 	private String Client = "JavaClient";
 	private String Version = "V1.0";
@@ -72,6 +73,7 @@ public class Client implements Runnable {
 		this.hostname = hostname;
 		this.port = port;
 		this.settings = new Settings(this);
+		this.login = new Login(this);
 		System.out.println("www.mein-chatserver.de - " + this.Client + " " + this.Version + ". Copyright © 2024 by Mein Chatserver. All Rights Reserved.");
 
 		this.window.setTitle("Chat " + this.Client + " (" + this.Version + ")");
@@ -82,7 +84,7 @@ public class Client implements Runnable {
 		this.window.pack();
 		this.window.setVisible(true);
 
-		new Thread(this).start();
+		this.connect(false);
 	}
 
 	public String getHostname() {
@@ -140,6 +142,10 @@ public class Client implements Runnable {
 			this.socket = new Socket(this.hostname, this.port);
 			this.input = this.socket.getInputStream();
 			this.output = this.socket.getOutputStream();
+
+			this.thread = new Thread(this);
+			this.thread.start();
+
 			this.onConnected();
 		} catch(SocketException e) {
 			this.onClose("DISCONNECTED");
@@ -155,6 +161,10 @@ public class Client implements Runnable {
 			if(this.isConnected()) {
 				this.send(new Disconnect());
 				this.connected = false;
+			}
+
+			if(this.thread != null && this.thread.isAlive()) {
+				this.thread.interrupt();
 			}
 
 			/* Close all Frames */
@@ -181,13 +191,7 @@ public class Client implements Runnable {
 
 	@Override
 	public void run() {
-		this.connect(false);
-
-		while(true) {
-			if(!this.isConnected()) {
-				continue;
-			}
-
+		while(this.isConnected()) {
 			synchronized(this.input) {
 				try {
 					byte[] lengthBytes = this.input.readNBytes(4);

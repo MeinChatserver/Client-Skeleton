@@ -11,8 +11,10 @@
 package Protocol;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+@JsonInclude(JsonInclude.Include.NON_NULL)
 public class Configuration implements IPacket {
 	@JsonProperty("id")
 	public String ID;
