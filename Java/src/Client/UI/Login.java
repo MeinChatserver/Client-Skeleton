@@ -44,6 +44,7 @@ public class Login extends Panel {
 	private Client client;
 
 	/* Panels */
+	private Panel panel_icons = new Panel();
 	private Panel panel_header = new Panel();
 	private Panel panel_top = new Panel();
 	private Panel panel_middle = new Panel();
@@ -64,6 +65,7 @@ public class Login extends Panel {
 	private List chatrooms = new List();
 	private Link button_lost_password;
 	private Link button_register;
+	private Link button_settings;
 	private Button button_login;
 
 	public Login(Client client) {
@@ -76,17 +78,17 @@ public class Login extends Panel {
 		this.button_lost_password = new Link();
 		this.button_login = new Button();
 
-		Panel panel_icons = new Panel();
-		Link button = new Link(Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.WHITE), Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.RED));
-		button.addActionListener(new ActionListener() {
+		this.panel_icons = new Panel();
+		this.button_settings = new Link(Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.WHITE), Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.RED));
+		this.button_settings.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				client.getSettings().open();
 			}
 		});
-		panel_icons.setLayout(new FlowLayout(FlowLayout.RIGHT));
-		panel_icons.setBorder(new EmptyBorder(5, 10, 0, 10));
-		panel_icons.add(button);
+		this.panel_icons.setLayout(new FlowLayout(FlowLayout.RIGHT));
+		this.panel_icons.setBorder(new EmptyBorder(5, 10, 0, 10));
+		this.panel_icons.add(this.button_settings);
 		this.panel_header.setLayout(new BorderLayout());
 		this.panel_header.add(panel_icons, BorderLayout.NORTH);
 		this.panel_header.add(this.panel_top, BorderLayout.CENTER);
@@ -290,5 +292,9 @@ public class Login extends Panel {
 		this.setForeground(style.getForeground().getColor());
 		this.chatrooms.getRootPane().setBackground(style.getBackgroundList().getColor());
 		this.chatrooms.setForeground(style.getForegroundList().getColor());
+	}
+
+	public void toggleSettings(boolean state) {
+		this.button_settings.setVisible(state);
 	}
 }

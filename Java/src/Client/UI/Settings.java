@@ -111,7 +111,13 @@ public class Settings extends Window {
 			this.panel.setForeground(null);
 			return;
 		}
+
 		this.panel.setBackground(style.getBackground().getColor(), style.getBackgroundImage().getImage());
 		this.panel.setForeground(style.getForeground().getColor());
+	}
+
+	public void update() {
+		this.input_hostname.setText(this.getClient().getHostname());
+		this.input_port.setText("" + this.getClient().getPort());
 	}
 }

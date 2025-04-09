@@ -52,7 +52,7 @@ import Protocol.Send.Handshake;
 public class Client implements Runnable {
 	private Thread thread = new Thread(this);
 	private Window window = new Window(this);
-	private Settings settings;
+	private Settings settings = new Settings(this);
 	private Login login;
 	private boolean connected = false;
 	private String Client = "JavaClient";
@@ -65,13 +65,21 @@ public class Client implements Runnable {
 	private InputStream input;
 	private OutputStream output;
 
+	public Client() {
+		this.login = new Login(this);
+	}
+
 	public Client(String hostname, int port) {
+		super();
 		this.hostname = hostname;
 		this.port = port;
-		this.settings = new Settings(this);
-		this.login = new Login(this);
+		this.start();
+	}
+
+	public void start() {
 		System.out.println("www.mein-chatserver.de - " + this.Client + " " + this.Version + ". Copyright © 2024 by Mein Chatserver. All Rights Reserved.");
 
+		this.settings.update();
 		this.window.setTitle("Chat " + this.Client + " (" + this.Version + ")");
 		this.window.setContentPane(this.login);
 		this.window.setSize(new Dimension(300, 450));
@@ -83,18 +91,37 @@ public class Client implements Runnable {
 		this.connect(false);
 	}
 
+	public String getVersion() {
+		return this.Version;
+	}
+
+	public String getName() {
+		return this.Client;
+	}
+
 	public String getHostname() {
 		return this.hostname;
+	}
+
+	public void setHostname(String hostname) {
+		this.hostname = hostname;
+		this.settings.update();
 	}
 
 	public int getPort() {
 		return this.port;
 	}
 
+	public void setPort(int port) {
+		this.port = port;
+		this.settings.update();
+	}
+
 	public void setServer(String hostname, int port) {
 		this.disconnect(true);
 		this.hostname = hostname;
 		this.port = port;
+		this.settings.update();
 
 		this.login.setDisconnected();
 		this.login.clearChatrooms();
@@ -437,5 +464,9 @@ public class Client implements Runnable {
 				System.err.println("[RECEIVE] Unknown Operation: " + packet.operation + ", " + json);
 			break;
 		}
+	}
+
+	public void setSettings(boolean state) {
+		this.login.toggleSettings(state);
 	}
 }
