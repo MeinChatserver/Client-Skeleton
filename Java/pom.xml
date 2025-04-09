@@ -19,6 +19,11 @@
 			<artifactId>jackson-databind</artifactId>
 			<version>2.17.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.github.jiconfont</groupId>
+			<artifactId>jiconfont-swing</artifactId>
+			<version>1.0.0</version>
+		</dependency>
 	</dependencies>
 	
 	<!-- Build -->
@@ -34,27 +39,6 @@
                     <target>${jdk.version}</target>
                 </configuration>
             </plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-jar-plugin</artifactId>
-			    <version>3.2.0</version>
-			    <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-			    <configuration>
-					<archive>
-						<manifest>
-							<addClasspath>true</addClasspath>
-							<mainClass>Main</mainClass>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 </project>
