@@ -78,6 +78,7 @@ public class Settings extends Window {
 		this.button_cancel.setText("Abbrechen");
 		this.buttons.add(this.button_cancel, BorderLayout.WEST);
 		this.button_cancel.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				input_hostname.setText(getClient().getHostname());
 				input_port.setText("" + getClient().getPort());
@@ -89,6 +90,7 @@ public class Settings extends Window {
 		this.button_save.setText("Speichern");
 		this.buttons.add(this.button_save, BorderLayout.EAST);
 		this.button_save.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent event) {
 				try {
 					client.setServer(input_hostname.getText(), Integer.parseInt(input_port.getText()));

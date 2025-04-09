@@ -32,22 +32,22 @@ import Client.UI.Login;
 import Client.UI.Settings;
 import Client.UI.Components.Dialog;
 import Client.UI.Components.Window;
-import Protocol.Category;
-import Protocol.Configuration;
-import Protocol.Disconnect;
-import Protocol.Handshake;
 import Protocol.IPacket;
-import Protocol.MessageAction;
-import Protocol.MessagePrivate;
-import Protocol.MessagePublic;
 import Protocol.Packet;
 import Protocol.Ping;
 import Protocol.Pong;
 import Protocol.Room;
-import Protocol.RoomUpdate;
-import Protocol.RoomUserAdd;
-import Protocol.RoomUserRemove;
 import Protocol.User;
+import Protocol.Receive.Category;
+import Protocol.Receive.Configuration;
+import Protocol.Receive.MessageAction;
+import Protocol.Receive.MessagePrivate;
+import Protocol.Receive.MessagePublic;
+import Protocol.Receive.RoomUpdate;
+import Protocol.Receive.RoomUserAdd;
+import Protocol.Receive.RoomUserRemove;
+import Protocol.Send.Disconnect;
+import Protocol.Send.Handshake;
 
 public class Client implements Runnable {
 	private Thread thread = new Thread(this);
@@ -264,8 +264,8 @@ public class Client implements Runnable {
 				Configuration config = objects.readerFor(Configuration.class).readValue(json);
 
 				this.login.showLoginButton();
-				this.login.setSuggestion(config.Suggestion);
-				this.login.setStyle(config.Style);
+				this.login.setSuggestion(config.getSuggestion());
+				this.login.setStyle(config.getStyle());
 
 				// Create Ping
 				// this.ping.shutdownNow();

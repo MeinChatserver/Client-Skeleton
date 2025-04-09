@@ -8,10 +8,12 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Send;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
+
+import Protocol.IPacket;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Disconnect implements IPacket {

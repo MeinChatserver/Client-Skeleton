@@ -10,30 +10,31 @@
 
 package Client.UI.Components;
 
+import java.awt.Adjustable;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.util.LinkedHashMap;
 
-import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.ScrollPaneConstants;
 
 import Client.ICallback;
 
 public class List extends Panel {
 	private Panel elements = new Panel(new GridBagLayout());
 	private final Panel spacer = new Panel();
-	private LinkedHashMap<String, Entry> entries = new LinkedHashMap<String, Entry>();
+	private LinkedHashMap<String, Entry> entries = new LinkedHashMap<>();
 	private JScrollPane scrollbar = new JScrollPane();
 	private ICallback onSelect;
 
 	public List() {
 		this.setLayout(new BorderLayout());
 		this.scrollbar.setViewportView(this.elements);
-		this.scrollbar.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
-		this.scrollbar.setHorizontalScrollBar(new Scrollbar(JScrollBar.HORIZONTAL));
-		this.scrollbar.setVerticalScrollBar(new Scrollbar(JScrollBar.VERTICAL));
+		this.scrollbar.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		this.scrollbar.setHorizontalScrollBar(new Scrollbar(Adjustable.HORIZONTAL));
+		this.scrollbar.setVerticalScrollBar(new Scrollbar(Adjustable.VERTICAL));
 		this.add(this.scrollbar, BorderLayout.CENTER);
 		this.update();
 	}

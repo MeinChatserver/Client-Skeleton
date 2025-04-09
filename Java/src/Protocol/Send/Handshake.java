@@ -8,10 +8,12 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Send;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import Protocol.IPacket;
 
 public class Handshake implements IPacket {
 	@JsonProperty("client")
@@ -33,6 +35,7 @@ public class Handshake implements IPacket {
 		this.UserAgent = System.getProperty("java.runtime.name") + "/" + System.getProperty("java.version") + " (" + System.getProperty("sun.arch.data.model") + "bit)";
 	}
 
+	@Override
 	@JsonIgnore
 	public String getOperation() {
 		return "HANDSHAKE";

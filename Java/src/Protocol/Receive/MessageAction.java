@@ -8,37 +8,34 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Receive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class RoomUserAdd implements IPacket {
-	@JsonProperty("room")
-	private String room;
+import Protocol.Message;
 
-	@JsonProperty("user")
-	private User user;
-
-	public RoomUserAdd(@JsonProperty("room") String room, @JsonProperty("user") User user) {
-		this.room = room;
-		this.user = user;
+public class MessageAction extends Message {
+	public MessageAction(@JsonProperty("room") String room, @JsonProperty("text") String text) {
+		super(room, text);
 	}
 
+	@Override
 	public String getRoom() {
 		return this.room;
 	}
 
-	public User getUser() {
-		return this.user;
+	@Override
+	public String getText() {
+		return this.text;
 	}
 
 	@Override
 	public String toString() {
-		return "[Add User Room=" + room + ", User=" + user + " ]";
+		return "[Message Type=ACTION Room=" + room + ", Text=" + text + " ]";
 	}
 
 	@Override
 	public String getOperation() {
-		return "ROOM_USER_ADD";
+		return "MESSAGE_ACTION";
 	}
 }

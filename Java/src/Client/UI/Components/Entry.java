@@ -98,6 +98,7 @@ public class Entry extends Panel {
 		}
 	}
 
+	@Override
 	public String getName() {
 		return this.name;
 	}

@@ -29,6 +29,7 @@ public class Rank implements IPacket {
 		this.Color = color;
 	}
 
+	@Override
 	@JsonIgnore
 	public String getOperation() {
 		return "RANK";

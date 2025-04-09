@@ -8,30 +8,44 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Receive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-public class MessageAction extends Message {
-	public MessageAction(@JsonProperty("room") String room, @JsonProperty("text") String text) {
+import Protocol.Message;
+import Protocol.User;
+
+public class MessagePublic extends Message {
+	@JsonProperty("sender")
+	private User sender;
+
+	public MessagePublic(@JsonProperty("room") String room, @JsonProperty("sender") User sender, @JsonProperty("text") String text) {
 		super(room, text);
+
+		this.sender = sender;
 	}
 
+	@Override
 	public String getRoom() {
 		return this.room;
 	}
 
+	public User getSender() {
+		return this.sender;
+	}
+
+	@Override
 	public String getText() {
 		return this.text;
 	}
 
 	@Override
 	public String toString() {
-		return "[Message Type=ACTION Room=" + room + ", Text=" + text + " ]";
+		return "[Message Type=PUBLIC Room=" + room + ", Sender=" + sender + ", Text=" + text + " ]";
 	}
 
 	@Override
 	public String getOperation() {
-		return "MESSAGE_ACTION";
+		return "MESSAGE_PUBLIC";
 	}
 }

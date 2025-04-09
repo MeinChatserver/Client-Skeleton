@@ -15,6 +15,7 @@ import java.beans.PropertyChangeListener;
 
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
+import javax.swing.WindowConstants;
 
 public class Dialog extends JDialog {
 	public Dialog(String title, String text) {
@@ -23,6 +24,7 @@ public class Dialog extends JDialog {
 		final JOptionPane optionPane = new JOptionPane(text, JOptionPane.QUESTION_MESSAGE, JOptionPane.CLOSED_OPTION);
 
 		optionPane.addPropertyChangeListener(new PropertyChangeListener() {
+			@Override
 			public void propertyChange(PropertyChangeEvent e) {
 				if(isVisible() && (e.getSource() == optionPane) && (e.getPropertyName().equals(JOptionPane.VALUE_PROPERTY))) {
 					dispose();
@@ -30,7 +32,7 @@ public class Dialog extends JDialog {
 			}
 		});
 
-		this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
 		this.setTitle(title);
 		this.setContentPane(optionPane);
 		this.pack();

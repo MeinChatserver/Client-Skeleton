@@ -44,6 +44,7 @@ public class Window implements IPacket {
 		return this.room;
 	}
 
+	@Override
 	@JsonIgnore
 	public String getOperation() {
 		return "WINDOW_ROOM";

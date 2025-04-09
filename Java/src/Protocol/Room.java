@@ -11,7 +11,10 @@
 package Protocol;
 
 import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import Protocol.Receive.Category;
 
 public class Room implements IPacket {
 	@JsonProperty("id")

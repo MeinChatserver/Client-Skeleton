@@ -8,9 +8,11 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Send;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import Protocol.IPacket;
 
 public class Login implements IPacket {
 	@JsonProperty("username")

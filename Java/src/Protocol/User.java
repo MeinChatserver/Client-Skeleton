@@ -33,6 +33,7 @@ public class User implements IPacket {
 		return this.Username;
 	}
 
+	@Override
 	@JsonIgnore
 	public String getOperation() {
 		return "USER";

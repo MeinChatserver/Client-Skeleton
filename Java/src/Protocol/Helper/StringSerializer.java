@@ -10,11 +10,13 @@
 
 package Protocol.Helper;
 
+import java.io.IOException;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
+
 import Protocol.IPacket;
-import java.io.IOException;
 
 public class StringSerializer extends JsonSerializer<IPacket> {
 	@Override

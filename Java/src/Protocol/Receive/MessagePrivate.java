@@ -8,9 +8,12 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Receive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+
+import Protocol.Message;
+import Protocol.User;
 
 public class MessagePrivate extends Message {
 	@JsonProperty("sender")
@@ -26,6 +29,7 @@ public class MessagePrivate extends Message {
 		this.users = users;
 	}
 
+	@Override
 	public String getRoom() {
 		return this.room;
 	}
@@ -38,6 +42,7 @@ public class MessagePrivate extends Message {
 		return this.users;
 	}
 
+	@Override
 	public String getText() {
 		return this.text;
 	}

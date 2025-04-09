@@ -8,22 +8,25 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Receive;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import Protocol.IPacket;
+import Protocol.LoginStyle;
+
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class Configuration implements IPacket {
 	@JsonProperty("id")
-	public String ID;
+	private String ID;
 
 	@JsonProperty("suggestion")
-	public String Suggestion;
+	private String Suggestion;
 
 	@JsonProperty("style")
-	public LoginStyle Style;
+	private LoginStyle Style;
 
 	public Configuration(@JsonProperty("id") String id, @JsonProperty("suggestion") String suggestion, @JsonProperty("style") LoginStyle style) {
 		this.ID = id;
@@ -31,6 +34,19 @@ public class Configuration implements IPacket {
 		this.Style = style;
 	}
 
+	public String getID() {
+		return this.ID;
+	}
+
+	public String getSuggestion() {
+		return this.Suggestion;
+	}
+
+	public LoginStyle getStyle() {
+		return this.Style;
+	}
+
+	@Override
 	@JsonIgnore
 	public String getOperation() {
 		return "CONFIGURATION";

@@ -17,7 +17,7 @@ import Client.UI.Chatroom;
 import Client.UI.Components.Window;
 
 public class WindowManager {
-	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<String, Chatroom>();
+	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<>();
 
 	public static Chatroom create(Client client, String name, int width, int height) {
 		if(exists(name)) {
@@ -45,7 +45,7 @@ public class WindowManager {
 	public static void remove(String name) {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-				Chatroom window = ((Chatroom) entry.getValue());
+				Chatroom window = (entry.getValue());
 
 				if(window.getName().equals(name)) {
 					frames.remove(entry.getKey());
@@ -63,7 +63,7 @@ public class WindowManager {
 	public static void closeAll() {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-				Chatroom window = ((Chatroom) entry.getValue());
+				Chatroom window = (entry.getValue());
 				window.close();
 			});
 
@@ -80,7 +80,7 @@ public class WindowManager {
 	public static void setConnected() {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-				((Chatroom) entry.getValue()).setConnected();
+				entry.getValue().setConnected();
 			});
 		}
 	}
@@ -88,7 +88,7 @@ public class WindowManager {
 	public static void setDisconnected() {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-				((Chatroom) entry.getValue()).setDisconnected();
+				entry.getValue().setDisconnected();
 			});
 		}
 	}

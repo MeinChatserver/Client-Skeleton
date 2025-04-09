@@ -18,6 +18,7 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 import javax.swing.JFrame;
+import javax.swing.WindowConstants;
 
 import Client.Client;
 import Client.ICallback;
@@ -28,10 +29,10 @@ import Client.UI.Components.List;
 import Client.UI.Components.TextPanel;
 import Protocol.Rank;
 import Protocol.Room;
-import Protocol.RoomMessage;
 import Protocol.User;
-import Protocol.WindowClose;
-import Protocol.WindowInit;
+import Protocol.Receive.RoomMessage;
+import Protocol.Send.WindowClose;
+import Protocol.Send.WindowInit;
 
 public class Chatroom extends JFrame {
 	private Client client = null;
@@ -44,7 +45,7 @@ public class Chatroom extends JFrame {
 
 		this.client = client;
 
-		this.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
 			public void windowClosing(WindowEvent e) {
@@ -68,6 +69,7 @@ public class Chatroom extends JFrame {
 		this.userlist.setPreferredSize(new Dimension(250, this.getHeight()));
 		this.panel_input.setPlaceholder("Gebe eine Nachricht ein...");
 		this.panel_input.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				// @ToDo Check selected users
 				client.send(new RoomMessage(getName(), panel_input.getText()));

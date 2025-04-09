@@ -8,44 +8,46 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Receive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import Protocol.IPacket;
+
 public class Category implements IPacket {
 	@JsonProperty("id")
-	private int id;
+	private int ID;
 
 	@JsonProperty("name")
-	private String name;
+	private String Name;
 
 	public Category() {
 	}
 
 	public Category(int id, String name) {
-		this.id = id;
-		this.name = name;
+		this.ID = id;
+		this.Name = name;
 	}
 
 	public int getID() {
-		return id;
+		return ID;
 	}
 
 	public void setID(int id) {
-		this.id = id;
+		this.ID = id;
 	}
 
 	public String getName() {
-		return name;
+		return this.Name;
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		this.Name = name;
 	}
 
 	@Override
 	public String toString() {
-		return "[Category ID=" + id + ", Name=\"" + name + "\" ]";
+		return "[Category ID=" + this.ID + ", Name=\"" + this.Name + "\" ]";
 	}
 
 	@Override

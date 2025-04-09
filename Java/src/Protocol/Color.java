@@ -11,15 +11,15 @@
 package Protocol;
 
 public class Color implements IPacket {
-	private String color = null;
+	private String Color = null;
 
 	public Color(String color) {
-		this.color = color;
+		this.Color = color;
 	}
 
 	@Override
 	public String toString() {
-		return "[Color " + this.color + "]";
+		return "[Color " + this.Color + "]";
 	}
 
 	@Override
@@ -28,10 +28,10 @@ public class Color implements IPacket {
 	}
 
 	public java.awt.Color getColor() {
-		if(this.color.isEmpty()) {
+		if(this.Color.isEmpty()) {
 			return null;
 		}
 
-		return java.awt.Color.decode(this.color);
+		return java.awt.Color.decode(this.Color);
 	}
 }

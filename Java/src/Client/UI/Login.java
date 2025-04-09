@@ -35,10 +35,10 @@ import Client.UI.Components.Label;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
 import Client.UI.Components.Panel;
-import Protocol.Category;
-import Protocol.CategoryChange;
 import Protocol.LoginStyle;
 import Protocol.Room;
+import Protocol.Receive.Category;
+import Protocol.Send.CategoryChange;
 
 public class Login extends Panel {
 	private Client client;
@@ -71,7 +71,7 @@ public class Login extends Panel {
 		this.input_username = new JTextField();
 		this.input_password = new JPasswordField();
 		this.input_chatroom = new JTextField();
-		this.input_category = new JComboBox<Category>();
+		this.input_category = new JComboBox<>();
 		this.button_register = new Link();
 		this.button_lost_password = new Link();
 		this.button_login = new Button();
@@ -79,6 +79,7 @@ public class Login extends Panel {
 		Panel panel_icons = new Panel();
 		Link button = new Link(Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.WHITE), Bootstrap.get(Bootstrap.Icons.GEAR, 18, Color.RED));
 		button.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				client.getSettings().open();
 			}
@@ -106,6 +107,7 @@ public class Login extends Panel {
 		this.panel_top.add(this.label_username, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 		this.panel_top.add(this.input_username, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		this.input_username.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				input_password.requestFocus();
 			}
@@ -117,6 +119,7 @@ public class Login extends Panel {
 		this.panel_top.add(this.label_password, new GridBagConstraints(0, 1, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 		this.panel_top.add(this.input_password, new GridBagConstraints(1, 1, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		this.input_password.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				input_chatroom.requestFocus();
 			}
@@ -128,6 +131,7 @@ public class Login extends Panel {
 		this.panel_top.add(this.label_chatroom, new GridBagConstraints(0, 2, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 5), 0, 0));
 		this.panel_top.add(this.input_chatroom, new GridBagConstraints(1, 2, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 0, 0), 0, 0));
 		this.input_chatroom.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				button_login.doClick();
 			}
@@ -141,6 +145,7 @@ public class Login extends Panel {
 		this.button_lost_password.setText("Password vergessen?");
 		// this.panel_buttons.add(this.button_lost_password, BorderLayout.WEST);
 		this.button_lost_password.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					URI uri = new URI("https://" + client.getHostname() + "/Password");
@@ -157,6 +162,7 @@ public class Login extends Panel {
 		this.button_register.setText("Neu registrieren");
 		this.panel_buttons.add(this.button_register, BorderLayout.EAST);
 		this.button_register.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
 					URI uri = new URI("https://" + client.getHostname() + "/Register");
@@ -184,6 +190,7 @@ public class Login extends Panel {
 		this.panel_middle.add(this.label_category, new GridBagConstraints(0, 0, 1, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 5), 0, 0));
 		this.panel_middle.add(this.input_category, new GridBagConstraints(1, 0, 2, 1, 0.0, 0.0, GridBagConstraints.CENTER, GridBagConstraints.BOTH, new Insets(0, 0, 5, 0), 0, 0));
 		this.input_category.addActionListener(new ActionListener() {
+			@Override
 			public void actionPerformed(ActionEvent e) {
 				Category obj = (Category) input_category.getSelectedItem();
 
@@ -240,6 +247,7 @@ public class Login extends Panel {
 				return category.getName();
 			}
 
+			@Override
 			public int getID() {
 				return category.getID();
 			}
@@ -253,7 +261,7 @@ public class Login extends Panel {
 			return;
 		}
 
-		this.client.send(new Protocol.Login(this.input_username.getText(), this.input_password.getPassword(), this.input_chatroom.getText()));
+		this.client.send(new Protocol.Send.Login(this.input_username.getText(), this.input_password.getPassword(), this.input_chatroom.getText()));
 	}
 
 	public void setConnected() {

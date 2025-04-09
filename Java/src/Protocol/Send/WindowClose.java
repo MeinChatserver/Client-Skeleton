@@ -8,10 +8,11 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Send;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
+import Protocol.IPacket;
 import Protocol.Helper.StringSerializer;
 
 @JsonSerialize(using = StringSerializer.class)

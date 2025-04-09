@@ -8,16 +8,28 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Send;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import Protocol.Helper.StringSerializer;
+import Protocol.IPacket;
+import Protocol.Helper.IntegerSerializer;
 
-@JsonSerialize(using = StringSerializer.class)
-public class RoomUpdate extends Room {
+@JsonSerialize(using = IntegerSerializer.class)
+public class CategoryChange implements IPacket {
+	private int ID;
+
+	public CategoryChange(int id) {
+		this.ID = id;
+	}
+
+	@Override
+	public String toString() {
+		return this.ID + "";
+	}
+
 	@Override
 	public String getOperation() {
-		return "ROOM_UPDATE";
+		return "CATEGORY_CHANGE";
 	}
 }

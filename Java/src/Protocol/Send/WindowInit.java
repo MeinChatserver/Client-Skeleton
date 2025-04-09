@@ -8,26 +8,28 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Protocol.Send;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import Protocol.Helper.IntegerSerializer;
 
-@JsonSerialize(using = IntegerSerializer.class)
-public class CategoryChange implements IPacket {
-	private int id;
+import Protocol.IPacket;
+import Protocol.Helper.StringSerializer;
 
-	public CategoryChange(int id) {
-		this.id = id;
+@JsonSerialize(using = StringSerializer.class)
+public class WindowInit implements IPacket {
+	private String name = null;
+
+	public WindowInit(String name) {
+		this.name = name;
 	}
 
 	@Override
 	public String toString() {
-		return this.id + "";
+		return this.name;
 	}
 
 	@Override
 	public String getOperation() {
-		return "CATEGORY_CHANGE";
+		return "WINDOW_INIT";
 	}
 }
