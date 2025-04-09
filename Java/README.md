@@ -11,11 +11,11 @@ The project using `Maven` as Build-Tool.
 ```bash
 usage: Client.jar [Options]
  -d,--hostname <arg>   Hostname, Domain oder IP-Adresse zu dem verbunden
-                       werden soll
- -h,--help             Zeigt diese Hilfe an
- -p,--port <arg>       Port des Servers zu dem verbunden werden soll
+                       werden soll.
+ -h,--help             Zeigt diese Hilfe an.
+ -p,--port <arg>       Port des Servers zu dem verbunden werden soll.
  -s,--settings <bol>   Deaktiviert die Einstellungen um nachträglich den
-                       Server zu ändern
+                       Server zu ändern (0/1, true/false oder on/off).
 ```
 ```bash
 java -jar Client.jar --host demo.mein-chatserver.de --port 2710 --settings false
