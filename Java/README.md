@@ -8,7 +8,7 @@ You can install [Eclipse from here](https://www.eclipse.org/downloads/download.p
 The project using `Maven` as Build-Tool.
 
 # Example
-```cli
+```bash
 java -jar Client.jar -host demo.mein-chatserver.de -port 2710 -settings false
 ```
 
