@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol;
@@ -15,14 +15,14 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Ping implements IPacket {
-    public Ping() {
-    	/* Do Nothing */
+	public Ping() {
+		/* Do Nothing */
 	}
 
 	@Override
-    public String toString() {
-        return "[Ping]";
-    }
+	public String toString() {
+		return "[Ping]";
+	}
 
 	@Override
 	public String getOperation() {

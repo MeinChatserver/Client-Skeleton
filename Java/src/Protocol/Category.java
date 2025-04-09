@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol;
@@ -14,38 +14,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Category implements IPacket {
 	@JsonProperty("id")
-    private int id;
+	private int id;
 
-    @JsonProperty("name")
-    private String name;
+	@JsonProperty("name")
+	private String name;
 
-    public Category() {}
+	public Category() {
+	}
 
-    public Category(int id, String name) {
-        this.id		= id;
-        this.name	= name;
-    }
+	public Category(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    public int getID() {
-        return id;
-    }
+	public int getID() {
+		return id;
+	}
 
-    public void setID(int id) {
-        this.id = id;
-    }
+	public void setID(int id) {
+		this.id = id;
+	}
 
-    public String getName() {
-        return name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    @Override
-    public String toString() {
-        return "[Category ID=" + id + ", Name=\"" + name + "\" ]";
-    }
+	@Override
+	public String toString() {
+		return "[Category ID=" + id + ", Name=\"" + name + "\" ]";
+	}
 
 	@Override
 	public String getOperation() {

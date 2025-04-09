@@ -8,11 +8,15 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Client.UI.Components;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.awt.Cursor;
 
-public interface IPacket {
-	@JsonIgnore
-	String getOperation();
+import javax.swing.JButton;
+
+public class Button extends JButton {
+	public Button() {
+		super();
+		this.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	}
 }

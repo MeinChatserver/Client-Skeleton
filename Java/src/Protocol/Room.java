@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol;
@@ -15,55 +15,56 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 public class Room implements IPacket {
 	@JsonProperty("id")
-    private int id;
+	private int id;
 
-    @JsonProperty("name")
-    private String name;
-    
-    @JsonProperty("category")
-    private Category category;
+	@JsonProperty("name")
+	private String name;
 
-    @JsonProperty("style")
-    private Style style;
-    
-    @JsonProperty("users")
-    private List<User> users;
-    
-    public Room() {}
+	@JsonProperty("category")
+	private Category category;
 
-    public Room(int id, String name) {
-        this.id = id;
-        this.name = name;
-    }
+	@JsonProperty("style")
+	private Style style;
 
-    public int getID() {
-        return id;
-    }
+	@JsonProperty("users")
+	private List<User> users;
 
-    public void setID(int id) {
-        this.id = id;
-    }
+	public Room() {
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Room(int id, String name) {
+		this.id = id;
+		this.name = name;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
-    
-    public List<User> getUsers() {
-    	return this.users;
-    }
-    
-    public Style getStyle() {
-    	return this. style;
-    }
+	public int getID() {
+		return id;
+	}
 
-    @Override
-    public String toString() {
-        return "[Room ID=" + id + ", Name=\"" + name + "\" ]";
-    }
+	public void setID(int id) {
+		this.id = id;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public List<User> getUsers() {
+		return this.users;
+	}
+
+	public Style getStyle() {
+		return this.style;
+	}
+
+	@Override
+	public String toString() {
+		return "[Room ID=" + id + ", Name=\"" + name + "\" ]";
+	}
 
 	@Override
 	public String getOperation() {

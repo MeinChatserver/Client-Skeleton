@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol;
@@ -17,15 +17,15 @@ import Protocol.Helper.StringSerializer;
 @JsonSerialize(using = StringSerializer.class)
 public class WindowClose implements IPacket {
 	private String name = null;
-	
-    public WindowClose(String name) {
+
+	public WindowClose(String name) {
 		this.name = name;
 	}
 
 	@Override
-    public String toString() {
-        return this.name;
-    }
+	public String toString() {
+		return this.name;
+	}
 
 	@Override
 	public String getOperation() {

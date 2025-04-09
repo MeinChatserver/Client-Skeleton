@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol.Helper;
@@ -17,12 +17,12 @@ import Protocol.IPacket;
 import java.io.IOException;
 
 public class StringSerializer extends JsonSerializer<IPacket> {
-    @Override
-    public void serialize(IPacket value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
-        if(value != null) {
-            gen.writeString(value.toString());
-        } else {
-            gen.writeNull();
-        }
-    }
+	@Override
+	public void serialize(IPacket value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+		if(value != null) {
+			gen.writeString(value.toString());
+		} else {
+			gen.writeNull();
+		}
+	}
 }

@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol;
@@ -15,17 +15,16 @@ import Protocol.Helper.IntegerSerializer;
 
 @JsonSerialize(using = IntegerSerializer.class)
 public class CategoryChange implements IPacket {
-    private int id;
+	private int id;
 
-    public CategoryChange(int id) {
+	public CategoryChange(int id) {
 		this.id = id;
 	}
 
 	@Override
-    public String toString() {
+	public String toString() {
 		return this.id + "";
-    }
-	
+	}
 
 	@Override
 	public String getOperation() {

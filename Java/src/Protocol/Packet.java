@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol;
@@ -22,46 +22,44 @@ import Protocol.Helper.ObjectSerializer;
 public class Packet {
 	@JsonProperty("operation")
 	public String operation;
-	
+
 	@JsonProperty("data")
 	@JsonSerialize(using = ObjectSerializer.class)
 	@JsonDeserialize(using = ObjectDeserializer.class)
 	public Object data;
-	
+
 	@JsonCreator
-	public Packet(
-		@JsonProperty("operation") String operation,
-		@JsonProperty("data") Object data
-	) {
-		 this.operation	= operation;
-		 this.data		= data;
+	public Packet(@JsonProperty("operation") String operation, @JsonProperty("data") Object data) {
+		this.operation = operation;
+		this.data = data;
 	}
-	
-	public Packet() {}
 
-    public String getOperation() {
-        return this.operation;
-    }
+	public Packet() {
+	}
 
-    public void setOperation(String operation) {
-        this.operation = operation;
-    }
+	public String getOperation() {
+		return this.operation;
+	}
 
-    public Object getData() {
-        return this.data;
-    }
+	public void setOperation(String operation) {
+		this.operation = operation;
+	}
 
-    public void setData(Object data) {
-        this.data = data;
-    }
-	
-    @Override
-    public String toString() {
-        try {
-            return new ObjectMapper().writeValueAsString(this);
-        } catch(Exception e) {
-            e.printStackTrace();
-            return "{}";
-        }
-    }
+	public Object getData() {
+		return this.data;
+	}
+
+	public void setData(Object data) {
+		this.data = data;
+	}
+
+	@Override
+	public String toString() {
+		try {
+			return new ObjectMapper().writeValueAsString(this);
+		} catch(Exception e) {
+			e.printStackTrace();
+			return "{}";
+		}
+	}
 }

@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Client;
@@ -13,63 +13,64 @@ package Client;
 import java.awt.Dimension;
 import java.util.concurrent.ConcurrentHashMap;
 
-import Client.UI.Window;
+import Client.UI.Chatroom;
+import Client.UI.Components.Window;
 
 public class WindowManager {
-	private static ConcurrentHashMap<String, Window> frames	= new ConcurrentHashMap<String, Window>();
+	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<String, Chatroom>();
 
-	public static Window create(Client client, String name, int width, int height) {
+	public static Chatroom create(Client client, String name, int width, int height) {
 		if(exists(name)) {
 			return get(name);
 		}
-		
-		Window window = new Window(client);
+
+		Chatroom window = new Chatroom(client);
 		window.setSize(new Dimension(width, height));
 		window.setName(name);
 		window.init();
-		
+
 		synchronized(frames) {
 			frames.put(name, window);
 		}
-		
+
 		return window;
 	}
-	
+
 	public static boolean exists(String name) {
 		synchronized(frames) {
 			return frames.containsKey(name);
 		}
 	}
-	
+
 	public static void remove(String name) {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-			    Window window = ((Window) entry.getValue());
-			    
-			    if(window.getName().equals(name)) {
-			    	frames.remove(entry.getKey());
-			    }
+				Chatroom window = ((Chatroom) entry.getValue());
+
+				if(window.getName().equals(name)) {
+					frames.remove(entry.getKey());
+				}
 			});
 		}
 	}
-	
-	public static Window get(String name) {
+
+	public static Chatroom get(String name) {
 		synchronized(frames) {
-			return frames.get(name);			
+			return frames.get(name);
 		}
 	}
-	
+
 	public static void closeAll() {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-				Window window = ((Window) entry.getValue());
-			    window.close();
+				Chatroom window = ((Chatroom) entry.getValue());
+				window.close();
 			});
-			
+
 			frames.clear();
 		}
 	}
-	
+
 	public static Window[] getAll() {
 		synchronized(frames) {
 			return (Window[]) frames.values().toArray();
@@ -79,7 +80,7 @@ public class WindowManager {
 	public static void setConnected() {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-			    ((Window) entry.getValue()).setConnected();
+				((Chatroom) entry.getValue()).setConnected();
 			});
 		}
 	}
@@ -87,7 +88,7 @@ public class WindowManager {
 	public static void setDisconnected() {
 		synchronized(frames) {
 			frames.entrySet().stream().forEach(entry -> {
-			    ((Window) entry.getValue()).setDisconnected();
+				((Chatroom) entry.getValue()).setDisconnected();
 			});
 		}
 	}

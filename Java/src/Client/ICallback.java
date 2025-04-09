@@ -5,11 +5,11 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Client;
 
 public interface ICallback {
-	 void execute(String message);
+	void execute(String message);
 }

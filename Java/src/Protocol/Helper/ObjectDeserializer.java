@@ -5,7 +5,7 @@
  * © Copyright 2024. All Rights Reserved.
  *
  * @version 1.0.0
- * @author  Adrian Preuß
+ * @author Adrian Preuß
  */
 
 package Protocol.Helper;
@@ -19,15 +19,15 @@ import java.io.IOException;
 
 public class ObjectDeserializer extends JsonDeserializer<Object> {
 	@Override
-    public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
+	public Object deserialize(JsonParser p, DeserializationContext ctxt) throws IOException {
 		if(p.getCurrentToken() == com.fasterxml.jackson.core.JsonToken.START_ARRAY) {
 			return p.readValueAs(ArrayNode.class);
 		}
-		
+
 		if(p.getCurrentToken().isScalarValue()) {
 			return p.getText();
-        }
-		
+		}
+
 		return p.readValueAs(ObjectNode.class);
-    }
+	}
 }
