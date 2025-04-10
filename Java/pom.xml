@@ -89,6 +89,9 @@
                             <Main-Class>Main</Main-Class>
                         </manifestEntries>
                     </archive>
+                    
+			        <classesDirectory>${basedir}/target/classes</classesDirectory>
+			        <outputDirectory>${basedir}/target</outputDirectory>
                 </configuration>
             </plugin>
 
