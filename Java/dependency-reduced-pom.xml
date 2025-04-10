@@ -20,6 +20,9 @@
         <configuration>
           <source>${jdk.version}</source>
           <target>${jdk.version}</target>
+          <includes>
+            <include>src/**/*.java</include>
+          </includes>
         </configuration>
       </plugin>
       <plugin>
