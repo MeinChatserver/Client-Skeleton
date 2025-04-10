@@ -1,67 +1,72 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-	<modelVersion>4.0.0</modelVersion>
-	<groupId>de.chathoster</groupId>
-	<artifactId>client</artifactId>
-	<packaging>jar</packaging>
-	<version>1.0.0</version>
-	<name>Mein Chatserver</name>
-	<url>https://mein-chatserver.de</url>
-	<description>Example Client for Mein-Chatserver.de</description>
-	<organization>
-		<name>Mein Chatserver</name>
-		<url>https://mein-chatserver.de</url>
-	</organization>
-	
-	 <!-- Java-Version -->
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>de.chathoster</groupId>
+    <artifactId>client</artifactId>
+    <packaging>jar</packaging>
+    <version>1.0.0</version>
+    <name>Mein Chatserver</name>
+    <url>https://mein-chatserver.de</url>
+    <description>Example Client for Mein-Chatserver.de</description>
+
+    <organization>
+        <name>Mein Chatserver</name>
+        <url>https://mein-chatserver.de</url>
+    </organization>
+
+    <!-- Java-Version -->
     <properties>
         <maven.compiler.source>24</maven.compiler.source>
         <maven.compiler.target>24</maven.compiler.target>
     </properties>
-	
-	<!-- Depencies -->
-	<dependencies>
-		<dependency>
-			<groupId>com.fasterxml.jackson.core</groupId>
-			<artifactId>jackson-databind</artifactId>
-			<version>2.17.0</version>
-		</dependency>
-		<dependency>
-			<groupId>com.github.jiconfont</groupId>
-			<artifactId>jiconfont-swing</artifactId>
-			<version>1.0.0</version>
-		</dependency>
-		<dependency>
-		    <groupId>commons-cli</groupId>
-		    <artifactId>commons-cli</artifactId>
-		    <version>1.9.0</version>
-		</dependency>
-	</dependencies>
-	
-	<!-- Build -->
-	<build>
-		<finalName>Client</finalName>
-		<sourceDirectory>${basedir}/src</sourceDirectory>
-		<plugins>
-			<plugin>
-			    <groupId>org.codehaus.mojo</groupId>
-			    <artifactId>build-helper-maven-plugin</artifactId>
-			    <version>3.2.0</version>
-			    <executions>
-			        <execution>
-			            <id>add-source</id>
-			            <phase>generate-sources</phase>
-			            <goals>
-			                <goal>add-source</goal>
-			            </goals>
-			            <configuration>
-			                <sources>
-			                    <source>${basedir}/src</source>
-			                </sources>
-			            </configuration>
-			        </execution>
-			    </executions>
-			</plugin>
-			<plugin>
+
+    <!-- Dependencies -->
+    <dependencies>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <version>2.17.0</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.jiconfont</groupId>
+            <artifactId>jiconfont-swing</artifactId>
+            <version>1.0.0</version>
+        </dependency>
+        <dependency>
+            <groupId>commons-cli</groupId>
+            <artifactId>commons-cli</artifactId>
+            <version>1.9.0</version>
+        </dependency>
+    </dependencies>
+
+    <!-- Build -->
+    <build>
+        <finalName>Client</finalName>
+        <sourceDirectory>${basedir}/src</sourceDirectory>
+
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>add-source</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>add-source</goal>
+                        </goals>
+                        <configuration>
+                            <sources>
+                                <source>${basedir}/src</source>
+                            </sources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            
+            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.10.1</version>
@@ -69,39 +74,38 @@
                     <release>24</release>
                 </configuration>
             </plugin>
-            
+
             <!-- Build JAR -->
             <plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-jar-plugin</artifactId>
-			    <version>3.2.0</version>
-			    <configuration>
-	                <archive>
-	                    <manifestEntries>
-	                        <Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
-	                        <Created-By>${user.name}</Created-By>
-	                        <Application-Version>1.0.0</Application-Version>
-			                <Main-Class>Main</Main-Class>
-			                <!--<Arguments>-host mein-chatserver.de -settings 0</Arguments>-->
-	                    </manifestEntries>
-	                </archive>
-	            </configuration>
-			</plugin>
-			
-			<!-- Include Depencies in JAR -->
-			<plugin>
-			    <groupId>org.apache.maven.plugins</groupId>
-			    <artifactId>maven-shade-plugin</artifactId>
-			    <version>3.2.4</version>
-			    <executions>
-			        <execution>
-			            <phase>package</phase>
-			            <goals>
-			                <goal>shade</goal>
-			            </goals>
-			        </execution>
-			    </executions>
-			</plugin>
-		</plugins>
-	</build>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.2.0</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <Build-Timestamp>${maven.build.timestamp}</Build-Timestamp>
+                            <Created-By>${user.name}</Created-By>
+                            <Application-Version>1.0.0</Application-Version>
+                            <Main-Class>Main</Main-Class>
+                        </manifestEntries>
+                    </archive>
+                </configuration>
+            </plugin>
+
+            <!-- Include Dependencies in JAR -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.2.4</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
 </project>

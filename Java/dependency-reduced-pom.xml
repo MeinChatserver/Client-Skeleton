@@ -51,7 +51,6 @@
               <Created-By>${user.name}</Created-By>
               <Application-Version>1.0.0</Application-Version>
               <Main-Class>Main</Main-Class>
-              <Arguments>-host mein-chatserver.de -settings 0</Arguments>
             </manifestEntries>
           </archive>
         </configuration>
