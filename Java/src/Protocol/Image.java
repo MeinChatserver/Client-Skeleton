@@ -10,6 +10,8 @@
 
 package Protocol;
 
+import Interfaces.IPacket;
+
 public class Image implements IPacket {
 	private String url = null;
 

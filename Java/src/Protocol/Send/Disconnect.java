@@ -13,7 +13,7 @@ package Protocol.Send;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Disconnect implements IPacket {

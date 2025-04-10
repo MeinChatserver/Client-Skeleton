@@ -12,6 +12,8 @@ package Protocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import Interfaces.IPacket;
+
 public class RoomBackground implements IPacket {
 	@JsonProperty("color")
 	private Color color;

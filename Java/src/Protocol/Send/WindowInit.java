@@ -12,7 +12,7 @@ package Protocol.Send;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 import Protocol.Helper.StringSerializer;
 
 @JsonSerialize(using = StringSerializer.class)

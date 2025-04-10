@@ -12,7 +12,7 @@ package Protocol.Send;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 
 public class Login implements IPacket {
 	@JsonProperty("username")

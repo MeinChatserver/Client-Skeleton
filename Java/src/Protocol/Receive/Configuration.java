@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 import Protocol.LoginStyle;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)

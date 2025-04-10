@@ -10,6 +10,8 @@
 
 package Protocol;
 
+import Interfaces.IPacket;
+
 public class Color implements IPacket {
 	private String Color = null;
 

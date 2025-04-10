@@ -12,7 +12,7 @@ package Protocol.Receive;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 
 public class Category implements IPacket {
 	@JsonProperty("id")

@@ -13,6 +13,8 @@ package Protocol;
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
+import Interfaces.IPacket;
+
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
 public class Ping implements IPacket {
 	public Ping() {

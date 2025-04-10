@@ -12,6 +12,8 @@ package Protocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import Interfaces.IPacket;
+
 public class LoginStyle implements IPacket {
 	@JsonProperty("background")
 	private Protocol.Color background;

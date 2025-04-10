@@ -12,6 +12,8 @@ package Protocol;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import Interfaces.IPacket;
+
 public class Message implements IPacket {
 	@JsonProperty("room")
 	protected String room;

@@ -33,7 +33,7 @@ import Client.UI.Settings;
 import Client.UI.Components.Dialog;
 import Client.UI.Components.Window;
 import Interfaces.IChatroom;
-import Protocol.IPacket;
+import Interfaces.IPacket;
 import Protocol.Packet;
 import Protocol.Ping;
 import Protocol.Pong;

@@ -8,7 +8,7 @@
  * @author Adrian Preuß
  */
 
-package Protocol;
+package Interfaces;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 

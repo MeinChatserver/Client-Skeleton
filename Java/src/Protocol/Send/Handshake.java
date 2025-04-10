@@ -13,7 +13,7 @@ package Protocol.Send;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 
 public class Handshake implements IPacket {
 	@JsonProperty("client")

@@ -16,7 +16,7 @@ import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 
-import Protocol.IPacket;
+import Interfaces.IPacket;
 
 public class IntegerSerializer extends JsonSerializer<IPacket> {
 	@Override

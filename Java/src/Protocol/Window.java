@@ -13,6 +13,8 @@ package Protocol;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import Interfaces.IPacket;
+
 public class Window implements IPacket {
 	@JsonProperty("name")
 	public String name;
