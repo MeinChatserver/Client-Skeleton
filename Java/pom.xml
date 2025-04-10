@@ -12,6 +12,12 @@
 		<url>https://mein-chatserver.de</url>
 	</organization>
 	
+	 <!-- Java-Version -->
+    <properties>
+        <maven.compiler.source>24</maven.compiler.source>
+        <maven.compiler.target>24</maven.compiler.target>
+    </properties>
+	
 	<!-- Depencies -->
 	<dependencies>
 		<dependency>
@@ -34,17 +40,14 @@
 	<!-- Build -->
 	<build>
 		<finalName>Client</finalName>
+		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
                 <version>3.0</version>
                 <configuration>
-                    <source>${jdk.version}</source>
-                    <target>${jdk.version}</target>
-					<includes>
-					    <include>src/**/*.java</include>
-					</includes>
+                    <release>24</release>
                 </configuration>
             </plugin>
             
