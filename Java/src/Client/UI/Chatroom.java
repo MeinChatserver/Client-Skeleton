@@ -24,6 +24,7 @@ import Client.Client;
 import Client.ICallback;
 import Client.Utils;
 import Client.WindowManager;
+import Client.UI.Style.StyleObserver;
 import Client.UI.Components.Input;
 import Client.UI.Components.List;
 import Client.UI.Components.TextPanel;
@@ -34,17 +35,20 @@ import Protocol.Receive.RoomMessage;
 import Protocol.Send.WindowClose;
 import Protocol.Send.WindowInit;
 
-public class Chatroom extends JFrame {
+public class Chatroom extends JFrame implements StyleObserver {
 	private Client client = null;
 	private List userlist = new List();
 	private TextPanel panel_output = new TextPanel();
 	private Input panel_input = new Input();
+	private Style style = new Style();
 
 	public Chatroom(Client client) {
 		super();
 
 		this.client = client;
-
+		this.style.addObserver(this);
+		this.style.addObserver(this.panel_output);
+		this.style.addObserver(this.userlist);
 		this.setDefaultCloseOperation(WindowConstants.DO_NOTHING_ON_CLOSE);
 		this.addWindowListener(new WindowAdapter() {
 			@Override
@@ -151,5 +155,11 @@ public class Chatroom extends JFrame {
 
 	public void clearUsers() {
 		this.userlist.clearEntrys();
+	}
+
+	@Override
+	public void update(Style style) {
+		// TODO Auto-generated method stub
+
 	}
 }

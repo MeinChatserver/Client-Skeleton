@@ -23,8 +23,10 @@ import javax.swing.ScrollPaneConstants;
 
 import Client.ICallback;
 import Client.IEntry;
+import Client.UI.Style;
+import Client.UI.Style.StyleObserver;
 
-public class List extends Panel {
+public class List extends Panel implements StyleObserver {
 	private Panel elements = new Panel(new GridBagLayout());
 	private final Panel spacer = new Panel();
 	private ConcurrentHashMap<String, Entry> entries = new ConcurrentHashMap<>();
@@ -111,5 +113,11 @@ public class List extends Panel {
 			// TODO
 			e.setColor(Color.RED);
 		}
+	}
+
+	@Override
+	public void update(Style style) {
+		// TODO Auto-generated method stub
+
 	}
 }

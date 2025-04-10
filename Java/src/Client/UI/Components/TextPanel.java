@@ -23,9 +23,11 @@ import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
+import Client.UI.Style;
+import Client.UI.Style.StyleObserver;
 import Protocol.RoomOutput;
 
-public class TextPanel extends Panel {
+public class TextPanel extends Panel implements StyleObserver {
 	private Panel elements = new Panel(new GridBagLayout());
 	private JScrollPane scrollbar = new JScrollPane();
 	private final Panel spacer = new Panel();
@@ -155,5 +157,11 @@ public class TextPanel extends Panel {
 
 	public void setColors(RoomOutput output) {
 		// TODO Auto-generated method stub
+	}
+
+	@Override
+	public void update(Style style) {
+		// TODO Auto-generated method stub
+
 	}
 }
