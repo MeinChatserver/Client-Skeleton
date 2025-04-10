@@ -21,10 +21,10 @@ import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
 import Client.Client;
-import Client.ICallback;
 import Client.Utils;
 import Client.WindowManager;
 import Client.UI.Style.StyleObserver;
+import Interfaces.ICallback;
 import Client.UI.Components.Input;
 import Client.UI.Components.List;
 import Client.UI.Components.TextPanel;

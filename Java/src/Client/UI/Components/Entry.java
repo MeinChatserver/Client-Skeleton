@@ -17,7 +17,7 @@ import java.awt.Graphics;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 
-import Client.ICallback;
+import Interfaces.ICallback;
 
 public class Entry extends Panel {
 	private boolean hover = true;

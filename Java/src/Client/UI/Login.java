@@ -29,12 +29,12 @@ import javax.swing.SwingConstants;
 import javax.swing.border.EmptyBorder;
 
 import Client.Client;
-import Client.ICallback;
 import Client.UI.Components.Button;
 import Client.UI.Components.Label;
 import Client.UI.Components.Link;
 import Client.UI.Components.List;
 import Client.UI.Components.Panel;
+import Interfaces.ICallback;
 import Protocol.LoginStyle;
 import Protocol.Room;
 import Protocol.Receive.Category;

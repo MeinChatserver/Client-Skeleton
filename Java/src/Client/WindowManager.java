@@ -14,6 +14,7 @@ import java.awt.Dimension;
 import java.util.concurrent.ConcurrentHashMap;
 
 import Client.UI.Chatroom;
+import Interfaces.IChatroom;
 
 public class WindowManager {
 	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<String, Chatroom>();

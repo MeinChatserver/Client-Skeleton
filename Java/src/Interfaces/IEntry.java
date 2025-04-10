@@ -8,7 +8,7 @@
  * @author Adrian Preuß
  */
 
-package Client;
+package Interfaces;
 
 import Client.UI.Components.Entry;
 

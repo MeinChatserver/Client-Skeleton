@@ -8,10 +8,8 @@
  * @author Adrian Preuß
  */
 
-package Client;
+package Interfaces;
 
-import Client.UI.Chatroom;
-
-public interface IChatroom {
-	void execute(Chatroom message);
+public interface ICallback {
+	void execute(String message);
 }

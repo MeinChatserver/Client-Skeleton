@@ -21,10 +21,10 @@ import java.util.concurrent.ConcurrentHashMap;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 
-import Client.ICallback;
-import Client.IEntry;
 import Client.UI.Style;
 import Client.UI.Style.StyleObserver;
+import Interfaces.ICallback;
+import Interfaces.IEntry;
 
 public class List extends Panel implements StyleObserver {
 	private Panel elements = new Panel(new GridBagLayout());
