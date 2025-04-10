@@ -43,9 +43,28 @@
 		<sourceDirectory>${basedir}/src</sourceDirectory>
 		<plugins>
 			<plugin>
+			    <groupId>org.codehaus.mojo</groupId>
+			    <artifactId>build-helper-maven-plugin</artifactId>
+			    <version>3.2.0</version>
+			    <executions>
+			        <execution>
+			            <id>add-source</id>
+			            <phase>generate-sources</phase>
+			            <goals>
+			                <goal>add-source</goal>
+			            </goals>
+			            <configuration>
+			                <sources>
+			                    <source>${basedir}/src</source>
+			                </sources>
+			            </configuration>
+			        </execution>
+			    </executions>
+			</plugin>
+			<plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.0</version>
+                <version>3.10.1</version>
                 <configuration>
                     <release>24</release>
                 </configuration>
@@ -63,7 +82,7 @@
 	                        <Created-By>${user.name}</Created-By>
 	                        <Application-Version>1.0.0</Application-Version>
 			                <Main-Class>Main</Main-Class>
-			                <Arguments>-host mein-chatserver.de -settings 0</Arguments>
+			                <!--<Arguments>-host mein-chatserver.de -settings 0</Arguments>-->
 	                    </manifestEntries>
 	                </archive>
 	            </configuration>
