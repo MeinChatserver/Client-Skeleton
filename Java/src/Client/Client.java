@@ -395,10 +395,13 @@ public class Client implements Runnable {
 				}
 
 				if(room3 == null) {
-					// @ToDo
-					/* WindowManager.getAll().forEach((frame) => {
-					 * frame.addMessage('private', packet.data);
-					 * }); */
+					WindowManager.each(new IChatroom() {
+						@Override
+						public void execute(Chatroom room) {
+							room.addPublicMessage(publicMessage.getSender(), publicMessage.getText());
+						}
+
+					});
 				} else {
 					window = WindowManager.get(room3);
 
@@ -420,15 +423,18 @@ public class Client implements Runnable {
 				}
 
 				if(room == null) {
-					// @ToDo
-					/* WindowManager.getAll().forEach((frame) => {
-					 * frame.addMessage('private', packet.data);
-					 * }); */
+					WindowManager.each(new IChatroom() {
+						@Override
+						public void execute(Chatroom room) {
+							room.addPrivateMessage(privateMessage.getSender(), privateMessage.getUsers(), privateMessage.getText());
+						}
+
+					});
 				} else {
 					window = WindowManager.get(room);
 
 					if(window != null) {
-						window.addPrivateMessage(privateMessage.getSender(), privateMessage.getUsers(), privateMessage.getText());
+
 					}
 				}
 			break;
@@ -445,10 +451,13 @@ public class Client implements Runnable {
 				}
 
 				if(room2 == null) {
-					// @ToDo
-					/* WindowManager.getAll().forEach((frame) => {
-					 * frame.addMessage('private', packet.data);
-					 * }); */
+					WindowManager.each(new IChatroom() {
+						@Override
+						public void execute(Chatroom room) {
+							room.addActionMessage(actionMessage.getText());
+						}
+
+					});
 				} else {
 					window = WindowManager.get(room2);
 

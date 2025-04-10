@@ -14,10 +14,9 @@ import java.awt.Dimension;
 import java.util.concurrent.ConcurrentHashMap;
 
 import Client.UI.Chatroom;
-import Client.UI.Components.Window;
 
 public class WindowManager {
-	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<>();
+	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<String, Chatroom>();
 
 	public static Chatroom create(Client client, String name, int width, int height) {
 		if(exists(name)) {
@@ -71,9 +70,11 @@ public class WindowManager {
 		}
 	}
 
-	public static Window[] getAll() {
+	public static void each(IChatroom callback) {
 		synchronized(frames) {
-			return (Window[]) frames.values().toArray();
+			frames.entrySet().stream().forEach(entry -> {
+				callback.execute(entry.getValue());
+			});
 		}
 	}
 
