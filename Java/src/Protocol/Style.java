@@ -55,4 +55,8 @@ public class Style {
 	public java.awt.Color getBackgroundColor() {
 		return this.background.getColor();
 	}
+
+	public BackgroundImage getBackgroundImage() {
+		return this.background.getImage();
+	}
 }

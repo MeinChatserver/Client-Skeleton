@@ -19,9 +19,9 @@ public class RoomBackground implements IPacket {
 	private Color color;
 
 	@JsonProperty("image")
-	private Image image;
+	private BackgroundImage image;
 
-	public RoomBackground(@JsonProperty("color") Color color, @JsonProperty("image") Image image) {
+	public RoomBackground(@JsonProperty("color") Color color, @JsonProperty("image") BackgroundImage image) {
 		this.color = color;
 		this.image = image;
 	}
@@ -38,5 +38,9 @@ public class RoomBackground implements IPacket {
 
 	public java.awt.Color getColor() {
 		return this.color.getColor();
+	}
+
+	public BackgroundImage getImage() {
+		return this.image;
 	}
 }

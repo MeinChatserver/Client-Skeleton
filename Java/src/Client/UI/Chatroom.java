@@ -24,10 +24,10 @@ import Client.Client;
 import Client.Utils;
 import Client.WindowManager;
 import Client.UI.Style.StyleObserver;
-import Interfaces.ICallback;
 import Client.UI.Components.Input;
 import Client.UI.Components.List;
 import Client.UI.Components.TextPanel;
+import Interfaces.ICallback;
 import Protocol.Rank;
 import Protocol.Room;
 import Protocol.User;
@@ -122,7 +122,7 @@ public class Chatroom extends JFrame implements StyleObserver {
 
 	public void update(Room room, Rank[] ranks) {
 		this.panel_output.setColors(room.getStyle().getOutput());
-		this.panel_output.setBackground(room.getStyle().getBackgroundColor());
+		this.panel_output.setBackground(room.getStyle().getBackgroundImage(), room.getStyle().getBackgroundColor());
 		this.userlist.setBackground(room.getStyle().getBackgroundColor());
 		this.userlist.setColors(room.getStyle().getRanks());
 		this.update();

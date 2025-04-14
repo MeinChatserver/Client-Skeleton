@@ -25,6 +25,7 @@ import javax.swing.ScrollPaneConstants;
 
 import Client.UI.Style;
 import Client.UI.Style.StyleObserver;
+import Protocol.BackgroundImage;
 import Protocol.RoomOutput;
 
 public class TextPanel extends Panel implements StyleObserver {
@@ -115,6 +116,8 @@ public class TextPanel extends Panel implements StyleObserver {
 		}
 	}
 
+	/* image */
+
 	@Override
 	public void update() {
 		this.validate();
@@ -144,6 +147,18 @@ public class TextPanel extends Panel implements StyleObserver {
 		if(current + visible >= max - 10) {
 			scroller.setValue(max);
 		}
+	}
+
+	public void setBackground(BackgroundImage image, Color color) {
+		super.setBackground(color);
+
+		this.background_image = image;
+
+		if(this.scrollbar != null) {
+			this.scrollbar.setBackground(color);
+		}
+
+		this.update();
 	}
 
 	@Override

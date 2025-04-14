@@ -14,12 +14,16 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Image;
 import java.awt.LayoutManager2;
 
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
+import Protocol.BackgroundImage;
+
 public class Panel extends JPanel {
+	protected BackgroundImage background_image = null;
 	private Color background_color = new Color(0, 0, 0, 0);
 
 	public Panel() {
@@ -53,6 +57,15 @@ public class Panel extends JPanel {
 			g.setColor(this.background_color);
 			g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		}
+
+		/* Background Image */
+		if(this.background_image != null) {
+			Image image = this.background_image.getImage();
+			int x = (getWidth() - image.getWidth(null)) / 2;
+			int y = (getHeight() - image.getHeight(null)) / 2;
+
+			g.drawImage(image, 0, 0, image.getWidth(null), image.getHeight(null), null);
+		}
 	}
 
 	@Override
@@ -62,8 +75,9 @@ public class Panel extends JPanel {
 		this.update();
 	}
 
-	public void setBackground(Color color, Object image) {
+	public void setBackground(Color color, BackgroundImage image) {
 		this.background_color = color;
+		this.background_image = image;
 
 		this.setbackgrounds(this, color);
 		this.update();

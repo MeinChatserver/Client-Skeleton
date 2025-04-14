@@ -28,9 +28,9 @@ public class LoginStyle implements IPacket {
 	private Protocol.Color foregroundList;
 
 	@JsonProperty("backgroundImage")
-	private Protocol.Image backgroundImage;
+	private String backgroundImage;
 
-	public LoginStyle(@JsonProperty("background") Protocol.Color background, @JsonProperty("foreground") Protocol.Color foreground, @JsonProperty("backgroundList") Protocol.Color backgroundList, @JsonProperty("foregroundList") Protocol.Color foregroundList, @JsonProperty("backgroundImage") Protocol.Image backgroundImage) {
+	public LoginStyle(@JsonProperty("background") Protocol.Color background, @JsonProperty("foreground") Protocol.Color foreground, @JsonProperty("backgroundList") Protocol.Color backgroundList, @JsonProperty("foregroundList") Protocol.Color foregroundList, @JsonProperty("backgroundImage") String backgroundImage) {
 		this.background = background;
 		this.foreground = foreground;
 		this.backgroundList = backgroundList;
@@ -54,8 +54,8 @@ public class LoginStyle implements IPacket {
 		return this.foregroundList;
 	}
 
-	public Image getBackgroundImage() {
-		return this.backgroundImage;
+	public BackgroundImage getBackgroundImage() {
+		return new BackgroundImage(new Image(this.backgroundImage), null);
 	}
 
 	@Override

@@ -235,6 +235,10 @@ public class Login extends Panel {
 	}
 
 	public void addChatroom(Room room) {
+		if(room == null) {
+			return;
+		}
+
 		this.chatrooms.addEntry(room.getName(), room.getName() + " (" + room.getUsers().size() + ")");
 	}
 
@@ -288,7 +292,7 @@ public class Login extends Panel {
 			this.chatrooms.setForeground(null);
 			return;
 		}
-		this.setBackground(style.getBackground().getColor(), style.getBackgroundImage().getImage());
+		this.setBackground(style.getBackground().getColor(), style.getBackgroundImage());
 		this.setForeground(style.getForeground().getColor());
 		this.chatrooms.getRootPane().setBackground(style.getBackgroundList().getColor());
 		this.chatrooms.setForeground(style.getForegroundList().getColor());

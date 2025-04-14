@@ -112,7 +112,7 @@ public class Settings extends Window {
 			return;
 		}
 
-		this.panel.setBackground(style.getBackground().getColor(), style.getBackgroundImage().getImage());
+		this.panel.setBackground(style.getBackground().getColor(), style.getBackgroundImage());
 		this.panel.setForeground(style.getForeground().getColor());
 	}
 
