@@ -34,10 +34,12 @@ import Client.UI.Components.Dialog;
 import Client.UI.Components.Window;
 import Interfaces.IChatroom;
 import Interfaces.IPacket;
+import Protocol.BackgroundImage;
 import Protocol.Packet;
 import Protocol.Ping;
 import Protocol.Pong;
 import Protocol.Room;
+import Protocol.Style;
 import Protocol.User;
 import Protocol.Receive.Category;
 import Protocol.Receive.Configuration;
@@ -333,8 +335,16 @@ public class Client implements Runnable {
 				this.login.clearChatrooms();
 
 				for(Room room : rooms) {
-					// ImageCache
-					room.getStyle().getBackgroundImage().getImage();
+					/* Preload Image over ImageCache */
+					Style style = room.getStyle();
+
+					if(style != null) {
+						BackgroundImage bg = style.getBackgroundImage();
+
+						if(bg != null) {
+							bg.getImage();
+						}
+					}
 
 					this.login.addChatroom(room);
 				}
@@ -344,8 +354,16 @@ public class Client implements Runnable {
 			case "WINDOW_ROOM":
 				Protocol.Window data = objects.readerFor(Protocol.Window.class).readValue(json);
 
-				// ImageCache
-				data.room.getStyle().getBackgroundImage().getImage();
+				/* Preload Image over ImageCache */
+				Style style = data.room.getStyle();
+
+				if(style != null) {
+					BackgroundImage bg = style.getBackgroundImage();
+
+					if(bg != null) {
+						bg.getImage();
+					}
+				}
 
 				Chatroom frame = WindowManager.create(this, data.name, data.width, data.height);
 				frame.setTitle(data.title);
@@ -362,8 +380,16 @@ public class Client implements Runnable {
 			case "ROOM_UPDATE":
 				RoomUpdate update = objects.readerFor(RoomUpdate.class).readValue(json);
 
-				// ImageCache
-				update.getStyle().getBackgroundImage().getImage();
+				/* Preload Image over ImageCache */
+				Style style1 = update.getStyle();
+
+				if(style1 != null) {
+					BackgroundImage bg = style1.getBackgroundImage();
+
+					if(bg != null) {
+						bg.getImage();
+					}
+				}
 
 				window = WindowManager.get(update.getName());
 
