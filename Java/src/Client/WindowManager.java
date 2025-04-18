@@ -17,7 +17,7 @@ import Client.UI.Chatroom;
 import Interfaces.IChatroom;
 
 public class WindowManager {
-	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<String, Chatroom>();
+	private static ConcurrentHashMap<String, Chatroom> frames = new ConcurrentHashMap<>();
 
 	public static Chatroom create(Client client, String name, int width, int height) {
 		if(exists(name)) {
