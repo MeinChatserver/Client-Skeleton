@@ -473,7 +473,7 @@ public class Client implements Runnable {
 					window = WindowManager.get(room);
 
 					if(window != null) {
-
+						window.addPrivateMessage(privateMessage.getSender(), privateMessage.getUsers(), privateMessage.getText());
 					}
 				}
 			break;
@@ -495,7 +495,6 @@ public class Client implements Runnable {
 						public void execute(Chatroom room) {
 							room.addActionMessage(actionMessage.getText());
 						}
-
 					});
 				} else {
 					window = WindowManager.get(room2);
