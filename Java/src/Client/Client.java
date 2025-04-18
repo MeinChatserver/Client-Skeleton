@@ -11,6 +11,8 @@
 package Client;
 
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -85,6 +87,40 @@ public class Client implements Runnable {
 
 		this.settings.update();
 		this.window.setTitle("Chat " + this.Client + " (" + this.Version + ")");
+		this.window.addWindowListener(new WindowListener() {
+			@Override
+			public void windowClosing(WindowEvent e) {
+				send(new Disconnect());
+				WindowManager.closeAll();
+			}
+
+			@Override
+			public void windowClosed(WindowEvent e) {
+				window.dispose();
+				System.exit(0);
+			}
+
+			@Override
+			public void windowOpened(WindowEvent e) {
+			}
+
+			@Override
+			public void windowIconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeiconified(WindowEvent e) {
+			}
+
+			@Override
+			public void windowDeactivated(WindowEvent e) {
+			}
+
+			@Override
+			public void windowActivated(WindowEvent e) {
+			}
+		});
+
 		this.window.setContentPane(this.login);
 		this.window.setSize(new Dimension(300, 450));
 		this.window.setPreferredSize(new Dimension(300, 450));
@@ -525,6 +561,11 @@ public class Client implements Runnable {
 			break;
 			case "POPUP":
 				new Dialog("Problem", (String) packet.data);
+			break;
+			case "DISCONNECT":
+				this.disconnect(false);
+				WindowManager.setDisconnected();
+				this.login.setDisconnected();
 			break;
 			default:
 				System.err.println("[RECEIVE] Unknown Operation: " + packet.operation + ", " + json);
