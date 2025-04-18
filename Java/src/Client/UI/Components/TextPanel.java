@@ -15,8 +15,6 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
-import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.util.LinkedHashMap;
 
 import javax.swing.JScrollBar;
@@ -51,28 +49,6 @@ public class TextPanel extends Panel implements StyleObserver {
 		this.scrollbar.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		this.scrollbar.setHorizontalScrollBar(new Scrollbar(Adjustable.HORIZONTAL));
 		this.scrollbar.setVerticalScrollBar(new Scrollbar(Adjustable.VERTICAL));
-
-		this.scrollbar.addComponentListener(new ComponentListener() {
-			@Override
-			public void componentResized(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentMoved(ComponentEvent e) {
-			}
-
-			@Override
-			public void componentShown(ComponentEvent e) {
-				scrollbar.setBackground(getBackground());
-			}
-
-			@Override
-			public void componentHidden(ComponentEvent e) {
-			}
-		});
-
-		this.scrollbar.revalidate();
-		this.scrollbar.repaint();
 	}
 
 	private GridBagConstraints createGrid(boolean last) {
@@ -118,11 +94,9 @@ public class TextPanel extends Panel implements StyleObserver {
 		}
 	}
 
-	/* image */
-
 	@Override
 	public void update() {
-		this.validate();
+		this.revalidate();
 		this.repaint();
 	}
 
@@ -151,7 +125,7 @@ public class TextPanel extends Panel implements StyleObserver {
 		}
 	}
 
-	public void setBackground(BackgroundImage image, Color color) {
+	public void setBackground(Color color, BackgroundImage image) {
 		super.setBackground(color);
 
 		this.background_image = image;
@@ -159,8 +133,6 @@ public class TextPanel extends Panel implements StyleObserver {
 		if(this.scrollbar != null) {
 			this.scrollbar.setBackground(color);
 		}
-
-		this.update();
 	}
 
 	@Override
@@ -179,6 +151,5 @@ public class TextPanel extends Panel implements StyleObserver {
 	@Override
 	public void update(Style style) {
 		// TODO Auto-generated method stub
-
 	}
 }

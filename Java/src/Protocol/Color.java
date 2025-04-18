@@ -16,7 +16,7 @@ public class Color implements IPacket {
 	private String Color = null;
 
 	public Color(boolean value) {
-
+		/* Ignore (For JSON "enabled": true from Style-Override) */
 	}
 
 	public Color(String color) {

@@ -120,6 +120,5 @@ public class List extends Panel implements StyleObserver {
 	@Override
 	public void update(Style style) {
 		// TODO Auto-generated method stub
-
 	}
 }

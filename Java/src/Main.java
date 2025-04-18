@@ -44,7 +44,8 @@ public class Main {
 		/* Set Look & Feel */
 		try {
 			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
-		} catch(Exception ignored) {
+		} catch(Exception e) {
+			/* Do Nothing */
 		}
 
 		/* Register Icons */
@@ -54,9 +55,11 @@ public class Main {
 		Options options = new Options();
 		CommandLineParser parser = new DefaultParser();
 
+		/* Default Values */
 		client.setHostname("demo.mein-chatserver.de");
 		client.setPort(2710);
 
+		/* Find Arguments on packed JAR */
 		try {
 			if(Main.class.getProtectionDomain().getCodeSource().getLocation().toString().endsWith(".jar")) {
 				InputStream file = Main.class.getClassLoader().getResourceAsStream("META-INF/MANIFEST.MF");

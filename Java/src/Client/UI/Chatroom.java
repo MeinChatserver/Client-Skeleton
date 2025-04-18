@@ -122,7 +122,7 @@ public class Chatroom extends JFrame implements StyleObserver {
 
 	public void update(Room room, Rank[] ranks) {
 		this.panel_output.setColors(room.getStyle().getOutput());
-		this.panel_output.setBackground(room.getStyle().getBackgroundImage(), room.getStyle().getBackgroundColor());
+		this.panel_output.setBackground(room.getStyle().getBackgroundColor(), room.getStyle().getBackgroundImage());
 		this.userlist.setBackground(room.getStyle().getBackgroundColor());
 		this.userlist.setColors(room.getStyle().getRanks());
 		this.update();

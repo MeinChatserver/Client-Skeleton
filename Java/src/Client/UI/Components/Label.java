@@ -10,7 +10,6 @@
 
 package Client.UI.Components;
 
-import java.awt.Color;
 import java.awt.Graphics;
 
 import javax.swing.JLabel;
@@ -28,7 +27,6 @@ public class Label extends JLabel {
 
 	protected void init() {
 		this.setOpaque(false);
-		this.setBackground(new Color(0, 0, 0, 0));
 	}
 
 	@Override

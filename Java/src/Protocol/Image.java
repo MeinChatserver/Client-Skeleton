@@ -33,6 +33,7 @@ public class Image implements IPacket {
 	}
 
 	public BufferedImage getImage() {
+		// @ToDo Client Hostname
 		return ImageCache.getInstance().getImage("https://demo.mein-chatserver.de" + this.url);
 	}
 }

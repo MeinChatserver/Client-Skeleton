@@ -14,10 +14,7 @@ import javax.imageio.ImageIO;
 public class ImageCache {
 	private static final ImageCache INSTANCE = new ImageCache();
 	private final ConcurrentHashMap<String, BufferedImage> cache = new ConcurrentHashMap<>();
-	private final HttpClient httpClient = HttpClient.newHttpClient();
-
-	private ImageCache() {
-	}
+	private final HttpClient http = HttpClient.newHttpClient();
 
 	public static ImageCache getInstance() {
 		return INSTANCE;
@@ -34,7 +31,7 @@ public class ImageCache {
 
 			if(pathOrUrl.startsWith("http://") || pathOrUrl.startsWith("https://")) {
 				HttpRequest request = HttpRequest.newBuilder().uri(URI.create(pathOrUrl)).build();
-				HttpResponse<InputStream> response = httpClient.send(request, HttpResponse.BodyHandlers.ofInputStream());
+				HttpResponse<InputStream> response = http.send(request, HttpResponse.BodyHandlers.ofInputStream());
 				System.out.println("[ImageCache] Load Image from URL: " + pathOrUrl);
 				image = ImageIO.read(response.body());
 			} else {

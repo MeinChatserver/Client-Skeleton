@@ -49,7 +49,6 @@ public class Panel extends JPanel {
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
-		// g.clearRect(0, 0, this.getWidth(), this.getHeight());
 
 		/* Background Color */
 		if(this.background_color != null) {

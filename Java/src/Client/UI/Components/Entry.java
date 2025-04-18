@@ -88,8 +88,6 @@ public class Entry extends Panel {
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
 
-		// g.clearRect(0, 0, this.getWidth(), this.getHeight());
-
 		if(hovering) {
 			if(clicking) {
 				g.setColor(new Color(0, 0, 128, 204));
@@ -117,6 +115,5 @@ public class Entry extends Panel {
 	public void setColor(Color color) {
 		this.color = color;
 		this.label.setForeground(this.color);
-		this.label.revalidate();
 	}
 }
