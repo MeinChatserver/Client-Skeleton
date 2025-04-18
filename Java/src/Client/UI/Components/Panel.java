@@ -20,6 +20,7 @@ import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
 import Protocol.BackgroundImage;
+import Protocol.BackgroundPosition;
 
 public class Panel extends JPanel {
 	protected BackgroundImage background_image = null;
@@ -46,6 +47,7 @@ public class Panel extends JPanel {
 		this.repaint();
 	}
 
+	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -63,8 +65,104 @@ public class Panel extends JPanel {
 			if(image != null) {
 				int width = image.getWidth();
 				int height = image.getHeight();
-				int x = (this.getWidth() - width) / 2;
-				int y = (this.getHeight() - height) / 2;
+				int x = 0;
+				int y = 0;
+
+				if(this.background_image.getPosition() != null) {
+					switch(this.background_image.getPosition()) {
+						case BackgroundPosition.STRETCHED:
+							width = this.getWidth();
+							height = this.getHeight();
+						break;
+						case BackgroundPosition.SCALED_FILL_CENTER_1:
+							float scale1 = Math.max((float) this.getWidth() / width, (float) this.getHeight() / height);
+							width *= scale1;
+							height *= scale1;
+							x = (this.getWidth() - width) / 2;
+							y = (this.getHeight() - height) / 2;
+						break;
+						case BackgroundPosition.SCALED_FILL_CENTER_2:
+							float scale2 = Math.min((float) this.getWidth() / width, (float) this.getHeight() / height);
+							width *= scale2;
+							height *= scale2;
+							x = (this.getWidth() - width) / 2;
+							y = (this.getHeight() - height) / 2;
+						break;
+						case BackgroundPosition.SCALED_FILL_CENTER_3:
+							x = (this.getWidth() - width) / 2;
+							y = (this.getHeight() - height) / 2;
+						break;
+						case BackgroundPosition.SCALED_HEIGHT_RIGHT:
+							float scaleH = (float) this.getHeight() / height;
+							width *= scaleH;
+							height = this.getHeight();
+							x = this.getWidth() - width;
+							y = 0;
+						break;
+						case BackgroundPosition.SCALED_WIDTH_TOP:
+							float scaleW1 = (float) this.getWidth() / width;
+							width = this.getWidth();
+							height *= scaleW1;
+							x = 0;
+							y = 0;
+						break;
+						case BackgroundPosition.SCALED_WIDTH_BOTTOM:
+							float scaleW2 = (float) this.getWidth() / width;
+							width = this.getWidth();
+							height *= scaleW2;
+							x = 0;
+							y = this.getHeight() - height;
+						break;
+						case BackgroundPosition.TILED:
+						case BackgroundPosition.TILED_ZOOM_2:
+						case BackgroundPosition.TILED_ZOOM_3:
+						case BackgroundPosition.TILED_ROWS_OFFSET:
+						case BackgroundPosition.TILED_ROWS_ZOOM_2:
+						case BackgroundPosition.TILED_ROWS_ZOOM_3:
+						case BackgroundPosition.TILED_COLUMS:
+						case BackgroundPosition.TILED_COLUMS_ZOOM_2:
+						case BackgroundPosition.TILED_COLUMS_ZOOM_3:
+							float tileScale = 1f;
+							if(this.background_image.getPosition() == BackgroundPosition.TILED_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_2)
+								tileScale = 2f;
+							else if(this.background_image.getPosition() == BackgroundPosition.TILED_ZOOM_3 || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_3 || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_3)
+								tileScale = 3f;
+
+							int tileW = (int) (width * tileScale);
+							int tileH = (int) (height * tileScale);
+							for(int i = 0; i < this.getWidth(); i += tileW) {
+								for(int j = 0; j < this.getHeight(); j += tileH) {
+									// Versatz für Zeilen?
+									int offsetX = 0;
+									int offsetY = 0;
+									if(this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_OFFSET || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_3)
+										offsetX = (j / tileH) % 2 == 1 ? tileW / 2 : 0;
+
+									if(this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_3) {
+										// Nur vertikal wiederholen
+										for(int yCol = 0; yCol < this.getHeight(); yCol += tileH)
+											g.drawImage(image, x, yCol, x + tileW, yCol + tileH, 0, 0, width, height, this);
+										break;
+									} else {
+										g.drawImage(image, i + offsetX, j + offsetY, i + offsetX + tileW, j + offsetY + tileH, 0, 0, width, height, this);
+									}
+								}
+							}
+							return; // Bereits gezeichnet
+						case BackgroundPosition.CENTERED:
+							x = (this.getWidth() - width) / 2;
+							y = (this.getHeight() - height) / 2;
+						break;
+						case BackgroundPosition.CENTERED_2:
+						case BackgroundPosition.CENTERED_3:
+							float scaleC = this.background_image.getPosition() == BackgroundPosition.CENTERED_2 ? 2f : 3f;
+							width *= scaleC;
+							height *= scaleC;
+							x = (this.getWidth() - width) / 2;
+							y = (this.getHeight() - height) / 2;
+						break;
+					}
+				}
 
 				g.drawImage(image, x, y, width, height, this);
 			}
