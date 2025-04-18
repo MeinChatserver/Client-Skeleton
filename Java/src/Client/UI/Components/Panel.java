@@ -47,7 +47,6 @@ public class Panel extends JPanel {
 		this.repaint();
 	}
 
-	@SuppressWarnings("incomplete-switch")
 	@Override
 	protected void paintComponent(Graphics g) {
 		super.paintComponent(g);

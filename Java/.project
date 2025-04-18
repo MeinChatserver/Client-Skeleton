@@ -3,6 +3,7 @@
 	<name>client</name>
 	<comment></comment>
 	<projects>
+		<project>.settings</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
