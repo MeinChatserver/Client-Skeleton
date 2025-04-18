@@ -41,4 +41,8 @@ public class BackgroundImage implements IPacket {
 	public BufferedImage getImage() {
 		return this.file.getImage();
 	}
+
+	public BackgroundPosition getPosition() {
+		return this.position;
+	}
 }
