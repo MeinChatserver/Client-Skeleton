@@ -10,10 +10,7 @@
 
 package Protocol;
 
-import java.io.IOException;
-import java.net.URL;
-
-import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -41,17 +38,7 @@ public class BackgroundImage implements IPacket {
 		return "BACKGROUND_IMAGE";
 	}
 
-	public java.awt.Image getImage() {
-		try {
-			URL url = this.file.getURL();
-
-			if(url != null) {
-				return ImageIO.read(url);
-			}
-		} catch(IOException ex) {
-			ex.printStackTrace();
-		}
-
-		return null;
+	public BufferedImage getImage() {
+		return this.file.getImage();
 	}
 }

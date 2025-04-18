@@ -291,6 +291,9 @@ public class Client implements Runnable {
 			case "CONFIGURATION":
 				Configuration config = objects.readerFor(Configuration.class).readValue(json);
 
+				// ImageCache
+				config.getStyle().getBackgroundImage();
+
 				this.login.showLoginButton();
 				this.login.setSuggestion(config.getSuggestion());
 				this.login.setStyle(config.getStyle());
@@ -330,6 +333,9 @@ public class Client implements Runnable {
 				this.login.clearChatrooms();
 
 				for(Room room : rooms) {
+					// ImageCache
+					room.getStyle().getBackgroundImage().getImage();
+
 					this.login.addChatroom(room);
 				}
 
@@ -337,6 +343,9 @@ public class Client implements Runnable {
 			break;
 			case "WINDOW_ROOM":
 				Protocol.Window data = objects.readerFor(Protocol.Window.class).readValue(json);
+
+				// ImageCache
+				data.room.getStyle().getBackgroundImage().getImage();
 
 				Chatroom frame = WindowManager.create(this, data.name, data.width, data.height);
 				frame.setTitle(data.title);
@@ -352,6 +361,9 @@ public class Client implements Runnable {
 			break;
 			case "ROOM_UPDATE":
 				RoomUpdate update = objects.readerFor(RoomUpdate.class).readValue(json);
+
+				// ImageCache
+				update.getStyle().getBackgroundImage().getImage();
 
 				window = WindowManager.get(update.getName());
 

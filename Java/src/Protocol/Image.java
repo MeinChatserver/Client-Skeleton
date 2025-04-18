@@ -10,9 +10,9 @@
 
 package Protocol;
 
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.awt.image.BufferedImage;
 
+import Client.ImageCache;
 import Interfaces.IPacket;
 
 public class Image implements IPacket {
@@ -32,13 +32,7 @@ public class Image implements IPacket {
 		return "IMAGE";
 	}
 
-	public URL getURL() {
-		try {
-			return new URL("https://demo.mein-chatserver.de" + this.url);
-		} catch(MalformedURLException e) {
-			e.printStackTrace();
-		}
-
-		return null;
+	public BufferedImage getImage() {
+		return ImageCache.getInstance().getImage("https://demo.mein-chatserver.de" + this.url);
 	}
 }

@@ -35,6 +35,7 @@ public class Entry extends Panel {
 		this.label = new Label(this.text);
 
 		this.label.setForeground(this.color);
+		this.label.setOpaque(false);
 		this.add(this.label);
 		this.setLayout(new FlowLayout(FlowLayout.LEFT));
 		this.addMouseListener(new MouseAdapter() {
@@ -96,7 +97,7 @@ public class Entry extends Panel {
 				g.setColor(new Color(255, 255, 255, 77));
 			}
 
-			g.fillRect(0, 0, this.getWidth(), this.getHeight());
+			// g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		}
 	}
 
