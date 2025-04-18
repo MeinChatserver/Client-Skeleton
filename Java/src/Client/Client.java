@@ -358,6 +358,7 @@ public class Client implements Runnable {
 				this.login.update();
 			break;
 			case "WINDOW_ROOM":
+			case "WINDOW_ROOM_UPDATE":
 				Protocol.Window data = objects.readerFor(Protocol.Window.class).readValue(json);
 
 				/* Preload Image over ImageCache */
@@ -371,7 +372,19 @@ public class Client implements Runnable {
 					}
 				}
 
-				Chatroom frame = WindowManager.create(this, data.name, data.width, data.height);
+				Chatroom frame;
+
+				if(data.hasReference()) {
+					frame = WindowManager.get(data.getReference());
+					WindowManager.remove(data.getReference());
+					WindowManager.add(data.name, frame);
+					frame.setSize(new Dimension(data.width, data.height));
+					frame.setName(data.name);
+					frame.init();
+				} else {
+					frame = WindowManager.create(this, data.name, data.width, data.height);
+				}
+
 				frame.setTitle(data.title);
 				frame.update(data.room, data.ranks);
 

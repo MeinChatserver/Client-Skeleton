@@ -22,6 +22,9 @@ public class Window implements IPacket {
 	@JsonProperty("title")
 	public String title;
 
+	@JsonProperty("reference")
+	public String reference = null;
+
 	@JsonProperty("width")
 	public int width;
 
@@ -44,6 +47,18 @@ public class Window implements IPacket {
 
 	public Room getRoom() {
 		return this.room;
+	}
+
+	public boolean hasReference() {
+		if(this.reference == null) {
+			return false;
+		}
+
+		return !this.reference.isEmpty();
+	}
+
+	public String getReference() {
+		return this.reference;
 	}
 
 	@Override

@@ -29,9 +29,7 @@ public class WindowManager {
 		window.setName(name);
 		window.init();
 
-		synchronized(frames) {
-			frames.put(name, window);
-		}
+		add(name, window);
 
 		return window;
 	}
@@ -51,6 +49,12 @@ public class WindowManager {
 					frames.remove(entry.getKey());
 				}
 			});
+		}
+	}
+
+	public static void add(String name, Chatroom window) {
+		synchronized(frames) {
+			frames.put(name, window);
 		}
 	}
 
