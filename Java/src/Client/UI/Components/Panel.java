@@ -14,11 +14,10 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.Image;
 import java.awt.LayoutManager2;
+import java.awt.image.BufferedImage;
 
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 
 import Protocol.BackgroundImage;
 
@@ -43,7 +42,7 @@ public class Panel extends JPanel {
 	}
 
 	public void update() {
-		this.validate();
+		this.revalidate();
 		this.repaint();
 	}
 
@@ -60,18 +59,22 @@ public class Panel extends JPanel {
 
 		/* Background Image */
 		if(this.background_image != null) {
-			Image image = this.background_image.getImage();
-			int x = (getWidth() - image.getWidth(null)) / 2;
-			int y = (getHeight() - image.getHeight(null)) / 2;
+			BufferedImage image = this.background_image.getImage();
 
-			g.drawImage(image, 0, 0, image.getWidth(null), image.getHeight(null), null);
+			if(image != null) {
+				int width = image.getWidth();
+				int height = image.getHeight();
+				int x = (this.getWidth() - width) / 2;
+				int y = (this.getHeight() - height) / 2;
+
+				g.drawImage(image, x, y, width, height, this);
+			}
 		}
 	}
 
 	@Override
 	public void setBackground(Color color) {
 		this.background_color = color;
-		this.setbackgrounds(this, color);
 		this.update();
 	}
 
@@ -79,22 +82,7 @@ public class Panel extends JPanel {
 		this.background_color = color;
 		this.background_image = image;
 
-		this.setbackgrounds(this, color);
 		this.update();
-	}
-
-	public void setbackgrounds(Component component, Color color) {
-		if(component instanceof Container) {
-			for(Component child : ((Container) component).getComponents()) {
-				if(child instanceof Panel) {
-					child.setBackground(color);
-				} else if(child instanceof JScrollPane) {
-					child.setBackground(color);
-				}
-
-				this.setbackgrounds(child, color);
-			}
-		}
 	}
 
 	@Override

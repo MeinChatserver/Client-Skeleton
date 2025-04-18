@@ -46,6 +46,8 @@ public class TextPanel extends Panel implements StyleObserver {
 		this.add(this.scrollbar, BorderLayout.CENTER);
 
 		this.scrollbar.setViewportView(this.elements);
+		this.scrollbar.setOpaque(false);
+		this.scrollbar.getViewport().setOpaque(false);
 		this.scrollbar.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		this.scrollbar.setHorizontalScrollBar(new Scrollbar(Adjustable.HORIZONTAL));
 		this.scrollbar.setVerticalScrollBar(new Scrollbar(Adjustable.VERTICAL));

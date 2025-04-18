@@ -97,7 +97,7 @@ public class Entry extends Panel {
 				g.setColor(new Color(255, 255, 255, 77));
 			}
 
-			// g.fillRect(0, 0, this.getWidth(), this.getHeight());
+			g.fillRect(0, 0, this.getWidth(), this.getHeight());
 		}
 	}
 

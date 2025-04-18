@@ -292,9 +292,10 @@ public class Login extends Panel {
 			this.chatrooms.setForeground(null);
 			return;
 		}
+
 		this.setBackground(style.getBackground().getColor(), style.getBackgroundImage());
 		this.setForeground(style.getForeground().getColor());
-		this.chatrooms.getRootPane().setBackground(style.getBackgroundList().getColor());
+		this.chatrooms.setBackground(style.getBackgroundList().getColor());
 		this.chatrooms.setForeground(style.getForegroundList().getColor());
 	}
 
