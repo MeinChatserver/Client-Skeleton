@@ -35,6 +35,7 @@ import Client.UI.Components.Window;
 import Interfaces.IChatroom;
 import Interfaces.IPacket;
 import Protocol.BackgroundImage;
+import Protocol.LoginStyle;
 import Protocol.Packet;
 import Protocol.Ping;
 import Protocol.Pong;
@@ -293,8 +294,12 @@ public class Client implements Runnable {
 			case "CONFIGURATION":
 				Configuration config = objects.readerFor(Configuration.class).readValue(json);
 
-				// ImageCache
-				config.getStyle().getBackgroundImage();
+				/* Preload Image over ImageCache */
+				LoginStyle style = config.getStyle();
+
+				if(style != null) {
+					style.getBackgroundImage();
+				}
 
 				this.login.showLoginButton();
 				this.login.setSuggestion(config.getSuggestion());
@@ -302,6 +307,7 @@ public class Client implements Runnable {
 
 				// Create Ping
 				// this.ping.shutdownNow();
+
 				this.ping.scheduleAtFixedRate(new Runnable() {
 					@Override
 					public void run() {
@@ -336,10 +342,10 @@ public class Client implements Runnable {
 
 				for(Room room : rooms) {
 					/* Preload Image over ImageCache */
-					Style style = room.getStyle();
+					Style style1 = room.getStyle();
 
-					if(style != null) {
-						BackgroundImage bg = style.getBackgroundImage();
+					if(style1 != null) {
+						BackgroundImage bg = style1.getBackgroundImage();
 
 						if(bg != null) {
 							bg.getImage();
@@ -355,10 +361,10 @@ public class Client implements Runnable {
 				Protocol.Window data = objects.readerFor(Protocol.Window.class).readValue(json);
 
 				/* Preload Image over ImageCache */
-				Style style = data.room.getStyle();
+				Style style1 = data.room.getStyle();
 
-				if(style != null) {
-					BackgroundImage bg = style.getBackgroundImage();
+				if(style1 != null) {
+					BackgroundImage bg = style1.getBackgroundImage();
 
 					if(bg != null) {
 						bg.getImage();
@@ -381,10 +387,10 @@ public class Client implements Runnable {
 				RoomUpdate update = objects.readerFor(RoomUpdate.class).readValue(json);
 
 				/* Preload Image over ImageCache */
-				Style style1 = update.getStyle();
+				Style style11 = update.getStyle();
 
-				if(style1 != null) {
-					BackgroundImage bg = style1.getBackgroundImage();
+				if(style11 != null) {
+					BackgroundImage bg = style11.getBackgroundImage();
 
 					if(bg != null) {
 						bg.getImage();
