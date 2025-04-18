@@ -11,30 +11,46 @@
 package Client.UI.Components;
 
 import java.awt.Color;
+import java.awt.Graphics;
+import java.awt.Rectangle;
 
+import javax.swing.JComponent;
 import javax.swing.JScrollBar;
 import javax.swing.plaf.basic.BasicScrollBarUI;
 
 public class Scrollbar extends JScrollBar {
-	private Color background = null;
+	private Scroller scroller = new Scroller();
 
 	public Scrollbar(final int orientation) {
 		super(orientation);
-
-		this.setUI(new BasicScrollBarUI() {
-			@Override
-			protected void configureScrollBarColors() {
-				super.configureScrollBarColors();
-
-				this.trackColor = background;
-			}
-		});
+		this.setUI(this.scroller);
+		this.updateUI();
 	}
 
 	@Override
 	public void setBackground(Color color) {
 		super.setBackground(color);
 
-		this.background = color;
+		if(this.scroller != null) {
+			this.scroller.setTrackColor(color);
+		}
+
+		this.repaint();
+	}
+
+	class Scroller extends BasicScrollBarUI {
+		public void setTrackColor(Color color) {
+			this.trackColor = color;
+
+			if(this.scrollbar != null) {
+				this.scrollbar.repaint();
+			}
+		}
+
+		@Override
+		protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
+			g.setColor(trackColor);
+			g.fillRect(trackBounds.x, trackBounds.y, trackBounds.width, trackBounds.height);
+		}
 	}
 }
