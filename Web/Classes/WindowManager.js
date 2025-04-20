@@ -98,10 +98,11 @@ export default (new class WindowManager {
 		head.appendChild(viewport);
 
 		Promise.all([
-			'css/Style.css',
-			'css/Components.css',
-			'css/Client.css',
-			'css/Room.css'
+			'./UI/Style.css',
+			'./UI/Components.css',
+			'./UI/Client.css',
+			'./UI/Background.css',
+			'./UI/Room.css'
 		].map(file => this.load(frame.document, file))).then(() => {
 			setTimeout(() => {
 				loading.classList.add('hidden');
@@ -112,6 +113,7 @@ export default (new class WindowManager {
 		});
 
 		body.appendChild(clone);
+		input.focus();
 		
 		input.addEventListener('keydown', (event) => {
 			if(event.keyCode === 13 || event.key === 'Enter') {
@@ -123,7 +125,7 @@ export default (new class WindowManager {
 						Client.send({
 							operation:	'USER_MESSAGE',
 							data:		{
-								room:	name,
+								room:	frame.name,
 								users:	users,
 								text:	input.value
 							}
@@ -134,7 +136,7 @@ export default (new class WindowManager {
 						Client.send({
 							operation:	'ROOM_MESSAGE',
 							data:		{
-								room:	name,
+								room:	frame.name,
 								text:	input.value
 							}
 						});
@@ -156,6 +158,15 @@ export default (new class WindowManager {
 			});
 			
 			return users;
+		};
+		
+		frame.change = (name, width, height) => {
+			frame.name	= name;
+			
+			Client.send({
+				operation:	'WINDOW_INIT',
+				data:		name
+			});
 		};
 		
 		frame.setConnected = () => {
@@ -187,7 +198,13 @@ export default (new class WindowManager {
 					}
 					
 					if(typeof(style.background.image) !== 'undefined' && style.background.image !== null) {
-						styles.setProperty('--room-background-image', 'url(' + style.background.image + ')');
+						if(typeof(style.background.image.file) !== 'undefined' && style.background.image.file !== null) {
+							styles.setProperty('--room-background-image', 'url(https://' + Client.getHostname() + style.background.image.file + ')');
+						}
+						
+						if(typeof(style.background.image.position) !== 'undefined' && style.background.image.position !== null) {
+							output.dataset.position = style.background.image.position;
+						}
 					} else {
 						styles.setProperty('--room-background-image', null);
 					}
@@ -312,7 +329,7 @@ export default (new class WindowManager {
 			const style		= target.createElement('link');
 			style.rel		= 'stylesheet';
 			style.type		= 'text/css';
-			style.href		= window.location.origin + file + '?t=' + Date.now();
+			style.href		= (window.location.origin !== 'file://' ? window.location.origin : '') + file + '?t=' + Date.now();
 			style.onload	= () => resolve(target, file);
 			style.onerror	= () => reject(new Error(`Failed to load ${file}`));
 

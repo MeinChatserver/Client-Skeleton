@@ -8,8 +8,8 @@
  * @author  Adrian Preuß
  */
  
-import Login from 'Login.js';
-import WindowManager from 'WindowManager.js'
+import Login from './Login.js';
+import WindowManager from './WindowManager.js'
 
 window.Client = (new class Client {
 	Client		= 'WebChat';
@@ -121,12 +121,25 @@ window.Client = (new class Client {
 		this.connect();
 	}
 	
+	getHostname() {
+		/* Fix Demo */
+		if(this.Hostname === null || this.Hostname.length === 0 || this.Hostname === 'www.mein-chatserver.de') {
+			this.Hostname = 'demo.mein-chatserver.de';
+		}
+		
+		return this.Hostname;
+	}
+	
+	getPort() {
+		return this.Port;
+	}
+	
 	connect(hard) {
 		if(hard) {
 			this.disconnect();
 		}
 		
-		this.Socket				= new WebSocket('wss://' + this.Hostname + ':' + this.Port + '/');
+		this.Socket				= new WebSocket('wss://' + this.getHostname() + ':' + this.getPort() + '/');
 		this.Socket.onopen		= this.onOpen.bind(this);
 		this.Socket.onclose		= this.onClose.bind(this);
 		this.Socket.onerror		= this.onError.bind(this);
@@ -277,6 +290,13 @@ window.Client = (new class Client {
 				break;
 				case 'WINDOW_ROOM':
 					frame = WindowManager.create(packet.data.name, packet.data.width, packet.data.height);
+					frame.setTitle(packet.data.title);
+					frame.setStyle(packet.data.room.style, packet.data.ranks);				
+					frame.focus();
+				break;
+				case 'WINDOW_ROOM_UPDATE':
+					frame = WindowManager.get(packet.data.reference);
+					frame.change(packet.data.name, packet.data.width, packet.data.height);
 					frame.setTitle(packet.data.title);
 					frame.setStyle(packet.data.room.style, packet.data.ranks);				
 					frame.focus();

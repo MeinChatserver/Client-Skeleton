@@ -11,7 +11,7 @@
 /* Default Colors */
 :root {
 	/* Login */
-	--login-background-image:	url('backgrounds/style_1.png');
+	--login-background-image:	url('/Client/backgrounds/style_1.png');
 	--login-background:			#444444;
 	--login-foreground:			#FEFEFE;
 	--login-foreground-list:	#111111;
@@ -23,6 +23,6 @@
 	--room-blue:				#0E0E8E;
 	
 	--room-background:			#BEBEBE;
-	--room-background-image:	url('rooms/chat.png');
+	--room-background-image:	url('/Client/rooms/chat.png');
 	--room-foreground:			#000000;
 }

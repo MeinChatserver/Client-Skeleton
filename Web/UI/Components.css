@@ -136,9 +136,7 @@ ui-tabs ui-tab .content::before {
 	right: 0;
 	bottom: 0;
 	z-index: 1;
-	margin-top: -101%;
 	width: 100%;
-	height: 100%;
 	pointer-events: none;
 	border-top: 1px solid #000000;
 	border-left: 1px solid #000000;
