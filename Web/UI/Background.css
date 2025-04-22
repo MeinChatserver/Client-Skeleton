@@ -1,0 +1,120 @@
+/* STRETCHED - Strecken */
+[data-position="STRETCHED"] {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: 100% 100%;
+}
+
+/* SCALED_FILL_CENTER_1 - Skaliert (Füllend, Zentriert, Modus 1) */
+[data-position="SCALED_FILL_CENTER_1"] {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: cover;
+}
+
+/* SCALED_FILL_CENTER_2 - Skaliert (Füllend, Zentriert, Modus 2) */
+[data-position="SCALED_FILL_CENTER_2"] {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: contain;
+}
+
+/* SCALED_FILL_CENTER_3 - Skaliert (Füllend, Zentriert, Modus 3) */
+[data-position="SCALED_FILL_CENTER_3"] {
+	background-repeat: no-repeat;
+	background-position: center center;
+	background-size: auto;
+	
+}
+
+/* SCALED_HEIGHT_RIGHT - Skaliert auf Höhe (Rechts) */
+[data-position="SCALED_HEIGHT_RIGHT"] {
+	background-position: center right;
+	background-size: auto 100px;
+}
+
+/* SCALED_WIDTH_TOP - Skaliert auf Breite (Oben) */
+[data-position="SCALED_WIDTH_TOP"] {
+	background-position: top center;
+	background-size: 100px auto;
+}
+
+/* SCALED_WIDTH_BOTTOM - Skaliert auf Breite (Unten) */
+[data-position="SCALED_WIDTH_BOTTOM"] {
+	background-position: bottom center;
+	background-size: 100px auto;
+}
+
+/* TILED - Gekachelt*/
+[data-position="TILED"] {
+	background-repeat: repeat;
+}
+
+/* TILED_ZOOM_2 - Gekachelt (2fache Größe) */
+[data-position="TILED_ZOOM_2"] {
+	background-repeat: repeat;
+	background-size: 200%;
+}
+
+/* TILED_ZOOM_3 - Gekachelt (3fache Größe) */
+[data-position="TILED_ZOOM_3"] {
+	background-repeat: repeat;
+	background-size: 300%;
+}
+
+/* TILED_ROWS_OFFSET - Gekachelt (Zeilenweise versetzt) */
+[data-position="TILED_ROWS_OFFSET"] {
+	background-image: var(--room-background-image), var(--room-background-image) !important;
+	background-repeat: repeat-x;
+	background-position: 0 0, 50% 50%;
+}
+
+/* TILED_ROWS_ZOOM_2 - Gekachelt (Zeilenweise, 2fache Größe) */
+[data-position="TILED_ROWS_ZOOM_2"] {
+	background-image: var(--room-background-image), var(--room-background-image) !important;
+	background-repeat: repeat-x;
+	background-position: 0 0, 50% 50%;
+	background-size: 200%;
+}
+
+/* TILED_ROWS_ZOOM_3 - Gekachelt (Zeilenweise, 3fache Größe) */
+[data-position="TILED_ROWS_ZOOM_3"] {
+	background-image: var(--room-background-image), var(--room-background-image) !important;
+	background-repeat: repeat-x;
+	background-position: 0 0, 50% 50%;
+	background-size: 300%;	
+}
+
+/* TILED_COLUMS - Gekachelt (Spaltenweise) */
+[data-position="TILED_COLUMS"] {
+	background-repeat: repeat-y;
+}
+
+/* TILED_COLUMS_ZOOM_2 - Gekachelt (Spaltenweise, 2fache Größe) */
+[data-position="TILED_COLUMS_ZOOM_2"] {
+	background-repeat: repeat-y;
+	background-size: 200%;
+}
+
+/* TILED_COLUMS_ZOOM_3 - Gekachelt (Spaltenweise, 3fache Größe) */
+[data-position="TILED_COLUMS_ZOOM_3"] {
+	background-repeat: repeat-y;
+	background-size: 300%;	
+}
+
+/* CENTERED - Zentriert */
+[data-position="CENTERED"] {
+	background-position: 50% 50%;
+}
+
+/* CENTERED_2 - Zentriert (2fache Größe) */
+[data-position="CENTERED_2"] {
+	background-position: 50% 50%;
+	background-size: 200%;
+}
+
+/* CENTERED_2 - Zentriert (3fache Größe)*/
+[data-position="CENTERED_3"] {
+	background-position: 50% 50%;
+	background-size: 300%;
+}

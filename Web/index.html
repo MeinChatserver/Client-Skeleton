@@ -13,10 +13,10 @@
 		<title>Client</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, maximum-scale=1" />
-		<link rel="stylesheet" type="text/css" href="css/Style.css" />
-		<link rel="stylesheet" type="text/css" href="css/Components.css" />
-		<link rel="stylesheet" type="text/css" href="css/Client.css" />
-		<link rel="stylesheet" type="text/css" href="css/Login.css" />
+		<link rel="stylesheet" type="text/css" href="UI/Style.css" />
+		<link rel="stylesheet" type="text/css" href="UI/Components.css" />
+		<link rel="stylesheet" type="text/css" href="UI/Client.css" />
+		<link rel="stylesheet" type="text/css" href="UI/Login.css" />
 	</head>
 	<body data-view="login">
 		<!-- Browser Support -->
@@ -25,15 +25,15 @@
 			<p>Your web browser does not support <strong>ECMAScript 6</strong>.</p>
 			<p>Please update your web browser or install a newer version.</p>
 			<a target="_blank" href="https://www.google.com/intl/de_de/chrome/">
-				<img src="browsers/chrome.svg" />
+				<img src="Assets/Browsers/Chrome.svg" />
 				<span>google Chrome</span>
 			</a>
 			<a target="_blank" href="https://www.mozilla.org/de/firefox/new/">
-				<img src="browsers/firefox.svg" />
+				<img src="Assets/Browsers/Firefox.svg" />
 				<span>Mozilla Firefox</span>
 			</a>
 			<a target="_blank" href="https://www.opera.com/de">
-				<img src="browsers/opera.svg" />
+				<img src="Assets/Browsers/Opera.svg" />
 				<span>Opera</span>
 			</a>
 		</browser-compatiblity>
@@ -53,15 +53,15 @@
 			window.Defaults = {
 				port:		2710,
 				style:		{
-						background:			"#8D99B9",
-						foreground:			"#FFFFFF",
-						backgroundList:		"#EBEFFF",
-						foregroundList:		"#7180B7",
-						backgroundImage:	"backgrounds/style_1.png"
+					background:			"#8D99B9",
+					foreground:			"#FFFFFF",
+					backgroundList:		"#EBEFFF",
+					foregroundList:		"#7180B7",
+					backgroundImage:	"../Assets/Login/style_1.png"
 				},
 				suggestion: 'Flirt'
 			};
 		</script>
-		<script type="module" src="Client.js"></script>
+		<script type="module" src="Classes/Client.js"></script>
 	</body>
 </html>
