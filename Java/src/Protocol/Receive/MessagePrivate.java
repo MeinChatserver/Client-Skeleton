@@ -17,12 +17,12 @@ import Protocol.User;
 
 public class MessagePrivate extends Message {
 	@JsonProperty("sender")
-	private String sender;
+	private User sender;
 
 	@JsonProperty("users")
-	private User[] users;
+	private String[] users;
 
-	public MessagePrivate(@JsonProperty("room") String room, @JsonProperty("sender") String sender, @JsonProperty("users") User[] users, @JsonProperty("text") String text) {
+	public MessagePrivate(@JsonProperty("room") String room, @JsonProperty("sender") User sender, @JsonProperty("users") String[] users, @JsonProperty("text") String text) {
 		super(room, text);
 
 		this.sender = sender;
@@ -34,11 +34,11 @@ public class MessagePrivate extends Message {
 		return this.room;
 	}
 
-	public String getSender() {
+	public User getSender() {
 		return this.sender;
 	}
 
-	public User[] getUsers() {
+	public String[] getUsers() {
 		return this.users;
 	}
 
