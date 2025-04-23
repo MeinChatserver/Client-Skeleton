@@ -90,7 +90,7 @@ public class Chatroom extends JFrame implements StyleObserver {
 	}
 
 	public void addPublicMessage(User user, String text) {
-		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong>" + user.getName() + ":</strong> " + Utils.escapeHTML(text));
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong>" + Utils.escapeHTML(user.getName()) + ":</strong> " + text);
 	}
 
 	public void addPrivateMessage(User user, String[] users, String text) {
@@ -107,11 +107,11 @@ public class Chatroom extends JFrame implements StyleObserver {
 			}
 		}
 
-		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + Utils.escapeHTML(username) + " (privat" + Utils.escapeHTML(target) + "):</strong> " + Utils.escapeHTML(text));
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + Utils.escapeHTML(username) + " (privat" + Utils.escapeHTML(target) + "):</strong> " + text);
 	}
 
 	public void addActionMessage(String text) {
-		this.panel_output.addMessage(TextPanel.Type.ACTION, Utils.escapeHTML(text));
+		this.panel_output.addMessage(TextPanel.Type.ACTION, text);
 	}
 
 	public void init() {
