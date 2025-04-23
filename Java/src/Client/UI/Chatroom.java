@@ -101,13 +101,13 @@ public class Chatroom extends JFrame implements StyleObserver {
 			username = "System";
 		} else {
 			username = user.getName();
+
+			if(users.length >= 1) {
+				target = " an " + String.join(", ", users);
+			}
 		}
 
-		if(username != "System" && users.length >= 1) {
-			target = " an " + ""; // String.join(", ", users);
-		}
-
-		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + user + " (privat" + target + "):</strong> " + Utils.escapeHTML(text));
+		this.panel_output.addMessage(TextPanel.Type.PUBLIC, "<strong style=\"color: #FF0000;\">" + Utils.escapeHTML(username) + " (privat" + Utils.escapeHTML(target) + "):</strong> " + Utils.escapeHTML(text));
 	}
 
 	public void addActionMessage(String text) {
