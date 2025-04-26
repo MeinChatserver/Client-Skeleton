@@ -154,3 +154,8 @@ ui-tabs > ui-tab > [id^="tab"]:checked ~ [id^="tab-content"] {
     display: flex;
 	flex-direction: column;
 }
+
+/* Smileys */
+img.smiley {
+	vertical-align: sub;
+}

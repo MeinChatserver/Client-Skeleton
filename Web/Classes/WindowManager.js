@@ -284,11 +284,12 @@ export default (new class WindowManager {
 		
 		frame.addMessage = (type, data) => {
 			let link;
-			const scrolling	= output.scrollTop + output.clientHeight >= output.scrollHeight - 10;
-			var wrapper		= document.createElement('p');
-			let username	= (typeof(data.sender) === 'undefined' || data.sender === null ? 'System' : (typeof(data.sender.username) === 'undefined' ? 'System' : data.sender.username));
-			let message		= document.createTextNode(data.text);
-			link			= document.createElement('a');
+			const scrolling		= output.scrollTop + output.clientHeight >= output.scrollHeight - 10;
+			var wrapper			= document.createElement('p');
+			let username		= (typeof(data.sender) === 'undefined' || data.sender === null ? 'System' : (typeof(data.sender.username) === 'undefined' ? 'System' : data.sender.username));
+			let message			= document.createElement('span');
+			message.innerHTML	= data.text;
+			link				= document.createElement('a');
 			link.classList.add('sender');
 			
 			switch(type) {

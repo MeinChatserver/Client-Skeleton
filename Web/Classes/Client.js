@@ -33,7 +33,9 @@ window.Client = (new class Client {
 		console.log('%cwww.mein-chatserver.de - ' + this.Client + ' ' + this.Version, 'background: #c8c5fb; font-size: 16px; padding: 2px 10px;', 'Copyright © 2024 by Mein Chatserver. All Rights Reserved.');
 		
 		/* Load Hostname */
-		this.Hostname = window.location.hostname;
+		if(window.location.protocol !== 'file:') {
+			this.Hostname = window.location.hostname;
+		}
 		
 		/* Load Defaults */
 		try {
