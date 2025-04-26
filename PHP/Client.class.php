@@ -70,7 +70,7 @@
 				'data'		=> [
 					'client'	=> 'PHP',
 					'version'	=> 'V1.0',
-					'location'	=> (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'Website'),
+					'location'	=> sprintf('%s://%s%s', (((!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off') || (isset($_SERVER['SERVER_PORT']) && $_SERVER['SERVER_PORT'] == 443)) ? 'https' : 'http'), ($_SERVER['HTTP_HOST'] ?? ($_SERVER['SERVER_NAME'] ?? 'localhost')), ($_SERVER['REQUEST_URI'] ?? '')),
 					'useragent'	=> (isset($_SERVER['HTTP_USER_AGENT']) ? $_SERVER['HTTP_USER_AGENT'] : 'none')
 				]
 			]);
