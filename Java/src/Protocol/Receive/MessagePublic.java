@@ -10,11 +10,13 @@
 
 package Protocol.Receive;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import Protocol.Message;
 import Protocol.User;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class MessagePublic extends Message {
 	@JsonProperty("sender")
 	private User sender;

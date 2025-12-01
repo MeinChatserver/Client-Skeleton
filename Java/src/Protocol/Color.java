@@ -11,7 +11,9 @@
 package Protocol;
 
 import Interfaces.IPacket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Color implements IPacket {
 	private String Color = null;
 

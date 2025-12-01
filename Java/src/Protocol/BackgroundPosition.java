@@ -1,8 +1,10 @@
 package Protocol;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonValue;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public enum BackgroundPosition {
 	STRETCHED("STRETCHED"), // Strecken
 		SCALED_FILL_CENTER_1("SCALED_FILL_CENTER_1"), // Skaliert (Füllend, Zentriert, Modus 1)

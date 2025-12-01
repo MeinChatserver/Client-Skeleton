@@ -10,12 +10,14 @@
 
 package Protocol.Send;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import Interfaces.IPacket;
 import Protocol.Helper.StringSerializer;
 
 @JsonSerialize(using = StringSerializer.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class WindowInit implements IPacket {
 	private String name = null;
 

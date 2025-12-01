@@ -12,10 +12,12 @@ package Protocol;
 
 import java.awt.image.BufferedImage;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import Interfaces.IPacket;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class BackgroundImage implements IPacket {
 	@JsonProperty("file")
 	private Image file;

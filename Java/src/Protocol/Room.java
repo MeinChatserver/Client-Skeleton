@@ -12,11 +12,13 @@ package Protocol;
 
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import Interfaces.IPacket;
 import Protocol.Receive.Category;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Room implements IPacket {
 	@JsonProperty("id")
 	private int id;

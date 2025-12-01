@@ -10,11 +10,13 @@
 
 package Protocol.Receive;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import Interfaces.IPacket;
 import Protocol.User;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RoomUserAdd implements IPacket {
 	@JsonProperty("room")
 	private String room;

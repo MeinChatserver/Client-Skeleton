@@ -14,7 +14,9 @@ import java.awt.image.BufferedImage;
 
 import Client.ImageCache;
 import Interfaces.IPacket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Image implements IPacket {
 	private String url = null;
 

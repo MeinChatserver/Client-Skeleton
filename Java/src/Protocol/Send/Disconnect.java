@@ -14,8 +14,10 @@ import com.fasterxml.jackson.annotation.JsonAutoDetect;
 import com.fasterxml.jackson.annotation.JsonAutoDetect.Visibility;
 
 import Interfaces.IPacket;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @JsonAutoDetect(fieldVisibility = Visibility.ANY)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Disconnect implements IPacket {
 	public Disconnect() {
 		/* Do Nothing */

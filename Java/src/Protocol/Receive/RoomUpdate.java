@@ -10,12 +10,14 @@
 
 package Protocol.Receive;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import Protocol.Room;
 import Protocol.Helper.StringSerializer;
 
 @JsonSerialize(using = StringSerializer.class)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class RoomUpdate extends Room {
 	@Override
 	public String getOperation() {
