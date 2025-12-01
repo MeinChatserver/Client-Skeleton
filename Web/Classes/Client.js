@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Mein Chatserver
  * ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
@@ -141,7 +142,7 @@ window.Client = (new class Client {
 			this.disconnect();
 		}
 		
-		this.Socket				= new WebSocket('wss://' + this.getHostname() + ':' + this.getPort() + '/');
+		this.Socket				= new WebSocket(`wss://${this.getHostname()}:${this.getPort()}/`);
 		this.Socket.onopen		= this.onOpen.bind(this);
 		this.Socket.onclose		= this.onClose.bind(this);
 		this.Socket.onerror		= this.onError.bind(this);
@@ -163,7 +164,7 @@ window.Client = (new class Client {
 		
 		/* Close the Socket */
 		if(this.Socket !== null) {
-			if(this.Socket.readyState == WebSocket.OPEN) {
+			if(this.Socket.readyState === WebSocket.OPEN) {
 				this.Socket.close();
 			}
 			
@@ -180,11 +181,7 @@ window.Client = (new class Client {
 			return false;
 		}
 		
-		if(this.Socket.readyState === this.Socket.OPEN){
-			return true;
-		}
-		
-		return false;
+		return (this.Socket.readyState === this.Socket.OPEN);
 	}
 	
 	send(packet) {
@@ -281,8 +278,6 @@ window.Client = (new class Client {
 					packet.data.forEach(Login.addCategory.bind(Login));
 				break;
 				case 'ROOMS':
-					let list = document.querySelector('body[data-view="login"] aside .content');
-					
 					if(packet.data.length === 0) {
 						Login.emptyChatrooms();
 					} else {
@@ -293,23 +288,38 @@ window.Client = (new class Client {
 				case 'WINDOW_ROOM':
 					frame = WindowManager.create(packet.data.name, packet.data.width, packet.data.height);
 					frame.setTitle(packet.data.title);
-					frame.setStyle(packet.data.room.style, packet.data.ranks);				
+					frame.setStyle(packet.data.room.style, packet.data.ranks);
 					frame.focus();
 				break;
+                case 'WINDOW_ROOM_CLOSE':
+                    if(packet.data === '-') {
+                        WindowManager.closeAll();
+                        return;
+                    }
+
+                    frame = WindowManager.get(packet.data);
+
+                    if(frame !== null) {
+                        frame.close();
+                    }
+                break;
 				case 'WINDOW_ROOM_UPDATE':
 					frame = WindowManager.get(packet.data.reference);
-					frame.change(packet.data.name, packet.data.width, packet.data.height);
-					frame.setTitle(packet.data.title);
-					frame.setStyle(packet.data.room.style, packet.data.ranks);				
-					frame.focus();
+
+                    if(frame !== null) {
+                        frame.change(packet.data.name, packet.data.width, packet.data.height);
+                        frame.setTitle(packet.data.title);
+                        frame.setStyle(packet.data.room.style, packet.data.ranks);
+                        frame.focus();
+                    }
 				break;
 				case 'ROOM_UPDATE':
 					frame = WindowManager.get(packet.data.name);
 					
 					if(frame !== null) {
-						packet.data.users.forEach((user, index) => {
+                        for(let user of packet.data.users) {
 							frame.addUser(user);
-						});
+						}
 						
 						if(packet.data.style) {
 							frame.setStyle(packet.data.style, packet.data.ranks);

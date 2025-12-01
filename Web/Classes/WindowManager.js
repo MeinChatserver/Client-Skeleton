@@ -1,3 +1,4 @@
+'use strict';
 /**
  * Mein Chatserver
  * ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
@@ -81,10 +82,39 @@ export default (new class WindowManager {
 		css_loading			+= 'ui-loading::after { display: inline-block; content: ""; left: 50%; top: 50%; position: absolute; width: 50px; height: 50px; border-radius: 50%; border: 4px solid #0D6EFD; border-right-color: transparent; animation: 0.75s linear infinite rotate; } ';
 		let loading			= document.createElement('ui-loading');
 		let style_loading	= document.createElement('style');
-		style_loading.type	= 'text/css';
 		
 		body.appendChild(loading);
 		head.appendChild(style_loading);
+
+        body.addEventListener('contextmenu', (event) => {
+            event.preventDefault();
+            return false;
+        }, true);
+
+        body.addEventListener('click', (event) => {
+            let data = event.target.closest('[data-action]');
+
+            console.log("CLICK", data);
+
+            if(data) {
+                let action = data.dataset.action;
+                let value = null;
+
+                if(action.indexOf(':') !== -1) {
+                    [action, value] = action.split(':', 2);
+                }
+
+                switch(action) {
+                    case 'profile':
+                        Client.send({
+                            operation:	'PROFILE_OPEN',
+                            data:		value
+                        });
+                    break;
+                }
+            }
+        });
+
 		if(style_loading.styleSheet){
 			style_loading.styleSheet.cssText = css_loading;
 		} else {
@@ -113,6 +143,7 @@ export default (new class WindowManager {
 		});
 
 		body.appendChild(clone);
+        input.placeholder	= 'Gebe eine Nachricht ein...';
 		input.focus();
 		
 		input.addEventListener('keydown', (event) => {
@@ -311,7 +342,7 @@ export default (new class WindowManager {
 			
 			wrapper.appendChild(message);
 			
-			let element				= document.createElement('ui-text');
+			let element = document.createElement('ui-text');
 			element.dataset.type	= type;
 			element.innerHTML		= wrapper.innerHTML; // @ToDo FormattedText-Parser
 			output.appendChild(element);
