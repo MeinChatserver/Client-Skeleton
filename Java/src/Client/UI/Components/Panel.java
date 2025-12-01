@@ -24,7 +24,8 @@ import Protocol.BackgroundPosition;
 
 public class Panel extends JPanel {
 	protected BackgroundImage background_image = null;
-	private Color background_color = new Color(0, 0, 0, 0);
+	private Color background_color = new Color(255, 255, 255, 0);
+    private Color foreground_color = new Color(0, 0, 0, 0);
 
 	public Panel() {
 		super();
@@ -38,6 +39,7 @@ public class Panel extends JPanel {
 
 	protected void init() {
 		this.setBackground(this.background_color);
+		this.setForeground(this.foreground_color);
 		this.setOpaque(false);
 		this.update();
 	}
@@ -121,7 +123,12 @@ public class Panel extends JPanel {
 						case BackgroundPosition.TILED_COLUMS:
 						case BackgroundPosition.TILED_COLUMS_ZOOM_2:
 						case BackgroundPosition.TILED_COLUMS_ZOOM_3:
-							float tileScale = 1f;
+                            BackgroundPosition pos = this.background_image.getPosition();
+                            boolean isRowOffset = (pos == BackgroundPosition.TILED_ROWS_OFFSET ||
+                                    pos == BackgroundPosition.TILED_ROWS_ZOOM_2 ||
+                                    pos == BackgroundPosition.TILED_ROWS_ZOOM_3);
+                            float tileScale = 1f;
+
 							if(this.background_image.getPosition() == BackgroundPosition.TILED_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_2)
 								tileScale = 2f;
 							else if(this.background_image.getPosition() == BackgroundPosition.TILED_ZOOM_3 || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_3 || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_3)
@@ -129,13 +136,12 @@ public class Panel extends JPanel {
 
 							int tileW = (int) (width * tileScale);
 							int tileH = (int) (height * tileScale);
-							for(int i = 0; i < this.getWidth(); i += tileW) {
-								for(int j = 0; j < this.getHeight(); j += tileH) {
+
+                            for(int i = 0; i < this.getWidth(); i += tileW) {
+                                for(int j = 0; j < this.getHeight(); j += tileH) {
 									// Versatz für Zeilen?
-									int offsetX = 0;
+                                    int offsetX = isRowOffset && (j / tileH) % 2 == 1 ? tileW / 2 : 0;
 									int offsetY = 0;
-									if(this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_OFFSET || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_ROWS_ZOOM_3)
-										offsetX = (j / tileH) % 2 == 1 ? tileW / 2 : 0;
 
 									if(this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_2 || this.background_image.getPosition() == BackgroundPosition.TILED_COLUMS_ZOOM_3) {
 										// Nur vertikal wiederholen
@@ -168,11 +174,15 @@ public class Panel extends JPanel {
 		}
 	}
 
-	@Override
-	public void setBackground(Color color) {
-		this.background_color = color;
-		this.update();
-	}
+    @Override
+    public void setBackground(Color color) {
+        if(this.background_color != null && this.background_color.equals(color)) {
+            return;
+        }
+
+        this.background_color = color;
+        this.update();
+    }
 
 	public void setBackground(Color color, BackgroundImage image) {
 		this.background_color = color;
@@ -182,20 +192,34 @@ public class Panel extends JPanel {
 	}
 
 	@Override
+	public Color getForeground() {
+        return this.foreground_color;
+    }
+
+    @Override
 	public void setForeground(Color color) {
-		super.setForeground(color);
-		this.setForegrounds(this, color);
+        if(this.foreground_color != null && this.foreground_color.equals(color)) {
+            return;
+        }
+
+        this.foreground_color = color;
+
+        this.setForegrounds(this);
 	}
 
-	public void setForegrounds(Component component, Color color) {
-		if(component instanceof Container) {
-			for(Component child : ((Container) component).getComponents()) {
-				if(child instanceof Label) {
-					child.setForeground(color);
-				}
+	public void setForegrounds(Component component) {
+        if(component instanceof Container) {
+            Component[] children = ((Container) component).getComponents();
 
-				this.setForegrounds(child, color);
-			}
-		}
+            for(Component child : children) {
+                if(child instanceof Label) {
+                    child.setForeground(this.foreground_color);
+                }
+
+                if(child instanceof Container) {
+                    setForegrounds(child);
+                }
+            }
+        }
 	}
 }

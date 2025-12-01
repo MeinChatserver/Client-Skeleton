@@ -69,24 +69,29 @@ public class List extends Panel implements StyleObserver {
 		this.addEntry(name, text, null);
 	}
 
-	public void addEntry(String name, String text, IEntry callback) {
-		if(name == null || name.trim().isEmpty()) {
-			return;
-		}
+    public void addEntry(String name, String text, IEntry callback) {
+        if(name == null || name.trim().isEmpty()) {
+            return;
+        }
 
-		Entry panel = new Entry(name, text);
+        Entry panel = new Entry(name, text);
 
-		if(callback != null) {
-			callback.execute(panel);
-		}
+        if(callback != null) {
+            callback.execute(panel);
+        }
 
-		panel.onClick(this.onSelect);
-		this.entries.put(name, panel);
-		this.elements.remove(this.spacer);
-		this.elements.add(panel, this.createGrid(false));
-		this.elements.add(this.spacer, this.createGrid(true));
-		this.update();
-	}
+        panel.onClick(this.onSelect);
+        panel.setForeground(this.getForeground());
+        this.entries.put(name, panel);
+
+        this.elements.remove(this.spacer);
+        this.elements.add(panel, this.createGrid(false));
+        this.elements.add(this.spacer, this.createGrid(true));
+
+        if(this.isShowing()) {
+            this.update();
+        }
+    }
 
 	public void removeEntry(String name) {
 		if(this.entries.containsKey(name)) {
@@ -101,24 +106,31 @@ public class List extends Panel implements StyleObserver {
 		this.onSelect = callback;
 	}
 
-	@Override
-	public void setBackground(Color color) {
-		super.setBackground(color);
-
-		this.update();
-	}
-
 	public void setColors(Map<String, Protocol.Color> ranks) {
 		for(Map.Entry<String, Entry> entry : this.entries.entrySet()) {
-			Entry e = (Entry) entry.getValue();
+			Entry e = entry.getValue();
 
 			// TODO
-			e.setColor(Color.RED);
+			e.setForeground(Color.RED);
 		}
 	}
 
-	@Override
-	public void update(Style style) {
-		// TODO Auto-generated method stub
-	}
+    @Override
+    public void setForeground(Color color) {
+        super.setForeground(color);
+
+        if(this.entries == null || this.entries.isEmpty()) {
+            return;
+        }
+
+        for(Map.Entry<String, Entry> entry : this.entries.entrySet()) {
+            Entry e = entry.getValue();
+            e.setForeground(color);
+        }
+    }
+
+    @Override
+    public void update(Style style) {
+        System.err.println("UPDATE: " + style);
+    }
 }
