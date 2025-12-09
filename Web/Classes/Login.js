@@ -11,12 +11,12 @@
  
 export default (new class Login {
 	Watcher			= null;
-	Container		= null;
-	RoomList		= null;
-	SelectCategory	= null;
-	InputUsername	= null;
-	InputPassword	= null;
-	InputRoom		= null;
+	Container		    = null;
+	RoomList		    = null;
+	SelectCategory  	= null;
+	InputUsername	    = null;
+	InputPassword	    = null;
+	InputRoom		    = null;
 	ButtonLogin		= null;
 	
 	constructor() {	

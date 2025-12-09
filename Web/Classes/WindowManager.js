@@ -8,10 +8,13 @@
  * @version 1.0.0
  * @author  Adrian Preuß
  */
- 
+
+import List from './List.js';
+
 export default (new class WindowManager {
-	Frames = [];
-	
+	Frames      = [];
+    Chatrooms   = [];
+
 	create(name, width, height) {
 		if(this.exists(name)) {
 			return this.get(name);
@@ -61,27 +64,44 @@ export default (new class WindowManager {
 			});
 		});
 		
-		const head			= frame.document.head || frame.document.querySelector('head');
-		const body			= frame.document.body || frame.document.querySelector('body');
-		const template		= document.querySelector('template[name="room"]');
-		const clone			= template.content.cloneNode(true);
-		const output		= clone.querySelector('main ui-output');	
-		const userlist		= clone.querySelector('aside');
-		const input			= clone.querySelector('main ui-input input');
-		body.dataset.view	= 'room';
-		body.ondragstart	= (event) => { event.preventDefault(); return false; };
-		body.ondrop			= (event) => { event.preventDefault(); return false; };
+		const head			    				= frame.document.head || frame.document.querySelector('head');
+		const body								= frame.document.body || frame.document.querySelector('body');
+		const template		           			= document.querySelector('template[name="room"]');
+		const clone			            		= template.content.cloneNode(true);
+		const output		                    = clone.querySelector('main ui-output');
+		const userlist		                    = clone.querySelector('aside');
+		const roomList		                    = clone.querySelector('aside select');
+		const input			                    = clone.querySelector('main ui-input input');
+		body.dataset.view	                    = 'room';
+		body.ondragstart	                    = (event) => { event.preventDefault(); return false; };
+		body.ondrop			                    = (event) => { event.preventDefault(); return false; };
 		userlist.addEventListener('contextmenu', (event) => { event.preventDefault(); return false; }, true);
 		output.addEventListener('contextmenu', (event) => { event.preventDefault(); return false; }, true);
-		
+
+        /* Rooms-Selection */
+        const rooms = new List(roomList, this.Chatrooms, {
+            value:          'id',
+            label:          'name',
+            placeholder:    'Chatraum wechseln...',
+            onChange:       (item, value) => {
+                Client.send({
+                    operation:	'ROOM_MESSAGE',
+                    data:		{
+                        room:	frame.name,
+                        text:	`/go ${item.name}`
+                    }
+                });
+            }
+        });
+
 		/* Loading Animation */
-		let css_loading		= '@keyframes rotate { to { transform: rotate(360deg); } } ';
-		css_loading			+= 'ui-loading { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(255, 255, 255, 0.9); } ';
-		css_loading			+= 'ui-loading.hidden { display: none; } ';
-		css_loading			+= 'ui-loading.error { display: none; } '; /* @ToDo? Error Message? */
-		css_loading			+= 'ui-loading::after { display: inline-block; content: ""; left: 50%; top: 50%; position: absolute; width: 50px; height: 50px; border-radius: 50%; border: 4px solid #0D6EFD; border-right-color: transparent; animation: 0.75s linear infinite rotate; } ';
-		let loading			= document.createElement('ui-loading');
-		let style_loading	= document.createElement('style');
+		let css_loading		         = '@keyframes rotate { to { transform: rotate(360deg); } } ';
+		css_loading			        += 'ui-loading { display: block; position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 10000; background: rgba(255, 255, 255, 0.9); } ';
+		css_loading			        += 'ui-loading.hidden { display: none; } ';
+		css_loading			        += 'ui-loading.error { display: none; } '; /* @ToDo? Error Message? */
+		css_loading			        += 'ui-loading::after { display: inline-block; content: ""; left: 50%; top: 50%; position: absolute; width: 50px; height: 50px; border-radius: 50%; border: 4px solid #0D6EFD; border-right-color: transparent; animation: 0.75s linear infinite rotate; } ';
+		let loading					= document.createElement('ui-loading');
+		let style_loading			= document.createElement('style');
 		
 		body.appendChild(loading);
 		head.appendChild(style_loading);
@@ -93,8 +113,6 @@ export default (new class WindowManager {
 
         body.addEventListener('click', (event) => {
             let data = event.target.closest('[data-action]');
-
-            console.log("CLICK", data);
 
             if(data) {
                 let action = data.dataset.action;
@@ -142,6 +160,7 @@ export default (new class WindowManager {
 			window.top.console.error(error);
 		});
 
+        rooms.appendTo(userlist);
 		body.appendChild(clone);
         input.placeholder	= 'Gebe eine Nachricht ein...';
 		input.focus();
@@ -182,7 +201,7 @@ export default (new class WindowManager {
 		frame.getSelectedUsers = () => {
 			let users = [];
 			
-			userlist.querySelectorAll('ui-entry').forEach(element => {
+			userlist.querySelectorAll('ui-list ui-entry').forEach(element => {
 				if(element.dataset.active === 'true') {
 					users.push(element.dataset.name);
 				}
@@ -277,7 +296,7 @@ export default (new class WindowManager {
 				return;
 			}
 			
-			userlist.querySelectorAll('ui-entry').forEach(element => {
+			userlist.querySelectorAll('ui-list ui-entry').forEach(element => {
 				if(element.dataset.name === user.username) {
 					element.parentNode.removeChild(element);
 				}
@@ -310,7 +329,7 @@ export default (new class WindowManager {
 				});
 			}, true);
 			
-			userlist.appendChild(element);
+			userlist.querySelector('ui-list ').appendChild(element);
 		};
 		
 		frame.addMessage = (type, data) => {
@@ -352,6 +371,10 @@ export default (new class WindowManager {
 				output.scrollTop = output.scrollHeight;
 			}
 		};
+
+        frame.handleRooms = (list) => {
+            rooms.add({ id: 1, name: 'Frankreich', code: 'FR' });
+        };
 		
 		return frame;
 	}
@@ -424,4 +447,19 @@ export default (new class WindowManager {
 			frame.setDisconnected();
 		});
 	}
+
+    clearChatrooms() {
+        this.Chatrooms = [];
+    }
+
+    addChatroom(room) {
+        if(room === null) {
+            return;
+        }
+
+        this.Chatrooms.push({
+            id:     room.id,
+            name:   room.name
+        });
+    }
 }());

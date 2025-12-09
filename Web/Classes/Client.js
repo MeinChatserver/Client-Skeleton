@@ -13,12 +13,12 @@ import Login from './Login.js';
 import WindowManager from './WindowManager.js'
 
 window.Client = (new class Client {
-	Client		= 'WebChat';
-	Version		= 'V1.0';
-	Hostname	= null;
-	Port		= 2710;
-	Socket		= null;
-	Ping		= null;
+	Client			= 'WebChat';
+	Version			= 'V1.0.1';
+	Hostname	    = null;
+	Port			= 2710;
+	Socket		    = null;
+	Ping		    = null;
 	
 	constructor() {
 		window.addEventListener('unload', () => {
@@ -273,6 +273,7 @@ window.Client = (new class Client {
 					alert(packet.data);
 				break;
 				case 'ROOMS_CATEGORIES':
+                    WindowManager.clearChatrooms();
 					Login.clearCategories();
 					Login.addCategory({ id: 0, name: 'Alle Chaträume' });
 					packet.data.forEach(Login.addCategory.bind(Login));
@@ -282,7 +283,9 @@ window.Client = (new class Client {
 						Login.emptyChatrooms();
 					} else {
 						Login.clearChatrooms();
+                        WindowManager.clearChatrooms();
 						packet.data.forEach(Login.addChatroom.bind(Login));
+						packet.data.forEach(WindowManager.addChatroom.bind(WindowManager));
 					}
 				break;
 				case 'WINDOW_ROOM':
