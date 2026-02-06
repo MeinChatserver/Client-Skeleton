@@ -11,6 +11,10 @@ export class Packet {
     return this.operation;
   }
 
+  setOperation(operation: string) {
+    this.operation = operation;
+  }
+
   getData(): any {
     return this.data;
   }

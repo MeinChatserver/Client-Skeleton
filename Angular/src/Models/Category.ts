@@ -1,9 +1,22 @@
 export class Category {
-  id: number | null;
-  name: string;
+  private id: number | null = null;
+  private name: string | null = null;
 
-  constructor(id: number | null, name: string) {
-    this.id = id;
-    this.name = name;
+  constructor(data: any) {
+    if(data.id) {
+      this.id = data.id;
+    }
+
+    if(data.name) {
+      this.name = data.name;
+    }
+  }
+
+  getId() {
+    return this.id;
+  }
+
+  getName() {
+    return this.name;
   }
 }

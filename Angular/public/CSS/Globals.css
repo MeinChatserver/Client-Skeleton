@@ -55,9 +55,6 @@ html, body {
 body {
   font-family: 'Open Sans', 'Lucida Sans Unicode', 'Lucida Grande', Arial, sans-serif;
   font-size: 90%;
-  background: var(--login-background);
-  color: var(--login-foreground);
-
   flex-direction: row;
   background-repeat: no-repeat;
   background-size: cover;

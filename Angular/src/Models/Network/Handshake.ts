@@ -1,5 +1,13 @@
 import {Packet} from './Packet';
 
+/**
+ * Dieses Paket kann Grundlegende Informationen oder Steuerungen zum Chatserver senden.
+ *
+ * Wichtig:
+ * Sendet der Client dieses Paket nicht am Anfang nach erfolgreicher Verbindung, so wird die Verbindung automatisch nach 5 Sekunden getrennt.
+ *
+ * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/HANDSHAKE.md
+ **/
 export class Handshake extends Packet {
   protected client: string | null = null;
   protected version: string | null = null;

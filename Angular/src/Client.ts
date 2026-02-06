@@ -130,33 +130,7 @@ export class Client implements OnInit, OnDestroy {
             let value= param.getAttribute('value');
 
             if(name && value) {
-              switch(name) {
-                case 'port':
-                  this.config[name] = Number(value);
-                  break;
-                case 'language':
-                case 'suggestion':
-                  this.config[name] = value;
-                  break;
-                case 'backgroundImage':
-                  document.documentElement.style.setProperty('--login-background-image', 'url(' + value + ')');
-                  break;
-                case 'background':
-                  document.documentElement.style.setProperty('--login-background', value);
-                  break;
-                case 'foreground':
-                  document.documentElement.style.setProperty('--login-foreground', value);
-                  break;
-                case 'backgroundList':
-                  document.documentElement.style.setProperty('--login-background-list', value);
-                  break;
-                case 'foregroundList':
-                  document.documentElement.style.setProperty('--login-foreground-list', value);
-                  break;
-                default:
-                  console.warn('Unsupported Parameter:', name, value);
-                  break;
-              }
+              this.updateLoginStyle(name, value);
             }
           });
         }
@@ -165,6 +139,36 @@ export class Client implements OnInit, OnDestroy {
       console.log('Config:', this.config);
     } catch (error) {
       console.warn('Could not access parent document (same-origin policy):', error);
+    }
+  }
+
+  private updateLoginStyle(name: string, value: string | null) {
+    switch(name) {
+      case 'port':
+        this.config[name] = Number(value);
+        break;
+      case 'language':
+      case 'suggestion':
+        this.config[name] = value;
+        break;
+      case 'backgroundImage':
+        document.documentElement.style.setProperty('--login-background-image', 'url(' + value + ')');
+        break;
+      case 'background':
+        document.documentElement.style.setProperty('--login-background', value);
+        break;
+      case 'foreground':
+        document.documentElement.style.setProperty('--login-foreground', value);
+        break;
+      case 'backgroundList':
+        document.documentElement.style.setProperty('--login-background-list', value);
+        break;
+      case 'foregroundList':
+        document.documentElement.style.setProperty('--login-foreground-list', value);
+        break;
+      default:
+        console.warn('Unsupported Parameter:', name, value);
+        break;
     }
   }
 
@@ -231,7 +235,22 @@ export class Client implements OnInit, OnDestroy {
           const config = packet as Configuration;
 
           if(this.loginComponent) {
-            this.loginComponent.chatroom = config.getSuggestion();
+            const suggestion = config.getSuggestion();
+            const style = config.getStyle();
+
+            if(suggestion) {
+              this.loginComponent.chatroom = suggestion;
+            }
+
+            if(style) {
+              // style
+              this.updateLoginStyle('background', style.getBackground());
+              this.updateLoginStyle('backgroundList', style.getBackgroundList());
+              this.updateLoginStyle('backgroundImage', style.getBackgroundImage());
+              this.updateLoginStyle('foreground', style.getForeground());
+              this.updateLoginStyle('foregroundList', style.getForegroundList());
+            }
+
             this.cdr.detectChanges();
           }
           break;
@@ -244,7 +263,10 @@ export class Client implements OnInit, OnDestroy {
 
           if (this.loginComponent && roomCategories.hasData()) {
             this.loginComponent.categories = [
-              new Category(null, 'Alle Chaträume'),
+              new Category({
+                id:   null,
+                name: 'Alle Chaträume'
+              }),
               ...roomCategories.getCategories()
             ];
             this.cdr.detectChanges();
