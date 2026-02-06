@@ -1,0 +1,57 @@
+<!--
+	Mein Chatserver
+	▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+	Licensed Materials - Property of mein-chatserver.de.
+	© Copyright 2024. All Rights Reserved.
+
+	@version 1.0.0
+	@author  Adrian Preuß
+-->
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+      <title>Client</title>
+      <meta charset="utf-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, shrink-to-fit=no" />
+      <link rel="icon" href="/icon.svg" type="image/svg" />
+      <link rel="manifest" href="/manifest.json" />
+      <link rel="mask-icon" href="/icon.svg" color="#444444" />
+      <link rel="icon" href="/icon.ico" />
+      <meta name="theme-color" content="#444444" />
+      <style>
+          body {
+            font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", "Noto Sans", "Liberation Sans", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+            text-align: center;
+          }
+
+          a {
+            padding: 5px 15px;
+            border: none;
+            border-radius: 3px;
+            color: #FFFFFF;
+            background-color: #0D6EFD;
+            text-decoration: none;
+          }
+
+          a.red {
+            background-color: #FD240D;
+          }
+      </style>
+  </head>
+  <body>
+    <object type="text/html" width="560" height="280" data="http://localhost:4200">
+      <!-- Pflichtangaben -->
+      <param name="port" value="2710"/>
+
+      <!-- Optional -->
+      <param name="suggestion" value="Winterdream"/>
+      <param name="language" value="de_DE"/>
+      <param name="theme" value="Gradient"/>
+      <param name="backgroundImage" value="Assets/Login/style_1.png"/>
+      <param name="background" value="#094F90" />
+      <param name="foreground" value="#FFFFFF" />
+      <param name="foregroundList" value="#FFFFFF" />
+      <param name="backgroundList" value="#00093D" />
+    </object>
+  </body>
+</html>
