@@ -16,11 +16,23 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
   template: `
       <input
         type="checkbox"
+        name="{{ name }}"
         [checked]="checked"
         (change)="onChange($event)"
-        [disabled]="disabled" />`
+        [disabled]="disabled" />`,
+  styles: [`:host {
+    margin: 1px;
+    display: inline-flex;
+    vertical-align: middle;
+  }
+
+  input {
+    width: 14px;
+    height: 14px;
+  }`]
 })
 export class CheckBox implements ControlValueAccessor {
+  @Input() name: string = '';
   checked: boolean = false;
   disabled: boolean = false;
 

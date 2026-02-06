@@ -26,10 +26,10 @@ export class Chatroom extends Frame {
     super(
       {
         ...config,
-        width: config.width || 500,
+        width: config.width || 800,
         height: config.height || 600,
-        resizable: config.resizable ?? true,
-        scrollbars: config.scrollbars ?? false
+        resizable: true,
+        scrollbars: false
       },
       appRef,
       injector
@@ -45,7 +45,7 @@ export class Chatroom extends Frame {
       return;
     }
 
-    const appRoot = this.frameDocument.querySelector('app-root');
+    const appRoot = this.frameDocument.querySelector('#app-root');
 
     if(!appRoot) {
       return;
@@ -212,12 +212,13 @@ export class Chatroom extends Frame {
       return;
     }
 
-    const messageInput = this.frameDocument.querySelector('ui-output') as HTMLInputElement;
+    const messageInput = this.frameDocument.querySelector('main ui-input input') as HTMLInputElement;
 
     if (messageInput) {
       messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
+          console.log('Send Message', messageInput.value);
           // sendMessage => messageInput.value
         }
       });

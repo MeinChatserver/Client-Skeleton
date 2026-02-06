@@ -262,13 +262,6 @@ export class Client implements OnInit, OnDestroy {
                 title: 'Anmelden',
                 fields: [
                   {
-                    id: 'email',
-                    label: 'E-Mail',
-                    type: 'email',
-                    required: true,
-                    placeholder: 'ihre@email.de'
-                  },
-                  {
                     id: 'password',
                     label: 'Passwort',
                     type: 'password',
@@ -290,7 +283,7 @@ export class Client implements OnInit, OnDestroy {
           const chatroom = this.windowManager.createChatroom(
             {
               id: 'support-chat',
-              title: 'Support',
+              title: 'Chatraum',
               width: 400,
               height: 600
             }

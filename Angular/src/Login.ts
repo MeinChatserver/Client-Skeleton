@@ -41,13 +41,13 @@ import {Panel} from './Components/Panel';
           <ui-input name="chatroom" [(ngModel)]="chatroom" />
 
           <div id="remember">
-            <ui-check name="remember" [(ngModel)]="remember" /> <ui-label text="Passwort merken" />
+            <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
           </div>
 
           <ui-button (click)="onLoginClick()" [disabled]="!canLogin()" text="{{ getButtonText() }}" />
         } @else {
           <div id="remember">
-            <ui-check name="remember" [(ngModel)]="remember" /> <ui-label text="Passwort merken" />
+            <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
           </div>
 
           <div id="links">

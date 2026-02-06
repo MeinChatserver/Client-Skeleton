@@ -24,11 +24,12 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
       </option>
     </select>`,
   styles: [`:host {
-    width: 100%;
+    margin: 1px;
   }
 
   select {
     width: 100%;
+    font-size: 16px;
   }`]
 })
 export class Select implements ControlValueAccessor {

@@ -13,7 +13,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
       multi: true
     }
   ],
-  template: `<label>{{ text }}{{ dotted ? ':' : ''}}</label>`,
+  template: `<label for="{{ for }}">{{ text }}{{ dotted ? ':' : ''}}</label>`,
   styles: [`
     :host {
       padding: 0 20px 0 0;
@@ -23,6 +23,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
 export class Label implements ControlValueAccessor {
   @Input() name: string = '';
   @Input() text: string = '';
+  @Input() for: string = '';
   @Input() dotted: boolean = false;
 
   private onChangeFn = (value: string) => {};

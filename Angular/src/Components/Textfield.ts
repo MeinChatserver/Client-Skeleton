@@ -20,7 +20,15 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
       [placeholder]="placeholder"
       (change)="onChange($event)"
       [disabled]="disabled" />`,
-  styles: [``]
+  styles: [`
+    :host {
+      margin: 1px;
+    }
+
+    input {
+      width: 100%;
+      font-size: 16px;
+    }`]
 })
 export class Textfield implements ControlValueAccessor {
   @Input() placeholder: string = '';
