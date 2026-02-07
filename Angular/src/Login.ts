@@ -24,27 +24,30 @@ import {Panel} from './Components/Panel';
         @if(client.isEmbedded) {
             <ui-label name="category" text="Kategorie" [dotted]="true" />
             <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" (ngModelChange)="onCategoryChange($event)" valueKey="id" labelKey="name"></ui-select>
+
+            <ui-label name="username" text="Benutzername" [dotted]="true" />
+            <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
+            <ui-label name="password" text="Passwort" [dotted]="true" />
+            <ui-input name="password" [(ngModel)]="password" (keydown.enter)="focusNext('ui-button', $event)" />
+            <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
+            <ui-input name="chatroom" [(ngModel)]="chatroom" />
+
+            <div id="remember_container">
+              <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
+            </div>
+
+             <ui-button (click)="onLoginClick()" [disabled]="!canLogin()" text="{{ getButtonText() }}" />
         } @else {
           <h1 name="logo">
             <i class="bi bi-cloud-fill"></i>&nbsp;<span>Mein Chatserver</span>
           </h1>
-        }
 
-        <ui-label name="username" text="Benutzername" [dotted]="true" />
-        <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
-        <ui-label name="password" text="Passwort" [dotted]="true" />
-        <ui-input name="password" [(ngModel)]="password" (keydown.enter)="focusNext('ui-button', $event)" />
+          <ui-container>
+            <ui-label name="username" text="Benutzername" [dotted]="true" />
+            <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
+            <ui-label name="password" text="Passwort" [dotted]="true" />
+            <ui-input name="password" [(ngModel)]="password" (keydown.enter)="focusNext('ui-button', $event)" />
 
-        @if(client.isEmbedded) {
-          <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
-          <ui-input name="chatroom" [(ngModel)]="chatroom" />
-
-          <div id="remember_container">
-            <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
-          </div>
-
-          <ui-button (click)="onLoginClick()" [disabled]="!canLogin()" text="{{ getButtonText() }}" />
-        } @else {
             <div id="remember_container">
               <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
             </div>
@@ -52,10 +55,10 @@ import {Panel} from './Components/Panel';
             <div id="links">
               <a href="#">Passwort vergessen?</a>&nbsp;<a href="#">Neu registrieren</a>
             </div>
+          </ui-container>
 
           <ui-label name="category" text="Kategorie" [dotted]="true" />
           <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" (ngModelChange)="onCategoryChange($event)" valueKey="id" labelKey="name"></ui-select>
-
           <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
           <ui-input name="chatroom" [(ngModel)]="chatroom" />
         }
@@ -87,29 +90,43 @@ import {Panel} from './Components/Panel';
       flex: 1;
       padding: 10px;
       display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: 1fr auto auto auto auto auto auto auto;
+      grid-template-columns: auto 1fr;
+      grid-template-rows: 1fr auto auto auto auto;
       grid-template-areas:
         ". ."
         "logo logo"
-        "username_label username_element"
-        "password_label password_element"
-        ". remember"
-        "links links"
+        "account account"
         "category_label category_element"
         "chatroom_label chatroom_element";
     }
 
-    ui-form ui-label[name="category"] {
-      grid-area: category_label;
+    ui-form [name="logo"] {
+      grid-area: logo;
+      text-align: center;
+      margin-bottom: 40px;
     }
 
-    ui-form ui-select[name="category"] {
-      grid-area: category_element;
+    ui-form ui-container {
+      grid-area: account;
+      flex: 1;
+      display: grid;
+      padding: 0 25px;
+      grid-template-columns: auto 1fr;
+      grid-template-rows: 1fr auto auto;
+      grid-template-areas:
+        "username_label username_element"
+        "password_label password_element"
+        ". remember"
+        "links links"
     }
 
     ui-form ui-label[name="username"] {
       grid-area: username_label;
+    }
+
+    ui-form ui-label[name="username"],
+    ui-form ui-label[name="password"] {
+      text-align: right;
     }
 
     ui-form ui-input[name="username"] {
@@ -124,20 +141,6 @@ import {Panel} from './Components/Panel';
       grid-area: password_element;
     }
 
-    ui-form ui-label[name="chatroom"] {
-      grid-area: chatroom_label;
-    }
-
-    ui-form ui-input[name="chatroom"] {
-      grid-area: chatroom_element;
-    }
-
-    ui-form [name="logo"] {
-      grid-area: logo;
-      text-align: center;
-      margin-bottom: 40px;
-    }
-
     ui-form div#remember_container {
       grid-area: remember;
       display: block;
@@ -148,7 +151,24 @@ import {Panel} from './Components/Panel';
       grid-area: links;
       text-align: center;
       display: block;
-      padding: 0 0 20px 0;
+      padding: 5px 0 20px 0;
+      white-space: nowrap;
+    }
+
+    ui-form ui-label[name="category"] {
+      grid-area: category_label;
+    }
+
+    ui-form ui-select[name="category"] {
+      grid-area: category_element;
+    }
+
+    ui-form ui-label[name="chatroom"] {
+      grid-area: chatroom_label;
+    }
+
+    ui-form  ui-input[name="chatroom"] {
+      grid-area: chatroom_element;
     }
 
     ui-form ui-button {

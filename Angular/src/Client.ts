@@ -21,6 +21,7 @@ import {Rooms} from './Models/Network/Rooms';
 import {Room} from './Models/Room';
 import {MetaInfo} from './Models/MetaInfo';
 import {Popup} from './Models/Network/Popup';
+import {Disconnect} from './Models/Network/Disconnect';
 
 @Component({
   selector: 'body',
@@ -82,6 +83,13 @@ import {Popup} from './Models/Network/Popup';
         "button button";
     }
 
+
+    :host.embedded ::ng-deep ui-label[name="username"],
+    :host.embedded ::ng-deep ui-label[name="password"] {
+      text-align: left !important;
+    }
+
+
     ui-login ::ng-deep ui-list {
       color: var(--login-foreground-list, #000000);
       background-color: var(--login-background-list, #FFFFFF);
@@ -103,19 +111,23 @@ import {Popup} from './Models/Network/Popup';
 export class Client implements OnInit, OnDestroy {
   @ViewChild(Login) loginComponent!: Login;
   @HostBinding('class.embedded')
+  isEmbedded: boolean = false;
   hostname: string | null = null;
   port: number = 2710;
-  isEmbedded: boolean = false;
   meta: MetaInfo = new MetaInfo();
-  websocket: WebSocket | null = null;
+  socket: WebSocket | null = null;
   connectionStatus: string = 'disconnected';
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
   chatRooms = signal<Room[]>([]);
 
-  constructor(private cdr: ChangeDetectorRef,
-              private appRef: ApplicationRef, public windowManager: WindowManager,
-              private injector: EnvironmentInjector) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private appRef: ApplicationRef,
+    public windowManager: WindowManager,
+    private injector: EnvironmentInjector
+  ) {
+    /* Do Nothing */
   }
 
   ngOnInit() {
@@ -124,13 +136,13 @@ export class Client implements OnInit, OnDestroy {
     this.isEmbedded = window.self !== window.top;
 
     /* Load Hostname */
-    if (window.location.protocol !== 'file:' && window.location.hostname !== 'localhost') {
+    if(window.location.protocol !== 'file:' && window.location.hostname !== 'localhost') {
       this.hostname = window.location.hostname;
     }
 
     window.addEventListener('unload', () => {
       this.windowManager.closeAll();
-      //this.disconnect(true);
+      this.disconnect(true);
     });
 
     /* Load Defaults */
@@ -140,26 +152,7 @@ export class Client implements OnInit, OnDestroy {
           return;
         }
 
-        switch (name) {
-          case 'backgroundImage':
-            document.documentElement.style.setProperty('--login-background-image', 'url(' + value + ')');
-            break;
-          case 'background':
-            document.documentElement.style.setProperty('--login-background', String(value));
-            break;
-          case 'foreground':
-            document.documentElement.style.setProperty('--login-foreground', String(value));
-            break;
-          case 'backgroundList':
-            document.documentElement.style.setProperty('--login-background-list', String(value));
-            break;
-          case 'foregroundList':
-            document.documentElement.style.setProperty('--login-foreground-list', String(value));
-            break;
-          default:
-            console.warn('Unsupported Parameter:', name, value);
-            break;
-        }
+        this.updateConfigurations(name, String(value));
       });
 
       this.port = (window as any).Defaults.port;
@@ -185,7 +178,7 @@ export class Client implements OnInit, OnDestroy {
             let value = param.getAttribute('value');
 
             if (name && value) {
-              this.updateLoginStyle(name, value);
+              this.updateConfigurations(name, value);
             }
           });
         }
@@ -194,15 +187,15 @@ export class Client implements OnInit, OnDestroy {
       console.warn('Could not access parent document (same-origin policy):', error);
     }
 
-    this.initializeWebSocket();
+    /* Prepare Socket */
+    this.connect();
   }
 
   ngOnDestroy(): void {
-    this.closeWebSocket();
-    this.windowManager.closeAll();
+    this.disconnect(true);
   }
 
-  private updateLoginStyle(name: string, value: string | null) {
+  private updateConfigurations(name: string, value: string | null) {
     switch (name) {
       case 'port':
         this.port = Number(value);
@@ -233,61 +226,70 @@ export class Client implements OnInit, OnDestroy {
     }
   }
 
-  private initializeWebSocket(): void {
-    const wsUrl = 'wss://demo.mein-chatserver.de:' + this.port;
+  getHostname() {
+    /* Fix Demo */
+    if(this.hostname === null || this.hostname.length === 0 || this.hostname === 'www.mein-chatserver.de') {
+      this.hostname = 'demo.mein-chatserver.de';
+    }
+
+    return this.hostname;
+  }
+
+  getPort() {
+    return this.port;
+  }
+
+  private connect(hard: boolean = false): void {
+    this.disconnect(hard);
 
     try {
-      this.websocket = new WebSocket(wsUrl);
+      this.socket				    = new WebSocket(`wss://${this.getHostname()}:${this.getPort()}/`);
       this.connectionStatus = 'connecting';
-
-      this.websocket.onopen = () => {
-        console.log('WebSocket connected');
-        this.connectionStatus = 'connected';
-        this.reconnectAttempts = 0;
-
-        const handshake = new Handshake();
-        handshake.setClient(this.meta.getClient());
-        handshake.setVersion(this.meta.getVersion());
-
-        try {
-          if (!window.top) {
-            throw new Error('Can\'t find Top-Window.');
-          }
-
-          handshake.setLocation(window.top.location.href);
-        } catch (error) {
-          handshake.setLocation(window.location.ancestorOrigins[0]);
-        }
-
-        handshake.setUserAgent(navigator.userAgent);
-        this.send(handshake);
-      };
-
-      this.websocket.onmessage = (event) => {
-        this.handleWebSocketMessage(event);
-      };
-
-      this.websocket.onerror = (error) => {
-        console.error('WebSocket error:', error);
-        this.connectionStatus = 'error';
-      };
-
-      this.websocket.onclose = () => {
-        console.log('WebSocket closed');
-        this.connectionStatus = 'disconnected';
-        this.attemptReconnect();
-      };
-
-    } catch (error) {
+      this.socket.onopen    = this.onOpen.bind(this);
+      this.socket.onclose   = this.onClose.bind(this);
+      this.socket.onerror   = this.onError.bind(this);
+      this.socket.onmessage = this.onReceive.bind(this);
+    } catch(error) {
       console.error('Failed to create WebSocket:', error);
       this.connectionStatus = 'error';
     }
   }
 
-  /**
-   * Verarbeitet eingehende WebSocket-Nachrichten
-   */
-  private handleWebSocketMessage(event: MessageEvent): void {
+  private onOpen() {
+    console.log('WebSocket connected');
+    this.connectionStatus = 'connected';
+    this.reconnectAttempts = 0;
+
+    const handshake = new Handshake();
+    handshake.setClient(this.meta.getClient());
+    handshake.setVersion(this.meta.getVersion());
+
+    try {
+      if (!window.top) {
+        throw new Error('Can\'t find Top-Window.');
+      }
+
+      handshake.setLocation(window.top.location.href);
+    } catch (error) {
+      handshake.setLocation(window.location.ancestorOrigins[0]);
+    }
+
+    handshake.setUserAgent(navigator.userAgent);
+    this.send(handshake);
+  }
+
+  private onClose() {
+    console.log('WebSocket closed');
+    this.connectionStatus = 'disconnected';
+    this.attemptReconnect();
+  }
+
+  private onError(error: any) {
+    console.error('WebSocket error:', error);
+    this.connectionStatus = 'error';
+  }
+
+  private onReceive(event: MessageEvent): void {
     try {
       const packet = PacketFactory.fromJson(event.data);
 
@@ -304,11 +306,11 @@ export class Client implements OnInit, OnDestroy {
             }
 
             if (style) {
-              this.updateLoginStyle('background', style.getBackground());
-              this.updateLoginStyle('backgroundList', style.getBackgroundList());
-              this.updateLoginStyle('backgroundImage', style.getBackgroundImage());
-              this.updateLoginStyle('foreground', style.getForeground());
-              this.updateLoginStyle('foregroundList', style.getForegroundList());
+              this.updateConfigurations('background', style.getBackground());
+              this.updateConfigurations('backgroundList', style.getBackgroundList());
+              this.updateConfigurations('backgroundImage', style.getBackgroundImage());
+              this.updateConfigurations('foreground', style.getForeground());
+              this.updateConfigurations('foregroundList', style.getForegroundList());
             }
 
             this.cdr.detectChanges();
@@ -358,6 +360,39 @@ export class Client implements OnInit, OnDestroy {
     }
   }
 
+  private disconnect(hard: boolean = false) {
+    /* Sending Disconnect */
+    if(this.socket !== null) {
+      this.send(new Disconnect());
+    }
+
+    /* Close all Frames */
+    if(hard) {
+      this.windowManager.closeAll();
+    }
+
+    /* Close the Socket */
+    if(this.socket !== null) {
+      if(this.socket.readyState === WebSocket.OPEN) {
+        this.socket.close();
+      }
+
+      this.socket = null;
+    }
+  }
+
+  isConnected() {
+    if(this.socket == null) {
+      return false;
+    }
+
+    if(this.socket.readyState === this.socket.CLOSED){
+      return false;
+    }
+
+    return (this.socket.readyState === this.socket.OPEN);
+  }
+
   private attemptReconnect(): void {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
@@ -366,7 +401,7 @@ export class Client implements OnInit, OnDestroy {
       console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
       setTimeout(() => {
-        this.initializeWebSocket();
+        this.connect();
       }, delay);
     } else {
       console.error('Max reconnection attempts reached');
@@ -374,23 +409,18 @@ export class Client implements OnInit, OnDestroy {
     }
   }
 
-  private closeWebSocket(): void {
-    if (this.websocket) {
-      this.websocket.close();
-      this.websocket = null;
-    }
-  }
-
   send(data: any) {
-    if (this.websocket) {
-      if (data instanceof Packet) {
-        let packet = PacketFactory.toJson(data);
-        console.log('[SEND]', packet);
-        this.websocket.send(packet);
-      } else {
-        console.warn('[SEND]', data);
-        this.websocket.send(JSON.stringify(data));
-      }
+    if(!this.isConnected()) {
+      return;
+    }
+
+    if(data instanceof Packet) {
+      let packet = PacketFactory.toJson(data);
+      console.log('[SEND]', packet);
+      this.socket?.send(packet);
+    } else {
+      console.warn('[SEND]', data);
+      this.socket?.send(JSON.stringify(data));
     }
   }
 }
