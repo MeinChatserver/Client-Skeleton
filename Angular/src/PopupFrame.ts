@@ -6,7 +6,7 @@ export interface PopupConfig extends FrameConfig {
   showCloseButton?: boolean;
 }
 
-export class Popup extends Frame {
+export class PopupFrame extends Frame {
   protected content: any;
   protected eventListeners: Map<string, Function[]> = new Map();
 

@@ -27,13 +27,17 @@ export class Frame {
     this.initialize();
   }
 
+  getId() {
+    return this.config.id;
+  }
+
   protected initialize(): void {
     const features = this.buildWindowFeatures();
 
     this.frameWindow = window.open('', this.config.id, features);
 
-    if (!this.frameWindow) {
-      console.error('Popup wurde blockiert oder konnte nicht geöffnet werden');
+    if(!this.frameWindow) {
+      console.error('PopupFrame wurde blockiert oder konnte nicht geöffnet werden');
       return;
     }
 
@@ -98,7 +102,7 @@ export class Frame {
   }
 
   protected copyParentStyles(): void {
-    if (!this.frameDocument) {
+    if(!this.frameDocument) {
       return;
     }
 
@@ -119,11 +123,11 @@ export class Frame {
   }
 
   protected checkAndRenderDocument(): void {
-    if (this.isRebuilding) {
+    if(this.isRebuilding) {
       return;
     }
 
-    if (!this.frameWindow || this.frameWindow.closed) {
+    if(!this.frameWindow || this.frameWindow.closed) {
       this.handleWindowClosed();
       return;
     }
@@ -132,11 +136,11 @@ export class Frame {
       const currentDoc = this.frameWindow.document;
       const isNewDocument = (currentDoc !== this.frameDocument || !currentDoc.getElementById('app-root'));
 
-      if (isNewDocument) {
+      if(isNewDocument) {
         console.log(`[Frame ${this.config.id}] Document-Reset erkannt - Re-initialisiere...`);
         this.isRebuilding = true;
 
-        if (this.componentRef) {
+        if(this.componentRef) {
           try {
             this.appRef.detachView(this.componentRef.hostView);
             this.componentRef.destroy();

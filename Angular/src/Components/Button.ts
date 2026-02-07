@@ -28,9 +28,8 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
 })
 export class Button implements ControlValueAccessor {
   @Input() text: string = '';
-
-  checked: boolean = false;
-  disabled: boolean = false;
+  @Input() checked: boolean = false;
+  @Input() disabled: boolean = false;
 
   private onChangeFn = (value: boolean) => {};
   private onTouchedFn = () => {};

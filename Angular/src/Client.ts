@@ -20,6 +20,7 @@ import {Packet} from './Models/Network/Packet';
 import {Rooms} from './Models/Network/Rooms';
 import {Room} from './Models/Room';
 import {MetaInfo} from './Models/MetaInfo';
+import {Popup} from './Models/Network/Popup';
 
 @Component({
   selector: 'body',
@@ -44,6 +45,8 @@ import {MetaInfo} from './Models/MetaInfo';
     ui-login {
       width: 400px;
       height: 600px;
+      padding: 0 20px;
+      color: var(--login-foreground, #000000);
       background-color: var(--login-background, #DDDDDD);
       background-image: var(--login-background-image, initial);
       background-repeat: no-repeat;
@@ -56,11 +59,17 @@ import {MetaInfo} from './Models/MetaInfo';
     :host.embedded ui-login {
       flex-direction: row;
       flex: 1;
+      padding: 0;
       box-shadow: none;
       height: inherit;
     }
 
+    :host ::ng-deep ui-form {
+      padding: 5px 0 !important;
+    }
+
     :host.embedded ::ng-deep ui-form {
+      padding: 10px !important;
       grid-template-rows: auto 1fr auto auto auto auto 1fr auto;
       grid-template-areas:
         "category_label category_element"
@@ -77,32 +86,114 @@ import {MetaInfo} from './Models/MetaInfo';
       color: var(--login-foreground-list, #000000);
       background-color: var(--login-background-list, #FFFFFF);
     }
+
+    :host ::ng-deep ui-form a {
+      padding: 0 20px;
+      color: var(--login-foreground-list, #000000);
+      text-decoration: underline;
+    }
+
+    :host ::ng-deep ui-form a:hover,
+    :host ::ng-deep ui-form a:active {
+      color: red;
+      text-decoration: underline;
+    }
   `]
 })
 export class Client implements OnInit, OnDestroy {
   @ViewChild(Login) loginComponent!: Login;
   @HostBinding('class.embedded')
+  hostname: string | null = null;
+  port: number = 2710;
   isEmbedded: boolean = false;
   meta: MetaInfo = new MetaInfo();
   websocket: WebSocket | null = null;
   connectionStatus: string = 'disconnected';
   private reconnectAttempts: number = 0;
   private maxReconnectAttempts: number = 5;
-  config: any = {
-    port: 2710
-  };
   chatRooms = signal<Room[]>([]);
 
   constructor(private cdr: ChangeDetectorRef,
-  private appRef: ApplicationRef, public windowManager: WindowManager,
-  private injector: EnvironmentInjector) {
+              private appRef: ApplicationRef, public windowManager: WindowManager,
+              private injector: EnvironmentInjector) {
   }
 
   ngOnInit() {
     console.log('%cwww.mein-chatserver.de - ' + this.meta.getClient() + ' ' + this.meta.getVersion(), 'background: #3b2caf; font-size: 16px; padding: 2px 10px;', 'Copyright © 2024 by Mein Chatserver. All Rights Reserved.');
 
     this.isEmbedded = window.self !== window.top;
-    this.initializeParamConfig();
+
+    /* Load Hostname */
+    if (window.location.protocol !== 'file:' && window.location.hostname !== 'localhost') {
+      this.hostname = window.location.hostname;
+    }
+
+    window.addEventListener('unload', () => {
+      this.windowManager.closeAll();
+      //this.disconnect(true);
+    });
+
+    /* Load Defaults */
+    try {
+      Object.entries((window as any).Defaults.style).forEach(([name, value]) => {
+        if (!name || !value) {
+          return;
+        }
+
+        switch (name) {
+          case 'backgroundImage':
+            document.documentElement.style.setProperty('--login-background-image', 'url(' + value + ')');
+            break;
+          case 'background':
+            document.documentElement.style.setProperty('--login-background', String(value));
+            break;
+          case 'foreground':
+            document.documentElement.style.setProperty('--login-foreground', String(value));
+            break;
+          case 'backgroundList':
+            document.documentElement.style.setProperty('--login-background-list', String(value));
+            break;
+          case 'foregroundList':
+            document.documentElement.style.setProperty('--login-foreground-list', String(value));
+            break;
+          default:
+            console.warn('Unsupported Parameter:', name, value);
+            break;
+        }
+      });
+
+      this.port = (window as any).Defaults.port;
+
+      if ((window as any).Defaults.suggestion) {
+        this.loginComponent.chatroom = (window as any).Defaults.suggestion;
+      }
+    } catch (e) {
+    }
+
+    /* Load Parameters */
+    try {
+      const parentDoc = window.parent?.document || window.top?.document;
+
+      if (parentDoc) {
+        const objectElement = parentDoc.querySelector('object');
+
+        if (objectElement) {
+          const params = objectElement.querySelectorAll('param');
+
+          params.forEach(param => {
+            const name = param.getAttribute('name');
+            let value = param.getAttribute('value');
+
+            if (name && value) {
+              this.updateLoginStyle(name, value);
+            }
+          });
+        }
+      }
+    } catch (error) {
+      console.warn('Could not access parent document (same-origin policy):', error);
+    }
+
     this.initializeWebSocket();
   }
 
@@ -111,45 +202,15 @@ export class Client implements OnInit, OnDestroy {
     this.windowManager.closeAll();
   }
 
-  /**
-   * Liest <param> Attribute aus dem parent/top document aus
-   * wenn die App in einem <object> eingebettet ist
-   */
-  private initializeParamConfig(): void {
-    try {
-      const parentDoc = window.parent?.document || window.top?.document;
-
-      if(parentDoc) {
-        const objectElement = parentDoc.querySelector('object');
-
-        if(objectElement) {
-          const params = objectElement.querySelectorAll('param');
-
-          params.forEach(param => {
-            const name= param.getAttribute('name');
-            let value= param.getAttribute('value');
-
-            if(name && value) {
-              this.updateLoginStyle(name, value);
-            }
-          });
-        }
-      }
-
-      console.log('Config:', this.config);
-    } catch (error) {
-      console.warn('Could not access parent document (same-origin policy):', error);
-    }
-  }
-
   private updateLoginStyle(name: string, value: string | null) {
-    switch(name) {
+    switch (name) {
       case 'port':
-        this.config[name] = Number(value);
+        this.port = Number(value);
         break;
-      case 'language':
       case 'suggestion':
-        this.config[name] = value;
+        if (value) {
+          this.loginComponent.chatroom = value;
+        }
         break;
       case 'backgroundImage':
         document.documentElement.style.setProperty('--login-background-image', 'url(' + value + ')');
@@ -173,7 +234,7 @@ export class Client implements OnInit, OnDestroy {
   }
 
   private initializeWebSocket(): void {
-    const wsUrl = 'wss://demo.mein-chatserver.de:' + this.config.port;
+    const wsUrl = 'wss://demo.mein-chatserver.de:' + this.port;
 
     try {
       this.websocket = new WebSocket(wsUrl);
@@ -189,12 +250,12 @@ export class Client implements OnInit, OnDestroy {
         handshake.setVersion(this.meta.getVersion());
 
         try {
-          if(!window.top) {
+          if (!window.top) {
             throw new Error('Can\'t find Top-Window.');
           }
 
           handshake.setLocation(window.top.location.href);
-        } catch(error) {
+        } catch (error) {
           handshake.setLocation(window.location.ancestorOrigins[0]);
         }
 
@@ -230,20 +291,19 @@ export class Client implements OnInit, OnDestroy {
     try {
       const packet = PacketFactory.fromJson(event.data);
 
-      switch(packet.getOperation()) {
+      switch (packet.getOperation()) {
         case 'CONFIGURATION':
           const config = packet as Configuration;
 
-          if(this.loginComponent) {
+          if (this.loginComponent) {
             const suggestion = config.getSuggestion();
             const style = config.getStyle();
 
-            if(suggestion) {
+            if (suggestion) {
               this.loginComponent.chatroom = suggestion;
             }
 
-            if(style) {
-              // style
+            if (style) {
               this.updateLoginStyle('background', style.getBackground());
               this.updateLoginStyle('backgroundList', style.getBackgroundList());
               this.updateLoginStyle('backgroundImage', style.getBackgroundImage());
@@ -255,8 +315,7 @@ export class Client implements OnInit, OnDestroy {
           }
           break;
         case 'ROOMS':
-          const rooms = packet as Rooms;
-          this.chatRooms.set(rooms.getRooms());
+          this.chatRooms.set((packet as Rooms).getRooms());
           break;
         case 'ROOMS_CATEGORIES':
           const roomCategories = packet as RoomsCategories;
@@ -264,7 +323,7 @@ export class Client implements OnInit, OnDestroy {
           if (this.loginComponent && roomCategories.hasData()) {
             this.loginComponent.categories = [
               new Category({
-                id:   null,
+                id: null,
                 name: 'Alle Chaträume'
               }),
               ...roomCategories.getCategories()
@@ -273,33 +332,7 @@ export class Client implements OnInit, OnDestroy {
           }
           break;
         case 'POPUP':
-
-          const popup = this.windowManager.createPopup({
-              id: 'login-popup',
-              title: 'Login',
-              width: 400,
-              height: 350,
-              content: {
-                type: 'form',
-                title: 'Anmelden',
-                fields: [
-                  {
-                    id: 'password',
-                    label: 'Passwort',
-                    type: 'password',
-                    required: true
-                  }
-                ],
-                submitLabel: 'Anmelden',
-                cancelLabel: 'Abbrechen'
-              }
-          });
-
-          popup.on('submit', (credentials: any) => {
-            console.log('Login-Daten:', credentials);
-          });
-
-          this.windowManager.addFrame('hello-popup', popup);
+          this.windowManager.createPopup(packet as Popup);
           break;
         case 'WINDOW_ROOM':
           const chatroom = this.windowManager.createChatroom(
@@ -359,13 +392,5 @@ export class Client implements OnInit, OnDestroy {
         this.websocket.send(JSON.stringify(data));
       }
     }
-  }
-
-  getConfig(name: string) {
-    if(!this.config) {
-      return null;
-    }
-
-    return this.config[name] ?? null;
   }
 }

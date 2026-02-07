@@ -18,6 +18,10 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
     :host {
       padding: 0 20px 0 0;
     }
+
+    label[for] {
+      cursor: pointer;
+    }
   `]
 })
 export class Label implements ControlValueAccessor {

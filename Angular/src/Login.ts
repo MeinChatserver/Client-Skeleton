@@ -31,28 +31,27 @@ import {Panel} from './Components/Panel';
         }
 
         <ui-label name="username" text="Benutzername" [dotted]="true" />
-        <ui-input name="username" [(ngModel)]="username" />
-
+        <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
         <ui-label name="password" text="Passwort" [dotted]="true" />
-        <ui-input name="password" [(ngModel)]="password" />
+        <ui-input name="password" [(ngModel)]="password" (keydown.enter)="focusNext('ui-button', $event)" />
 
         @if(client.isEmbedded) {
           <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
           <ui-input name="chatroom" [(ngModel)]="chatroom" />
 
-          <div id="remember">
+          <div id="remember_container">
             <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
           </div>
 
           <ui-button (click)="onLoginClick()" [disabled]="!canLogin()" text="{{ getButtonText() }}" />
         } @else {
-          <div id="remember">
-            <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
-          </div>
+            <div id="remember_container">
+              <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
+            </div>
 
-          <div id="links">
-            <a href="#">Passwort vergessen?</a>&nbsp;<a href="#">Neu registrieren</a>
-          </div>
+            <div id="links">
+              <a href="#">Passwort vergessen?</a>&nbsp;<a href="#">Neu registrieren</a>
+            </div>
 
           <ui-label name="category" text="Kategorie" [dotted]="true" />
           <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" (ngModelChange)="onCategoryChange($event)" valueKey="id" labelKey="name"></ui-select>
@@ -139,13 +138,17 @@ import {Panel} from './Components/Panel';
       margin-bottom: 40px;
     }
 
-    ui-form div#remember {
+    ui-form div#remember_container {
       grid-area: remember;
+      display: block;
+      padding: 5px 0;
     }
 
     ui-form div#links {
       grid-area: links;
       text-align: center;
+      display: block;
+      padding: 0 0 20px 0;
     }
 
     ui-form ui-button {
@@ -174,7 +177,7 @@ import {Panel} from './Components/Panel';
     }
 
     footer {
-      padding: 10px;
+      padding: 15px 0;
     }
   `]
 })
@@ -193,9 +196,7 @@ export class Login implements OnInit {
     }))
   );
 
-  ngOnInit() {
-    this.chatroom = this.client.getConfig('suggestion') ?? '';
-  }
+  ngOnInit() {}
 
   onCategoryChange(categoryId: string): void {
     this.client.send(new CategoryChange(categoryId));
@@ -241,5 +242,34 @@ export class Login implements OnInit {
     }
 
     return 'Einloggen';
+  }
+
+  focusNext(selector: string, event: Event): void {
+    event.preventDefault();
+
+    const target = event.target as HTMLElement;
+    const form = target.closest('ui-form')?.parentElement || document.body;
+    const next = form.querySelector<HTMLElement>(selector);
+
+    if (!next) {
+      console.warn(`No element found for selector: ${selector}`, form);
+      return;
+    }
+
+    if (next.tagName === 'UI-BUTTON' || next.tagName === 'BUTTON') {
+      next.dispatchEvent(new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true
+      }));
+    } else {
+      const innerInput = next.querySelector('input, textarea, select') as HTMLInputElement;
+
+      if (innerInput) {
+        innerInput.focus();
+        innerInput.select?.();
+      } else {
+        next.focus();
+      }
+    }
   }
 }

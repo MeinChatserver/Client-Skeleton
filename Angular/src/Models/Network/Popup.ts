@@ -3,7 +3,7 @@ import {Component} from '@angular/core';
 import {Size} from '../Size';
 
 /**
- * Dieses Paket kann ein Popup am Clienten anzeigen.
+ * Dieses Paket kann ein PopupFrame am Clienten anzeigen.
  *
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/POPUP.md
  **/

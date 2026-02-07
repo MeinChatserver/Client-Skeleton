@@ -16,6 +16,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
   template: `
       <input
         type="checkbox"
+        id="{{ name }}"
         name="{{ name }}"
         [checked]="checked"
         (change)="onChange($event)"
@@ -29,6 +30,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
   input {
     width: 14px;
     height: 14px;
+    cursor: pointer;
   }`]
 })
 export class CheckBox implements ControlValueAccessor {

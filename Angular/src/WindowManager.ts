@@ -1,7 +1,8 @@
 import { Injectable, ApplicationRef, EnvironmentInjector } from '@angular/core';
 import { Frame } from './Frame';
-import { Popup, PopupConfig } from './Popup';
+import { PopupFrame, PopupConfig } from './PopupFrame';
 import { Chatroom, ChatroomConfig } from './Chatroom';
+import {Popup} from './Models/Network/Popup';
 
 @Injectable({
   providedIn: 'root'
@@ -14,10 +15,34 @@ export class WindowManager {
     private injector: EnvironmentInjector
   ) {}
 
-  createPopup(config: PopupConfig): Popup {
-    const popup = new Popup(config, this.appRef, this.injector);
-    this.addFrame(config.id, popup);
-    return popup;
+  createPopup(popup: Popup): PopupFrame {
+    let config: PopupConfig = {
+      id: popup.getName() ?? 'popup-' + Math.random().toString(36).substr(2, 9)
+    };
+
+    if(popup.hasTitle()) {
+      config.title = popup.getTitle() ?? 'Neues Fenster';
+    }
+
+    if(popup.hasSize()) {
+      const size = popup.getSize();
+
+      if(size?.hasWidth()) {
+        config.width = size?.getWidth() ?? 400;
+      }
+
+      if(size?.hasHeight()) {
+        config.height = size?.getHeight() ?? 100;
+      }
+    }
+
+    if(popup.hasElements()) {
+      // @ToDo
+    }
+
+    const frame = new PopupFrame(config, this.appRef, this.injector);
+    this.addFrame(frame.getId(), frame);
+    return frame;
   }
 
   createChatroom(config: ChatroomConfig): Chatroom {
