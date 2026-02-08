@@ -1,9 +1,8 @@
 import { Injectable, ApplicationRef, EnvironmentInjector } from '@angular/core';
 import { Frame } from './Frame';
 import { PopupFrame, PopupConfig } from './PopupFrame';
-import { ChatroomFrame, ChatroomConfig } from './ChatroomFrame';
-import {Popup} from './Models/Network/Popup';
-import {WindowRoom} from './Models/Network/WindowRoom';
+import { ChatroomFrame } from './ChatroomFrame';
+import {Popup, WindowRoom } from './Models/Network';
 
 @Injectable({
   providedIn: 'root'
@@ -62,43 +61,63 @@ export class WindowManager {
     return chatroom;
   }
 
-  addFrame(id: string, frame: Frame): void {
-    if (this.frames.has(id)) {
-      console.warn(`Frame mit ID "${id}" existiert bereits und wird überschrieben.`);
+  addFrame(name: string, frame: Frame): void {
+    if (this.frames.has(name)) {
+      console.warn(`Frame mit Name "${name}" existiert bereits und wird überschrieben.`);
       // @ToDo bad behavior!
     }
 
-    this.frames.set(id, frame);
+    this.frames.set(name, frame);
   }
 
-  removeFrame(id: string): boolean {
-    return this.frames.delete(id);
+  removeFrame(name: string): boolean {
+    return this.frames.delete(name);
   }
 
-  existsFrame(id: string): boolean {
-    return this.frames.has(id);
+  existsFrame(name: string): boolean {
+    return this.frames.has(name);
   }
 
-  getFrame(id: string | null): Frame | null {
-    if(id === null) {
+  getFrame(name: string | null): Frame | null {
+    if(!name) {
       return null;
     }
 
-    return this.frames.get(id) ?? null;
-  }
+    const frame = this.frames.get(name);
 
-  getPopup(id: string): Popup | null {
-    const frame = this.frames.get(id);
-    return frame instanceof Popup ? frame : null;
-  }
-
-  getChatroom(id: string | null): ChatroomFrame | null {
-    if(id === null) {
+    if(!frame) {
       return null;
     }
 
-    const frame = this.frames.get(id);
-    return frame instanceof ChatroomFrame ? frame : null;
+    return frame;
+  }
+
+  getPopup(name: string | null): PopupFrame | null {
+    if(!name) {
+      return null;
+    }
+
+    const frame = this.frames.get(name);
+
+    if(!(frame instanceof PopupFrame)) {
+      return null;
+    }
+
+    return frame as PopupFrame;
+  }
+
+  getChatroom(name: string | null): ChatroomFrame | null {
+    if(!name) {
+      return null;
+    }
+
+    const frame = this.frames.get(name);
+
+    if(!(frame instanceof ChatroomFrame)) {
+      return null;
+    }
+
+    return frame as ChatroomFrame;
   }
 
   getAllChatrooms() {
@@ -110,7 +129,7 @@ export class WindowManager {
     this.frames.clear();
   }
 
-  getAllFrameIds(): string[] {
+  getAllFrameNames(): string[] {
     return Array.from(this.frames.keys());
   }
 

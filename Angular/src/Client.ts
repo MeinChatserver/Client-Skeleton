@@ -7,37 +7,35 @@ import {
   ChangeDetectorRef,
   HostBinding,
   ApplicationRef, EnvironmentInjector
-} from '@angular/core';
-import { CommonModule } from '@angular/common';
-import {Login} from './Login';
+} from '@angular/core';import { CommonModule } from '@angular/common';
+import { Login } from './Login';
+import { Room, MetaInfo, Category } from './Models';
+import {
+  Packet,
+  PacketFactory,
+  Configuration,
+  RoomsCategories,
+  Handshake,
+  Rooms,
+  Popup,
+  Disconnect,
+  Pong,
+  Ping,
+  WindowRoom,
+  WindowRoomClose,
+  WindowRoomUpdate,
+  RoomFeature,
+  RoomUpdate,
+  RoomUserAdd,
+  RoomUserFeature,
+  RoomUserRemove,
+  MessagePrivate,
+  MessageAction,
+  MessagePublic,
+  WindowInit
+} from './Models/Network';
 import { WindowManager } from './WindowManager';
-import {Category} from './Models/Category';
-import {PacketFactory} from './Models/Network/PacketFactory';
-import {Configuration} from './Models/Network/Configuration';
-import {RoomsCategories} from './Models/Network/RoomsCategories';
-import {Handshake} from './Models/Network/Handshake';
-import {Packet} from './Models/Network/Packet';
-import {Rooms} from './Models/Network/Rooms';
-import {Room} from './Models/Room';
-import {MetaInfo} from './Models/MetaInfo';
-import {Popup} from './Models/Network/Popup';
-import {Disconnect} from './Models/Network/Disconnect';
-import {Pong} from './Models/Network/Pong';
-import {Ping} from './Models/Network/Ping';
-import {ChatMessage, ChatroomFrame} from './ChatroomFrame';
-import {WindowRoom} from './Models/Network/WindowRoom';
-import {WindowRoomClose} from './Models/Network/WindowRoomClose';
-import {WindowRoomUpdate} from './Models/Network/WindowRoomUpdate';
-import {RoomFeature} from './Models/Network/RoomFeature';
-import {RoomUpdate} from './Models/Network/RoomUpdate';
-import {RoomUserAdd} from './Models/Network/RoomUserAdd';
-import {RoomUserFeature} from './Models/Network/RoomUserFeature';
-import {RoomUserRemove} from './Models/Network/RoomUserRemove';
-import {MessagePrivate} from './Models/Network/MessagePrivate';
-import {MessageAction} from './Models/Network/MessageAction';
-import {MessagePublic} from './Models/Network/MessagePublic';
-import {WindowInit} from './Models/Network/WindowInit';
-import {Message} from './Models/Network/Message';
+import { ChatMessage } from './ChatroomFrame';
 
 @Component({
   selector: 'body',
@@ -372,7 +370,13 @@ export class Client implements OnInit, OnDestroy {
             this.send(new Pong());
             break;
         case 'PONG':
-          // @ToDo
+          if(this.pingInterval) {
+            clearInterval(this.pingInterval);
+          }
+
+          this.pingInterval = setInterval(() => {
+            this.send(new Ping());
+          }, 10000);
           break;
         case 'ALERT':
           alert(packet.getData() as string);
