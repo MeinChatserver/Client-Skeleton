@@ -18,6 +18,17 @@ export class Frame {
   protected isDocumentInitialized = false;
   protected componentRef: ComponentRef<any> | null = null;
   protected isRebuilding = false;
+  protected windowFeatures = {
+    popup:		true,
+    location:	false,
+    toolbar:	false,
+    menubar:	false,
+    status:		false,
+    resizable:	false,
+    titlebar:	false,
+    scrollbars:	false,
+    showLoading: false
+  };
 
   constructor(
     protected config: FrameConfig,
@@ -32,12 +43,17 @@ export class Frame {
   }
 
   protected initialize(): void {
-    const features = this.buildWindowFeatures();
-
-    this.frameWindow = window.open('', this.config.id, features);
+    this.frameWindow = window.open('', this.config.id, Object.entries({
+      ...this.windowFeatures,
+      width: this.config.width || 400,
+      height: this.config.height || 100,
+      left: this.config.left || null,
+      top: this.config.top || null,
+    }).map(([ key, value ]) => key + '=' + (typeof(value) === 'boolean' ? (value ? 'yes' : 'no') : value)).join(','));
 
     if(!this.frameWindow) {
       console.error('PopupFrame wurde blockiert oder konnte nicht geöffnet werden');
+      // @ToDo notify client event for popup-blocker info
       return;
     }
 
@@ -45,21 +61,6 @@ export class Frame {
     this.setupInitialDocument();
     this.startWatcher();
     this.setupCloseHandler();
-  }
-
-  protected buildWindowFeatures(): string {
-    const features: string[] = [];
-
-    // @ToDo wie im alten Clienten verbessern!
-    if (this.config.width) features.push(`width=${this.config.width}`);
-    if (this.config.height) features.push(`height=${this.config.height}`);
-    if (this.config.left !== undefined) features.push(`left=${this.config.left}`);
-    if (this.config.top !== undefined) features.push(`top=${this.config.top}`);
-
-    features.push(`resizable=${this.config.resizable ? 'yes' : 'no'}`);
-    features.push(`scrollbars=${this.config.scrollbars ? 'yes' : 'no'}`);
-
-    return features.join(',');
   }
 
   protected setupInitialDocument(): void {

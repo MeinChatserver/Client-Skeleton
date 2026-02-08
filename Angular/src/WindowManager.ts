@@ -54,6 +54,7 @@ export class WindowManager {
   addFrame(id: string, frame: Frame): void {
     if (this.frames.has(id)) {
       console.warn(`Frame mit ID "${id}" existiert bereits und wird überschrieben.`);
+      // @ToDo bad behavior!
     }
 
     this.frames.set(id, frame);

@@ -7,7 +7,7 @@ import {Packet} from './Packet';
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/PONG.md
  **/
 export class Pong extends Packet {
-  constructor() {
+  constructor(data: any) {
     super('PONG', null);
   }
 }

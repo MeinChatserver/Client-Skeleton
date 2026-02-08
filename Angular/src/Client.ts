@@ -22,6 +22,8 @@ import {Room} from './Models/Room';
 import {MetaInfo} from './Models/MetaInfo';
 import {Popup} from './Models/Network/Popup';
 import {Disconnect} from './Models/Network/Disconnect';
+import {Pong} from './Models/Network/Pong';
+import {Ping} from './Models/Network/Ping';
 
 @Component({
   selector: 'body',
@@ -114,6 +116,7 @@ export class Client implements OnInit, OnDestroy {
   isEmbedded: boolean = false;
   hostname: string | null = null;
   port: number = 2710;
+  pingInterval: number | null = null;
   meta: MetaInfo = new MetaInfo();
   socket: WebSocket | null = null;
   connectionStatus: string = 'disconnected';
@@ -260,6 +263,10 @@ export class Client implements OnInit, OnDestroy {
     this.connectionStatus = 'connected';
     this.reconnectAttempts = 0;
 
+    if(this.pingInterval) {
+      clearInterval(this.pingInterval);
+    }
+
     const handshake = new Handshake();
     handshake.setClient(this.meta.getClient());
     handshake.setVersion(this.meta.getVersion());
@@ -279,9 +286,15 @@ export class Client implements OnInit, OnDestroy {
   }
 
   private onClose() {
-    console.log('WebSocket closed');
+    if(this.pingInterval) {
+      clearInterval(this.pingInterval);
+    }
+
     this.connectionStatus = 'disconnected';
+    this.disconnect();
     this.attemptReconnect();
+
+    console.warn('WebSocket: onClose', event);
   }
 
   private onError(error: any) {
@@ -315,6 +328,10 @@ export class Client implements OnInit, OnDestroy {
 
             this.cdr.detectChanges();
           }
+
+          this.pingInterval = setInterval(() => {
+            this.send(new Ping());
+          }, 10000);
           break;
         case 'ROOMS':
           this.chatRooms.set((packet as Rooms).getRooms());
@@ -333,8 +350,17 @@ export class Client implements OnInit, OnDestroy {
             this.cdr.detectChanges();
           }
           break;
+          case 'PING':
+            this.send(new Pong());
+            break;
+        case 'PONG':
+          // @ToDo
+          break;
         case 'POPUP':
           this.windowManager.createPopup(packet as Popup);
+          break;
+        case 'ALERT':
+          alert(packet.getData() as string);
           break;
         case 'WINDOW_ROOM':
           const chatroom = this.windowManager.createChatroom(

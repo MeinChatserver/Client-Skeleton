@@ -15,17 +15,12 @@ export class PopupFrame extends Frame {
     appRef: ApplicationRef,
     injector: EnvironmentInjector
   ) {
-    super(
-      {
+    console.log('PopupFrame', config);
+    super({
         ...config,
         width: config.width || 400,
-        height: config.height || 300,
-        resizable: config.resizable ?? true,
-        scrollbars: config.scrollbars ?? true
-      },
-      appRef,
-      injector
-    );
+        height: config.height || 100
+      }, appRef, injector);
 
     this.content = config.content || {};
     this.renderContent();
