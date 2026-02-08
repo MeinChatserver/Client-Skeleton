@@ -7,13 +7,12 @@ export interface ChatroomConfig extends FrameConfig {
 }
 
 export interface ChatMessage {
-  id: string;
   username: string;
   message: string;
-  timestamp: Date;
+  timestamp?: Date;
 }
 
-export class Chatroom extends Frame {
+export class ChatroomFrame extends Frame {
   protected roomName: string;
   protected messages: ChatMessage[] = [];
   protected eventListeners: Map<string, Function[]> = new Map();
@@ -38,6 +37,7 @@ export class Chatroom extends Frame {
     this.roomName = config.roomName || 'Chat';
 
     this.renderContent();
+    this.emit('init', null);
   }
 
   protected override renderContent(): void {
@@ -218,8 +218,8 @@ export class Chatroom extends Frame {
       messageInput.addEventListener('keypress', (e) => {
         if (e.key === 'Enter' && !e.shiftKey) {
           e.preventDefault();
-          console.log('Send Message', messageInput.value);
-          // sendMessage => messageInput.value
+
+          this.emit('sendMessage', messageInput.value);
         }
       });
     }

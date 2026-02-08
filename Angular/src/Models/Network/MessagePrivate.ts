@@ -1,4 +1,4 @@
-import {Packet} from './Packet';
+import {Message} from './Message';
 
 /**
  * Wird eine private Nachricht an den Nutzer versendet, wird dieses Paket an den Ziel-Clienten versendet.
@@ -9,18 +9,13 @@ import {Packet} from './Packet';
  *
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/MESSAGE_PRIVATE.md
  **/
-export class MessagePrivate extends Packet {
-  protected room: string | null = null;
+export class MessagePrivate extends Message {
   protected sender: string | null = null;
   protected users: string[] | null = null;
-  protected text: string | null = null;
 
   constructor(data: any = null) {
-    super('MESSAGE_PRIVATE', data);
-
-    if(data.room) {
-      this.room = data.room;
-    }
+    super(data);
+    this.setOperation('MESSAGE_PRIVATE');
 
     if(data.sender) {
       this.sender = data.sender;
@@ -29,14 +24,6 @@ export class MessagePrivate extends Packet {
     if(data.users) {
       this.users = data.users;
     }
-
-    if(data.text) {
-      this.text = data.text;
-    }
-  }
-
-  getRoom() {
-    return this.room;
   }
 
   getSender() {
@@ -45,9 +32,5 @@ export class MessagePrivate extends Packet {
 
   getUsers() {
     return this.users;
-  }
-
-  getText() {
-    return this.text;
   }
 }

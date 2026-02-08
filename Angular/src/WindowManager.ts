@@ -1,8 +1,9 @@
 import { Injectable, ApplicationRef, EnvironmentInjector } from '@angular/core';
 import { Frame } from './Frame';
 import { PopupFrame, PopupConfig } from './PopupFrame';
-import { Chatroom, ChatroomConfig } from './Chatroom';
+import { ChatroomFrame, ChatroomConfig } from './ChatroomFrame';
 import {Popup} from './Models/Network/Popup';
+import {WindowRoom} from './Models/Network/WindowRoom';
 
 @Injectable({
   providedIn: 'root'
@@ -45,8 +46,18 @@ export class WindowManager {
     return frame;
   }
 
-  createChatroom(config: ChatroomConfig): Chatroom {
-    const chatroom = new Chatroom(config, this.appRef, this.injector);
+  createChatroom(packet: WindowRoom): ChatroomFrame {
+    let config: PopupConfig = {
+      id: packet.getName() ?? 'chatroom-' + Math.random().toString(36).substr(2, 9),
+      width: 800,
+      height: 600
+    };
+
+    if(packet.hasTitle()) {
+      config.title = packet.getTitle() ?? 'ChatroomFrame';
+    }
+
+    const chatroom = new ChatroomFrame(config, this.appRef, this.injector);
     this.addFrame(config.id, chatroom);
     return chatroom;
   }
@@ -68,18 +79,30 @@ export class WindowManager {
     return this.frames.has(id);
   }
 
-  getFrame(id: string): Frame | undefined {
-    return this.frames.get(id);
+  getFrame(id: string | null): Frame | null {
+    if(id === null) {
+      return null;
+    }
+
+    return this.frames.get(id) ?? null;
   }
 
-  getPopup(id: string): Popup | undefined {
+  getPopup(id: string): Popup | null {
     const frame = this.frames.get(id);
-    return frame instanceof Popup ? frame : undefined;
+    return frame instanceof Popup ? frame : null;
   }
 
-  getChatroom(id: string): Chatroom | undefined {
+  getChatroom(id: string | null): ChatroomFrame | null {
+    if(id === null) {
+      return null;
+    }
+
     const frame = this.frames.get(id);
-    return frame instanceof Chatroom ? frame : undefined;
+    return frame instanceof ChatroomFrame ? frame : null;
+  }
+
+  getAllChatrooms() {
+    return Array.from(this.frames.values()).filter(frame => frame instanceof ChatroomFrame);
   }
 
   closeAll(): void {

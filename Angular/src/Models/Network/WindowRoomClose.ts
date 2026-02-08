@@ -17,4 +17,8 @@ export class WindowRoomClose extends Packet {
   getName() {
     return this.name;
   }
+
+  closeAll() {
+    return (this.name === '-');
+  }
 }

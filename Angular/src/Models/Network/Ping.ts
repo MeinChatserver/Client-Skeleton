@@ -6,7 +6,7 @@ import {Packet} from './Packet';
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/PING.md
  **/
 export class Ping extends Packet {
-  constructor(data: any) {
+  constructor(data: any | null = null) {
     super('PING', null);
   }
 }

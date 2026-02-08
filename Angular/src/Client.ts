@@ -24,6 +24,20 @@ import {Popup} from './Models/Network/Popup';
 import {Disconnect} from './Models/Network/Disconnect';
 import {Pong} from './Models/Network/Pong';
 import {Ping} from './Models/Network/Ping';
+import {ChatMessage, ChatroomFrame} from './ChatroomFrame';
+import {WindowRoom} from './Models/Network/WindowRoom';
+import {WindowRoomClose} from './Models/Network/WindowRoomClose';
+import {WindowRoomUpdate} from './Models/Network/WindowRoomUpdate';
+import {RoomFeature} from './Models/Network/RoomFeature';
+import {RoomUpdate} from './Models/Network/RoomUpdate';
+import {RoomUserAdd} from './Models/Network/RoomUserAdd';
+import {RoomUserFeature} from './Models/Network/RoomUserFeature';
+import {RoomUserRemove} from './Models/Network/RoomUserRemove';
+import {MessagePrivate} from './Models/Network/MessagePrivate';
+import {MessageAction} from './Models/Network/MessageAction';
+import {MessagePublic} from './Models/Network/MessagePublic';
+import {WindowInit} from './Models/Network/WindowInit';
+import {Message} from './Models/Network/Message';
 
 @Component({
   selector: 'body',
@@ -305,6 +319,10 @@ export class Client implements OnInit, OnDestroy {
   private onReceive(event: MessageEvent): void {
     try {
       const packet = PacketFactory.fromJson(event.data);
+      let frame = null;
+      let message = null;
+      let user = null;
+      let roomName = null;
 
       switch (packet.getOperation()) {
         case 'CONFIGURATION':
@@ -356,28 +374,179 @@ export class Client implements OnInit, OnDestroy {
         case 'PONG':
           // @ToDo
           break;
-        case 'POPUP':
-          this.windowManager.createPopup(packet as Popup);
-          break;
         case 'ALERT':
           alert(packet.getData() as string);
           break;
+        case 'POPUP':
+          this.windowManager.createPopup(packet as Popup);
+          break;
         case 'WINDOW_ROOM':
-          const chatroom = this.windowManager.createChatroom(
-            {
-              id: 'support-chat',
-              title: 'Chatraum',
-              width: 400,
-              height: 600
-            }
-          );
-          this.windowManager.addFrame('dwqqw-popup', chatroom);
+          let chatroom = this.windowManager.createChatroom(packet as WindowRoom);
+
+          chatroom.on('init', () => {
+            this.send(new WindowInit(chatroom.getId()));
+          });
+
+          chatroom.on('sendMessage', (message: string) => {
+            this.send({
+              operation: 'ROOM_MESSAGE',
+              data: {
+                room: chatroom.getId(),
+                text: message
+              }
+            });
+          })
           break;
         case 'WINDOW_ROOM_CLOSE':
+          const closing = packet as WindowRoomClose;
 
+          if(closing.closeAll()) {
+            this.windowManager.closeAll();
+          }
+
+          frame = this.windowManager.getFrame(closing.getName());
+
+          if(frame !== null) {
+            frame.close();
+          }
           break;
         case 'WINDOW_ROOM_UPDATE':
+          const updating = packet as WindowRoomUpdate;
 
+          frame = this.windowManager.getFrame(updating.getName());
+
+          if(frame !== null) {
+           /*
+           * frame.change(packet.data.name, packet.data.width, packet.data.height);
+                        frame.setTitle(packet.data.title);
+                        frame.setStyle(packet.data.room.style, packet.data.ranks);
+                        frame.focus();
+           * */
+          }
+          break;
+        case 'ROOM_FEATURE':
+          const feature = packet as RoomFeature;
+
+          //frame = this.windowManager.getFrame(feature.getName());
+
+          if(frame !== null) {
+            //frame.addFeature('ROOM', packet.data.name);
+          }
+          break;
+        case 'ROOM_UPDATE':
+          const updt = packet as RoomUpdate;
+
+          //frame = this.windowManager.getFrame(feature.getName());
+
+          if(frame !== null) {
+            /*
+             for(let user of packet.data.users) {
+							frame.addUser(user);
+						}
+
+						if(packet.data.style) {
+							frame.setStyle(packet.data.style, packet.data.ranks);
+						}
+             */
+          }
+          break;
+        case 'ROOM_USER_ADD':
+          user = packet as RoomUserAdd;
+          frame = this.windowManager.getChatroom(user.getRoom());
+
+          if(frame !== null) {
+            //frame.addUser(user.getUser());
+          }
+          break;
+        case 'ROOM_USER_REMOVE':
+          user = packet as RoomUserRemove;
+          frame = this.windowManager.getChatroom(user.getRoom());
+
+          if(frame !== null) {
+            //frame.removeUser(user.getUser());
+          }
+          break;
+        case 'ROOM_USER_FEATURE':
+          user = packet as RoomUserFeature;
+          frame = this.windowManager.getChatroom(user.getRoom());
+
+          if(frame !== null) {
+            //frame.addFeature('USER', packet.data.name, packet.data.reference);
+          }
+          break;
+        case 'MESSAGE_PRIVATE':
+          message = packet as MessagePrivate;
+          roomName = null;
+
+          if(message.hasRoom() && !message.forAll()) {
+            roomName = message.getRoom();
+          }
+
+          /* Publish on all rooms */
+          if(roomName === null) {
+            this.windowManager.getAllChatrooms().forEach((frame) => {
+              //frame.addMessage('private', message);
+            });
+
+            /* Publish on single room */
+          } else {
+            frame = this.windowManager.getChatroom(roomName);
+
+            if(frame !== null) {
+             //frame.addMessage('private', message);
+            }
+          }
+          break;
+        case 'MESSAGE_ACTION':
+          message = packet as MessageAction;
+          roomName = null;
+
+          if(message.hasRoom() && !message.forAll()) {
+            roomName = message.getRoom();
+          }
+
+          /* Publish on all rooms */
+          if(roomName === null) {
+            this.windowManager.getAllChatrooms().forEach((frame) => {
+              //frame.addMessage('private', message);
+            });
+
+            /* Publish on single room */
+          } else {
+            frame = this.windowManager.getChatroom(roomName);
+
+            if(frame !== null) {
+              //frame.addMessage('private', message);
+            }
+          }
+          break;
+        case 'MESSAGE_PUBLIC':
+          message = packet as MessagePublic;
+          roomName = null;
+
+          if(message.hasRoom() && !message.forAll()) {
+            roomName = message.getRoom();
+          }
+
+          /* Publish on all rooms */
+          if(roomName === null) {
+            this.windowManager.getAllChatrooms().forEach((frame) => {
+              //frame.addMessage('private', message);
+            });
+
+            /* Publish on single room */
+          } else {
+            frame = this.windowManager.getChatroom(roomName);
+
+            if(frame !== null) {
+              frame.addMessage({
+                username: message.getSender(),
+                message: message.getText(),
+                timestamp: new Date()
+              } as ChatMessage)
+              //frame.addMessage('private', message);
+            }
+          }
           break;
       }
       console.log('Received message:', packet);

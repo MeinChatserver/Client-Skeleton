@@ -1,4 +1,6 @@
 import {Packet} from './Packet';
+import {Size} from '../Size';
+import {Popup} from './Popup';
 
 /**
  * Dieses Paket wird nach erfolgreichem Login durch das LOGIN-Paket versendet und öffnet im Clienten ein Chatfenster mit dem jeweiligen Raum.
@@ -8,20 +10,12 @@ import {Packet} from './Packet';
  *
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/WINDOW_ROOM.md
  **/
-export class WindowRoom extends Packet {
-  protected name: string | null = null;
+export class WindowRoom extends Popup {
 
   constructor(data: any = null) {
-    super('WINDOW_ROOM', data);
-
-    if(data.name) {
-      this.name = data.name;
-    }
+    super(data);
+    super.setOperation('WINDOW_ROOM');
 
     // @ToDo
-  }
-
-  getName() {
-    return this.name;
   }
 }
