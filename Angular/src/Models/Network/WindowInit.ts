@@ -6,17 +6,11 @@ import {Packet} from './Packet';
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/WINDOW_INIT.md
  **/
 export class WindowInit extends Packet {
-  protected name: string | null = null;
-
   constructor(data: any = null) {
     super('WINDOW_INIT', data);
-
-    if(data) {
-      this.name = data;
-    }
   }
 
   getName() {
-    return this.name;
+    return this.getData();
   }
 }

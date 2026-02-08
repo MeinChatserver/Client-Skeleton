@@ -381,11 +381,8 @@ export class Client implements OnInit, OnDestroy {
           this.windowManager.createPopup(packet as Popup);
           break;
         case 'WINDOW_ROOM':
-          let chatroom = this.windowManager.createChatroom(packet as WindowRoom);
-
-          chatroom.on('init', () => {
-            this.send(new WindowInit(chatroom.getId()));
-          });
+          let windowRoom = packet as WindowRoom;
+          let chatroom = this.windowManager.createChatroom(windowRoom);
 
           chatroom.on('sendMessage', (message: string) => {
             this.send({
@@ -395,7 +392,11 @@ export class Client implements OnInit, OnDestroy {
                 text: message
               }
             });
-          })
+          });
+
+
+          this.send(new WindowInit(chatroom.getId()));
+
           break;
         case 'WINDOW_ROOM_CLOSE':
           const closing = packet as WindowRoomClose;
@@ -609,12 +610,14 @@ export class Client implements OnInit, OnDestroy {
       return;
     }
 
-    if(data instanceof Packet) {
+    if(data instanceof Ping || data instanceof Pong) {
+      /* Ignore */
+    } else if(data instanceof Packet) {
       let packet = PacketFactory.toJson(data);
-      console.log('[SEND]', packet);
+      console.warn('[SEND] Packet:', packet);
       this.socket?.send(packet);
     } else {
-      console.warn('[SEND]', data);
+      console.warn('[SEND] RAW:', data);
       this.socket?.send(JSON.stringify(data));
     }
   }

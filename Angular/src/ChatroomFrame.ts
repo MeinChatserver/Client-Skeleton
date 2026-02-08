@@ -37,7 +37,6 @@ export class ChatroomFrame extends Frame {
     this.roomName = config.roomName || 'Chat';
 
     this.renderContent();
-    this.emit('init', null);
   }
 
   protected override renderContent(): void {
@@ -215,9 +214,9 @@ export class ChatroomFrame extends Frame {
     const messageInput = this.frameDocument.querySelector('main ui-input input') as HTMLInputElement;
 
     if (messageInput) {
-      messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
-          e.preventDefault();
+      messageInput.addEventListener('keypress', (event) => {
+        if(event.keyCode === 13 || event.key === 'Enter') {
+          event.preventDefault();
 
           this.emit('sendMessage', messageInput.value);
         }
