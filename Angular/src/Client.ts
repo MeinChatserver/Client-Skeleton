@@ -400,6 +400,13 @@ export class Client implements OnInit, OnDestroy {
             });
           });
 
+          if(windowRoom.getStyle()) {
+            chatroom.setStyle(windowRoom.getStyle());
+          }
+
+          if(windowRoom.getUsers()) {
+            chatroom.setUsers(windowRoom.getUsers());
+          }
 
           this.send(new WindowInit(chatroom.getId()));
 
@@ -420,15 +427,21 @@ export class Client implements OnInit, OnDestroy {
         case 'WINDOW_ROOM_UPDATE':
           const updating = packet as WindowRoomUpdate;
 
-          frame = this.windowManager.getFrame(updating.getName());
+          // reference = old room name to find the existing frame
+          const updatingFrame = this.windowManager.getChatroom(updating.getReference());
 
-          if(frame !== null) {
-           /*
-           * frame.change(packet.data.name, packet.data.width, packet.data.height);
-                        frame.setTitle(packet.data.title);
-                        frame.setStyle(packet.data.room.style, packet.data.ranks);
-                        frame.focus();
-           * */
+          if(updatingFrame !== null) {
+            updatingFrame.clearMessages();
+
+            if(updating.getUsers()) {
+              updatingFrame.setUsers(updating.getUsers());
+            }
+
+            if(updating.getStyle()) {
+              updatingFrame.setStyle(updating.getStyle());
+            }
+
+            updatingFrame.focus();
           }
           break;
         case 'ROOM_FEATURE':
@@ -444,8 +457,16 @@ export class Client implements OnInit, OnDestroy {
           const updt = packet as RoomUpdate;
           frame = this.windowManager.getChatroom(updt.getName());
 
-          if(frame !== null && updt.getUsers()) {
-            frame.setUsers(updt.getUsers());
+          console.log('[ROOM_UPDATE] name:', updt.getName(), '| frame found:', frame !== null, '| style:', updt.getStyle(), '| users:', updt.getUsers());
+
+          if(frame !== null) {
+            if(updt.getUsers()) {
+              frame.setUsers(updt.getUsers());
+            }
+
+            if(updt.getStyle()) {
+              frame.setStyle(updt.getStyle());
+            }
           }
           break;
         case 'ROOM_USER_ADD':

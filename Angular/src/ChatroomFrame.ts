@@ -105,6 +105,22 @@ export const CHATROOM_STYLES = `
     flex: 1 1 auto;
     overflow-x: hidden;
     overflow-y: scroll;
+    background: var(--room-background) !important;
+    color: var(--room-foreground) !important;
+    border-color: transparent !important;
+  }
+
+  aside ui-list .list-item {
+    color: var(--room-foreground) !important;
+  }
+
+  aside ui-list .list-item:hover {
+    background: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  aside ui-list .list-item.active {
+    background: rgba(0, 0, 128, 0.8) !important;
+    color: #FFFFFF !important;
   }
 
   aside ui-list::after {
@@ -157,6 +173,7 @@ export class ChatroomFrame extends Frame {
   protected roomName: string;
   protected messages: ChatMessage[] = [];
   protected users: User[] = [];
+  protected style: any = null;
   protected eventListeners: Map<string, Function[]> = new Map();
 
   constructor(
@@ -183,6 +200,8 @@ export class ChatroomFrame extends Frame {
   }
 
   protected override renderContent(): void {
+    this.applyStyle();
+
     if (this.frameDocument && !this.frameDocument.getElementById('chatroom-styles')) {
       const style = this.frameDocument.createElement('style');
       style.id = 'chatroom-styles';
@@ -253,6 +272,64 @@ export class ChatroomFrame extends Frame {
     if (this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).removeUser(user);
     }
+  }
+
+  public setStyle(style: any): void {
+    console.log('[ChatroomFrame] setStyle', this.config.id, style);
+    this.style = style;
+    this.applyStyle();
+  }
+
+  protected applyStyle(): void {
+    if (!this.style) {
+      return;
+    }
+
+    let doc: Document | null = null;
+
+    try {
+      doc = this.frameWindow?.document ?? this.frameDocument;
+    } catch (e) {
+      return;
+    }
+
+    if (!doc?.head) {
+      return;
+    }
+
+    const vars: string[] = [];
+    const bg     = this.style.background;
+    const output = this.style.output;
+    const ranks  = this.style.ranks;
+
+    if (bg?.color)            vars.push(`--room-background: ${bg.color};`);
+    if (bg?.image?.file)      vars.push(`--room-background-image: url(${bg.image.file});`);
+    if (output?.blue)         vars.push(`--room-blue: ${output.blue};`);
+    if (output?.red)          vars.push(`--room-red: ${output.red};`);
+    if (output?.green)        vars.push(`--room-green: ${output.green};`);
+    if (output?.default)      vars.push(`--room-foreground: ${output.default};`);
+
+    if (ranks?.enabled) {
+      Object.entries(ranks).forEach(([key, value]) => {
+        if (key !== 'enabled' && typeof value === 'string') {
+          vars.push(`--room-rank-${key}: ${value};`);
+        }
+      });
+    }
+
+    if (vars.length === 0) {
+      return;
+    }
+
+    let el = doc.getElementById('chatroom-theme') as HTMLStyleElement | null;
+
+    if (!el) {
+      el = doc.createElement('style');
+      el.id = 'chatroom-theme';
+      doc.head.appendChild(el);
+    }
+
+    el.textContent = `:root { ${vars.join(' ')} }`;
   }
 
   public on(eventName: string, callback: Function): void {

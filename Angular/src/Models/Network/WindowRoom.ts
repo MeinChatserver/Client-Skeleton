@@ -1,5 +1,3 @@
-import {Packet} from './Packet';
-import {Size} from '../Size';
 import {Popup} from './Popup';
 
 /**
@@ -11,11 +9,26 @@ import {Popup} from './Popup';
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/WINDOW_ROOM.md
  **/
 export class WindowRoom extends Popup {
+  protected room: any = null;
 
   constructor(data: any = null) {
     super(data);
     super.setOperation('WINDOW_ROOM');
 
-    // @ToDo
+    if(data.room) {
+      this.room = data.room;
+    }
+  }
+
+  getRoom(): any {
+    return this.room;
+  }
+
+  getStyle(): any {
+    return this.room?.style ?? null;
+  }
+
+  getUsers(): any[] | null {
+    return this.room?.users ?? null;
   }
 }

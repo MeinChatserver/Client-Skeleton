@@ -38,7 +38,8 @@ import {ListItem} from '../Models';
       overflow-y: auto;
       display: block;
       position: relative;
-      background: #FFFFFF;
+      background: var(--ui-list-background, #FFFFFF);
+      color: var(--ui-list-color, inherit);
       border-top: 1px solid #808080;
       border-left: 1px solid #808080;
       border-right: 1px solid #CACACA;
@@ -72,12 +73,12 @@ import {ListItem} from '../Models';
     }
 
     .list-item:hover {
-      background: rgba(255, 255, 255, 0.3);
+      background: var(--ui-list-hover-background, rgba(255, 255, 255, 0.3));
     }
 
     .list-item.active {
-      background: rgba(0, 0, 128, 0.8);
-      color: #FFFFFF;
+      background: var(--ui-list-active-background, rgba(0, 0, 128, 0.8));
+      color: var(--ui-list-active-color, #FFFFFF);
     }
 
     .prefix-icon {
