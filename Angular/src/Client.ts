@@ -442,33 +442,24 @@ export class Client implements OnInit, OnDestroy {
           break;
         case 'ROOM_UPDATE':
           const updt = packet as RoomUpdate;
+          frame = this.windowManager.getChatroom(updt.getName());
 
-          //frame = this.windowManager.getFrame(feature.getName());
-
-          if(frame !== null) {
-            /*
-             for(let user of packet.data.users) {
-							frame.addUser(user);
-						}
-
-						if(packet.data.style) {
-							frame.setStyle(packet.data.style, packet.data.ranks);
-						}
-             */
+          if(frame !== null && updt.getUsers()) {
+            frame.setUsers(updt.getUsers());
           }
           break;
         case 'ROOM_USER_ADD':
           frame = this.windowManager.getChatroom((packet as RoomUserAdd).getRoom());
 
           if(frame !== null) {
-            //frame.addUser(user.getUser());
+            frame.addUser((packet as RoomUserAdd).getUser());
           }
           break;
         case 'ROOM_USER_REMOVE':
           frame = this.windowManager.getChatroom((packet as RoomUserRemove).getRoom());
 
           if(frame !== null) {
-            //frame.removeUser(user.getUser());
+            frame.removeUser((packet as RoomUserRemove).getUser());
           }
           break;
         case 'ROOM_USER_FEATURE':

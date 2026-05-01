@@ -3,6 +3,7 @@ import { Frame, FrameConfig } from './Frame';
 import { ChatroomComponent} from './ChatroomComponent';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
+import { User } from './Models';
 export { ChatMessage, ChatMessageType } from './ChatMessage';
 
 export interface ChatroomConfig extends FrameConfig {
@@ -152,10 +153,10 @@ export const CHATROOM_STYLES = `
   }
 `;
 
-
 export class ChatroomFrame extends Frame {
   protected roomName: string;
   protected messages: ChatMessage[] = [];
+  protected users: User[] = [];
   protected eventListeners: Map<string, Function[]> = new Map();
 
   constructor(
@@ -201,6 +202,7 @@ export class ChatroomFrame extends Frame {
     const instance = ref.instance as ChatroomComponent;
 
     instance.initMessages(this.messages);
+    instance.setUsers(this.users);
     instance.sendMessage.subscribe((msg: string) => this.emit('sendMessage', msg));
     instance.chatroomSelect.subscribe(({ type, item }: { type: string; item: any }) =>
       this.emit('chatroomSelect', { type, item })
@@ -225,6 +227,32 @@ export class ChatroomFrame extends Frame {
     }
 
     this.emit('messages-cleared');
+  }
+
+  public setUsers(users: User[]): void {
+    this.users = [...users];
+
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).setUsers(this.users);
+    }
+  }
+
+  public addUser(user: User): void {
+    if (!this.users.some(u => u.id === user.id)) {
+      this.users.push(user);
+    }
+
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).addUser(user);
+    }
+  }
+
+  public removeUser(user: User): void {
+    this.users = this.users.filter(u => u.id !== user.id);
+
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).removeUser(user);
+    }
   }
 
   public on(eventName: string, callback: Function): void {

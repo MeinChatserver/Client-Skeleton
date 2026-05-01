@@ -19,7 +19,9 @@ import {ListItem} from '../Models';
         }
 
         <span class="label">{{ item.label }}</span>
-        <small class="count">({{ item.count }})</small>
+        @if(item.count) {
+          <small class="count">({{ item.count }})</small>
+        }
 
         @if (item.suffixIcon) {
             <i [class]="item.suffixIcon" class="suffix-icon"></i>

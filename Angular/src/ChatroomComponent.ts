@@ -8,7 +8,7 @@ import { CommonModule } from '@angular/common';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { Client } from './Client';
 import {List, Select, Textfield} from './Components';
-import { ListItem, Room } from './Models';
+import { ListItem, Room, User } from './Models';
 
 @Component({
   selector: 'app-chatroom',
@@ -34,7 +34,7 @@ import { ListItem, Room } from './Models';
       </ui-input>
     </main>
     <aside>
-      <ui-list></ui-list>
+      <ui-list [items]="userItems()"></ui-list>
       <ui-select name="chatrooms" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
     </aside>
   `,
@@ -49,7 +49,12 @@ export class ChatroomComponent implements AfterViewChecked {
   @ViewChild('messagesContainer') messagesContainer?: ElementRef<HTMLElement>;
 
   messages = signal<ChatMessage[]>([]);
+  users = signal<User[]>([]);
   private pendingScroll = false;
+
+  userItems = computed((): ListItem[] =>
+    this.users().map(user => ({ label: user.username, count: 0 }))
+  );
 
   chatrooms = computed(() => {
     if (!this.client) return [];
@@ -81,6 +86,21 @@ export class ChatroomComponent implements AfterViewChecked {
 
   clearMessages(): void {
     this.messages.set([]);
+  }
+
+  setUsers(users: User[]): void {
+    this.users.set([...users]);
+  }
+
+  addUser(user: User): void {
+    this.users.update(users => {
+      if (users.some(u => u.id === user.id)) return users;
+      return [...users, user];
+    });
+  }
+
+  removeUser(user: User): void {
+    this.users.update(users => users.filter(u => u.id !== user.id));
   }
 
   onSendMessage(input: HTMLInputElement): void {
