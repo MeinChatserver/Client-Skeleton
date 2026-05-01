@@ -35,7 +35,7 @@ import {
   WindowInit
 } from './Models/Network';
 import { WindowManager } from './WindowManager';
-import {ChatMessage, ChatMessageType} from './ChatroomFrame';
+import {ChatMessage, ChatMessageType} from './ChatMessage';
 
 @Component({
   selector: 'body',
@@ -388,7 +388,7 @@ export class Client implements OnInit, OnDestroy {
           break;
         case 'WINDOW_ROOM':
           let windowRoom = packet as WindowRoom;
-          let chatroom = this.windowManager.createChatroom(windowRoom);
+          let chatroom = this.windowManager.createChatroom(windowRoom, this);
 
           chatroom.on('sendMessage', (message: string) => {
             this.send({

@@ -2,6 +2,7 @@ import { Injectable, ApplicationRef, EnvironmentInjector } from '@angular/core';
 import { Frame } from './Frame';
 import { PopupFrame, PopupConfig } from './PopupFrame';
 import { ChatroomFrame } from './ChatroomFrame';
+import { Client } from './Client';
 import {Popup, WindowRoom } from './Models/Network';
 
 @Injectable({
@@ -45,7 +46,7 @@ export class WindowManager {
     return frame;
   }
 
-  createChatroom(packet: WindowRoom): ChatroomFrame {
+  createChatroom(packet: WindowRoom, client: Client): ChatroomFrame {
     let config: PopupConfig = {
       id: packet.getName() ?? 'chatroom-' + Math.random().toString(36).substr(2, 9),
       width: 800,
@@ -56,7 +57,7 @@ export class WindowManager {
       config.title = packet.getTitle() ?? 'ChatroomFrame';
     }
 
-    const chatroom = new ChatroomFrame(config, this.appRef, this.injector);
+    const chatroom = new ChatroomFrame(config, this.appRef, this.injector, client);
     this.addFrame(config.id, chatroom);
     return chatroom;
   }

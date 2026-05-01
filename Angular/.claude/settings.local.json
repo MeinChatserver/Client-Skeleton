@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"F:\\\\MeinChatserver\\\\Client-Skeleton\\\\Angular\" -Recurse -Directory)",
+      "Bash(Select-Object FullName)",
+      "Bash(Get-ChildItem -Path \"F:\\\\MeinChatserver\\\\Client-Skeleton\\\\Angular\" -MaxDepth 1 -File)",
+      "Bash(Select-Object Name, FullName)",
+      "Bash(npx tsc *)"
+    ]
+  }
+}
