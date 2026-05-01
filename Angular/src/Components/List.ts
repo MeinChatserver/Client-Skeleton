@@ -1,28 +1,31 @@
-// scrollable-list.component.ts
 import {Component, EventEmitter, Input, Output} from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {ListItem} from '../Models/ListItem';
+import {ListItem} from '../Models';
 
 @Component({
   selector: 'ui-list',
   standalone: true,
   imports: [CommonModule],
   template: `
+    @for (item of items; track item.label) {
       <div
-        *ngFor="let item of items"
         class="list-item"
         [class.active]="item === selectedItem"
         (click)="onItemClick($event, item)"
         (contextmenu)="onItemRightClick($event, item)">
 
-        <i *ngIf="item.prefixIcon" [class]="item.prefixIcon" class="prefix-icon"></i>
+        @if (item.prefixIcon) {
+            <i [class]="item.prefixIcon" class="prefix-icon"></i>
+        }
 
         <span class="label">{{ item.label }}</span>
-
         <small class="count">({{ item.count }})</small>
 
-        <i *ngIf="item.suffixIcon" [class]="item.suffixIcon" class="suffix-icon"></i>
+        @if (item.suffixIcon) {
+            <i [class]="item.suffixIcon" class="suffix-icon"></i>
+        }
       </div>
+    }
   `,
   styles: [`
     :host {

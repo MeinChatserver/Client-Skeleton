@@ -2,16 +2,9 @@ import {computed, Component, OnInit, Input, CUSTOM_ELEMENTS_SCHEMA} from '@angul
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Client } from './Client';
-import { Select } from './Components/Select';
+import { Select, Textfield, CheckBox, Button, List, Label, Panel } from './Components';
 import {Category, ListItem} from './Models';
-import { Textfield } from './Components/Textfield';
-import { CheckBox } from './Components/CheckBox';
-import {Button} from './Components/Button';
-import {List} from './Components/List';
-import {Label} from './Components/Label';
-import {CategoryChange} from './Models/Network/CategoryChange';
-import {ChatroomInfo} from './Models/Network/ChatroomInfo';
-import {Panel} from './Components/Panel';
+import {CategoryChange, ChatroomInfo} from './Models/Network';
 
 @Component({
   selector: 'ui-login',

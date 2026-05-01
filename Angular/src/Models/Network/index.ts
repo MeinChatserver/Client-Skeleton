@@ -17,6 +17,8 @@ export { RoomUpdate } from './RoomUpdate';
 export { RoomUserAdd } from './RoomUserAdd';
 export { RoomUserRemove } from './RoomUserRemove';
 export { RoomUserFeature } from './RoomUserFeature';
+export { CategoryChange } from './CategoryChange';
+export { ChatroomInfo } from './ChatroomInfo';
 
 // Windows
 export { WindowRoom } from './WindowRoom';
