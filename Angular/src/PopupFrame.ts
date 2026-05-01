@@ -1,6 +1,6 @@
-import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, Type } from '@angular/core';
+import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
-import { Button } from './Components/Button';
+import { Button } from './Components';
 
 export interface PopupConfig extends FrameConfig {
   content?: any;
@@ -133,10 +133,15 @@ export class PopupFrame extends Frame {
   }
 
   protected renderOkButton(): void {
-    if (!this.frameDocument) return;
+    if (!this.frameDocument) {
+      return;
+    }
 
     const slot = this.frameDocument.getElementById('ok-btn');
-    if (!slot) return;
+
+    if (!slot) {
+      return;
+    }
 
     if (this.okButtonRef) {
       this.appRef.detachView(this.okButtonRef.hostView);
@@ -287,9 +292,15 @@ export class PopupFrame extends Frame {
   }
 
   protected setupEventListeners(): void {
-    if (!this.frameDocument) return;
+    if (!this.frameDocument) {
+      return;
+    }
 
     const form = this.frameDocument.getElementById('popup-form');
+    const okBtn = this.frameDocument.getElementById('ok-btn');
+    const cancelBtn = this.frameDocument.getElementById('cancel-btn');
+    const inputs = this.frameDocument.querySelectorAll('input');
+
     if (form) {
       form.addEventListener('submit', (e) => {
         e.preventDefault();
@@ -297,7 +308,6 @@ export class PopupFrame extends Frame {
       });
     }
 
-    const cancelBtn = this.frameDocument.getElementById('cancel-btn');
     if (cancelBtn) {
       cancelBtn.addEventListener('click', () => {
         this.emit('cancel');
@@ -305,7 +315,6 @@ export class PopupFrame extends Frame {
       });
     }
 
-    const okBtn = this.frameDocument.getElementById('ok-btn');
     if (okBtn) {
       okBtn.addEventListener('click', () => {
         this.emit('ok');
@@ -313,7 +322,6 @@ export class PopupFrame extends Frame {
       });
     }
 
-    const inputs = this.frameDocument.querySelectorAll('input');
     inputs.forEach(input => {
       input.addEventListener('input', (e) => {
         this.handleInputChange(e as Event);
@@ -335,6 +343,7 @@ export class PopupFrame extends Frame {
 
   protected handleInputChange(event: Event): void {
     const input = event.target as HTMLInputElement;
+
     this.emit('input-change', {
       id: input.id,
       value: input.value
@@ -345,6 +354,7 @@ export class PopupFrame extends Frame {
     if (!this.eventListeners.has(eventName)) {
       this.eventListeners.set(eventName, []);
     }
+
     this.eventListeners.get(eventName)!.push(callback);
   }
 
@@ -355,8 +365,10 @@ export class PopupFrame extends Frame {
     }
 
     const listeners = this.eventListeners.get(eventName);
+
     if (listeners) {
       const index = listeners.indexOf(callback);
+
       if (index > -1) {
         listeners.splice(index, 1);
       }
@@ -365,6 +377,7 @@ export class PopupFrame extends Frame {
 
   protected emit(eventName: string, data?: any): void {
     const listeners = this.eventListeners.get(eventName);
+
     if (listeners) {
       listeners.forEach(callback => callback(data));
     }
@@ -376,18 +389,24 @@ export class PopupFrame extends Frame {
   }
 
   public setInputValue(inputId: string, value: string): void {
-    if (!this.frameDocument) return;
+    if(!this.frameDocument) {
+      return;
+    }
 
     const input = this.frameDocument.getElementById(inputId) as HTMLInputElement;
+
     if (input) {
       input.value = value;
     }
   }
 
   public getInputValue(inputId: string): string | null {
-    if (!this.frameDocument) return null;
+    if (!this.frameDocument) {
+      return null;
+    }
 
     const input = this.frameDocument.getElementById(inputId) as HTMLInputElement;
+
     return input ? input.value : null;
   }
 }

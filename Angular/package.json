@@ -1,6 +1,19 @@
 {
-  "name": "angular",
-  "version": "0.0.0",
+  "name": "mc-client",
+  "version": "2.0.0",
+  "license": "MIT",
+  "description": "OpenSource Angular & TypeScript based Client for Mein-ChatServer.",
+  "keywords": [ "chat", "client", "angular", "typescript", "mein-chatserver"],
+  "homepage": "https://mein-chatserver.de/",
+  "bugs": {
+    "url": "https://github.com/MeinChatserver/Client-Skeleton/issues",
+    "email": "support@mein-chatserver.de"
+  },
+  "author": {
+    "name": "Bizarrus",
+    "email": "support@mein-chatserver.de",
+    "url": "https://mein-chatserver.de/"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve Angular",
