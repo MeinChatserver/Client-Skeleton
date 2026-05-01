@@ -45,11 +45,11 @@ import { ChatMessage } from './ChatroomFrame';
   template: `<ui-login [client]="this" />`,
   styles: [`
     :host {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
       display: flex;
       align-items: center;
       justify-content: center;
       flex: 1;
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
     }
 
     :host.embedded {
@@ -77,6 +77,7 @@ import { ChatMessage } from './ChatroomFrame';
       padding: 0;
       box-shadow: none;
       height: inherit;
+      min-height: 0;
     }
 
     :host ::ng-deep ui-form {

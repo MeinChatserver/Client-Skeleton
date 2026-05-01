@@ -15,7 +15,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
     }
   ],
   template: `
-    <input type="text"
+    <input [type]="password ? 'password' : 'text'"
       [value]="value"
       [placeholder]="placeholder"
       (change)="onChange($event)"
@@ -32,6 +32,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
 })
 export class Textfield implements ControlValueAccessor {
   @Input() placeholder: string = '';
+  @Input() password: boolean = false;
 
   value: any;
   disabled = false;

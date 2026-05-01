@@ -94,7 +94,7 @@ export class Frame {
           }
         </style>
       </head>
-      <body id="app-root"></body>
+      <body></body>
       </html>`);
     this.frameDocument.close();
 
@@ -135,7 +135,7 @@ export class Frame {
 
     try {
       const currentDoc = this.frameWindow.document;
-      const isNewDocument = (currentDoc !== this.frameDocument || !currentDoc.getElementById('app-root'));
+      const isNewDocument = (currentDoc !== this.frameDocument || !currentDoc.querySelector('body'));
 
       if(isNewDocument) {
         console.log(`[Frame ${this.config.id}] Document-Reset erkannt - Re-initialisiere...`);
@@ -170,10 +170,10 @@ export class Frame {
 
         this.isDocumentInitialized = true;
       } else {
-        const appRoot = currentDoc.getElementById('app-root');
+        const appRoot = currentDoc.querySelector('body');
 
         if(!appRoot || !currentDoc.body.contains(appRoot)) {
-          console.log(`[Frame ${this.config.id}] app-root fehlt - Re-initialisiere...`);
+          console.log(`[Frame ${this.config.id}] Body fehlt - Re-initialisiere...`);
 
           this.isRebuilding = true;
           this.setupInitialDocument();
@@ -196,7 +196,7 @@ export class Frame {
       return null;
     }
 
-    const appRoot = this.frameDocument.getElementById('app-root');
+    const appRoot = this.frameDocument.querySelector('body');
 
     if(!appRoot) {
       return null;
@@ -303,7 +303,7 @@ export class Frame {
       isOpen: this.isOpen(),
       isRebuilding: this.isRebuilding,
       documentExists: !!this.frameDocument,
-      appRootExists: !!this.frameDocument?.getElementById('app-root'),
+      appRootExists: !!this.frameDocument?.querySelector('body'),
       documentUrl: this.frameDocument?.location.href || 'N/A',
       watcherActive: this.watcherInterval !== null
     };

@@ -15,11 +15,10 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
   ],
   template: `
     <select
-      [value]="value"
       (change)="onChange($event)"
       [disabled]="disabled">
-      <option [value]="null" *ngIf="placeholder">{{ placeholder }}</option>
-      <option *ngFor="let option of options" [value]="option[valueKey]">
+      <option [ngValue]="null" *ngIf="placeholder">{{ placeholder }}</option>
+      <option *ngFor="let option of options" [ngValue]="option[valueKey]" [selected]="value === option[valueKey]">
         {{ option[labelKey] }}
       </option>
     </select>`,
@@ -62,7 +61,8 @@ export class Select implements ControlValueAccessor {
 
   onChange(event: Event): void {
     const target = event.target as HTMLSelectElement;
-    this.value = target.value;
+    const index = target.selectedIndex - (this.placeholder ? 1 : 0);
+    this.value = index >= 0 ? this.options[index][this.valueKey] : null;
     this.onChangeFn(this.value);
     this.onTouchedFn();
   }

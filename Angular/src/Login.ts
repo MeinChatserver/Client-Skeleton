@@ -3,12 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Client } from './Client';
 import { Select } from './Components/Select';
-import {Category} from './Models/Category';
+import {Category, ListItem} from './Models';
 import { Textfield } from './Components/Textfield';
 import { CheckBox } from './Components/CheckBox';
 import {Button} from './Components/Button';
 import {List} from './Components/List';
-import {ListItem} from './Models/ListItem';
 import {Label} from './Components/Label';
 import {CategoryChange} from './Models/Network/CategoryChange';
 import {ChatroomInfo} from './Models/Network/ChatroomInfo';
@@ -23,12 +22,12 @@ import {Panel} from './Components/Panel';
     <ui-form>
         @if(client.isEmbedded) {
             <ui-label name="category" text="Kategorie" [dotted]="true" />
-            <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" (ngModelChange)="onCategoryChange($event)" valueKey="id" labelKey="name"></ui-select>
+            <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" valueKey="id" labelKey="name"></ui-select>
 
             <ui-label name="username" text="Benutzername" [dotted]="true" />
             <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
             <ui-label name="password" text="Passwort" [dotted]="true" />
-            <ui-input name="password" [(ngModel)]="password" (keydown.enter)="focusNext('ui-button', $event)" />
+            <ui-input name="password" [(ngModel)]="password" [password]="true" (keydown.enter)="focusNext('ui-button', $event)" />
             <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
             <ui-input name="chatroom" [(ngModel)]="chatroom" />
 
@@ -46,7 +45,7 @@ import {Panel} from './Components/Panel';
             <ui-label name="username" text="Benutzername" [dotted]="true" />
             <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
             <ui-label name="password" text="Passwort" [dotted]="true" />
-            <ui-input name="password" [(ngModel)]="password" (keydown.enter)="focusNext('ui-button', $event)" />
+            <ui-input name="password" [(ngModel)]="password" [password]="true" (keydown.enter)="focusNext('ui-button', $event)" />
 
             <div id="remember_container">
               <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
@@ -58,7 +57,7 @@ import {Panel} from './Components/Panel';
           </ui-container>
 
           <ui-label name="category" text="Kategorie" [dotted]="true" />
-          <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" (ngModelChange)="onCategoryChange($event)" valueKey="id" labelKey="name"></ui-select>
+          <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" valueKey="id" labelKey="name"></ui-select>
           <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
           <ui-input name="chatroom" [(ngModel)]="chatroom" />
         }
@@ -81,8 +80,6 @@ import {Panel} from './Components/Panel';
   styles: [`
     :host {
       display: flex;
-      width: 100%;
-      height: 100%;
     }
 
     /* Login-Form */
@@ -207,7 +204,13 @@ export class Login implements OnInit {
   password: string = '';
   chatroom: string = '';
   remember: boolean = false;
-  selectedCategory: string = '';
+  private _selectedCategory: number | null = null;
+  get selectedCategory(): number | null { return this._selectedCategory; }
+  set selectedCategory(value: number | null) {
+    this._selectedCategory = value;
+    this.client.send(new CategoryChange(value));
+  }
+
   categories: Category[] = [];
   chatrooms = computed(() =>
     this.client.chatRooms().filter(room => room.getName() !== null).map((room): ListItem => ({
@@ -217,10 +220,6 @@ export class Login implements OnInit {
   );
 
   ngOnInit() {}
-
-  onCategoryChange(categoryId: string): void {
-    this.client.send(new CategoryChange(categoryId));
-  }
 
   onChatroomSelect(type: string, item: ListItem): void {
     switch(type) {

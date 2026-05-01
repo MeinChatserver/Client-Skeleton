@@ -1,5 +1,6 @@
-import { ApplicationRef, EnvironmentInjector, Type } from '@angular/core';
+import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, Type } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
+import { Button } from './Components/Button';
 
 export interface PopupConfig extends FrameConfig {
   content?: any;
@@ -9,6 +10,7 @@ export interface PopupConfig extends FrameConfig {
 export class PopupFrame extends Frame {
   protected content: any;
   protected eventListeners: Map<string, Function[]> = new Map();
+  protected okButtonRef: ComponentRef<Button> | null = null;
 
   constructor(
     config: PopupConfig,
@@ -31,7 +33,7 @@ export class PopupFrame extends Frame {
       return;
     }
 
-    const appRoot = this.frameDocument.getElementById('app-root');
+    const appRoot = this.frameDocument.querySelector('body');
 
     if(!appRoot) {
       return;
@@ -39,12 +41,17 @@ export class PopupFrame extends Frame {
 
     appRoot.innerHTML = this.buildContentFromJSON(this.content);
 
+    this.renderOkButton();
     this.setupEventListeners();
   }
 
   protected buildContentFromJSON(content: any): string {
     if(typeof content === 'string') {
       return `<div class="popup-content">${content}</div>`;
+    }
+
+    if(Array.isArray(content)) {
+      return this.buildFromElements(content);
     }
 
     if(content.type === 'form') {
@@ -60,6 +67,98 @@ export class PopupFrame extends Frame {
     }
 
     return '<div>Kein Content definiert</div>';
+  }
+
+  protected buildFromElements(elements: any[]): string {
+    const sorted = [...elements].sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
+    const html = sorted.map(el => this.buildElement(el)).join('');
+
+    return `
+      <div class="popup-wrapper">
+        <div class="popup-body">
+          ${html}
+        </div>
+        <div class="popup-footer">
+          <div id="ok-btn" class="popup-footer-btn"></div>
+        </div>
+      </div>
+      <style>
+        .popup-wrapper {
+          display: flex;
+          flex-direction: column;
+          height: 100vh;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        .popup-body {
+          flex: 1;
+          padding: 20px;
+          overflow-y: auto;
+        }
+        .popup-label {
+          display: block;
+          font-weight: 600;
+          font-size: 15px;
+          color: #222;
+          margin-bottom: 10px;
+        }
+        .popup-content {
+          color: #555;
+          line-height: 1.5;
+          font-size: 14px;
+        }
+        .popup-footer {
+          display: flex;
+          justify-content: flex-end;
+          padding: 10px 20px;
+          border-top: 1px solid #e0e0e0;
+          background: #f9f9f9;
+        }
+        .popup-footer-btn {
+          min-width: 80px;
+          height: 34px;
+        }
+      </style>
+    `;
+  }
+
+  protected buildElement(element: any): string {
+    switch(element.type) {
+      case 'label':
+        return `<label class="popup-label">${element.label ?? ''}</label>`;
+      case 'content':
+        return `<div class="popup-content">${element.content ?? ''}</div>`;
+      default:
+        return '';
+    }
+  }
+
+  protected renderOkButton(): void {
+    if (!this.frameDocument) return;
+
+    const slot = this.frameDocument.getElementById('ok-btn');
+    if (!slot) return;
+
+    if (this.okButtonRef) {
+      this.appRef.detachView(this.okButtonRef.hostView);
+      this.okButtonRef.destroy();
+    }
+
+    this.okButtonRef = createComponent(Button, {
+      environmentInjector: this.injector,
+      hostElement: slot
+    });
+    this.okButtonRef.instance.text = 'OK';
+    this.okButtonRef.changeDetectorRef.detectChanges();
+    this.appRef.attachView(this.okButtonRef.hostView);
+  }
+
+  protected override cleanup(): void {
+    if (this.okButtonRef) {
+      this.appRef.detachView(this.okButtonRef.hostView);
+      this.okButtonRef.destroy();
+      this.okButtonRef = null;
+    }
+    super.cleanup();
   }
 
   protected buildForm(config: any): string {

@@ -37,7 +37,7 @@ export class WindowManager {
     }
 
     if(popup.hasElements()) {
-      // @ToDo
+      config.content = popup.getElements();
     }
 
     const frame = new PopupFrame(config, this.appRef, this.injector);
