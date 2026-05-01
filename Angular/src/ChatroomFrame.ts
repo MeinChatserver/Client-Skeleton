@@ -1,7 +1,7 @@
 import { ApplicationRef, ComponentRef, EnvironmentInjector } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
-import { ChatroomComponent } from './ChatroomComponent';
+import { ChatroomComponent, CHATROOM_STYLES } from './ChatroomComponent';
 import { Client } from './Client';
 
 export { ChatMessage, ChatMessageType } from './ChatMessage';
@@ -40,6 +40,13 @@ export class ChatroomFrame extends Frame {
   }
 
   protected override renderContent(): void {
+    if (this.frameDocument && !this.frameDocument.getElementById('chatroom-styles')) {
+      const style = this.frameDocument.createElement('style');
+      style.id = 'chatroom-styles';
+      style.textContent = CHATROOM_STYLES;
+      this.frameDocument.head.appendChild(style);
+    }
+
     const ref = this.renderComponent(ChatroomComponent, {
       client: this.client,
       roomName: this.roomName
