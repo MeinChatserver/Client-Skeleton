@@ -1,4 +1,5 @@
 import {Popup} from './Popup';
+import {User} from '../User';
 
 /**
  * Dieses Paket wird nach erfolgreichem Login durch das LOGIN-Paket versendet und öffnet im Clienten ein Chatfenster mit dem jeweiligen Raum.
@@ -28,7 +29,7 @@ export class WindowRoom extends Popup {
     return this.room?.style ?? null;
   }
 
-  getUsers(): any[] | null {
+  getUsers(): User[] | null {
     return this.room?.users ?? null;
   }
 }

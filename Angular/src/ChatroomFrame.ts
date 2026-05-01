@@ -154,6 +154,9 @@ export const CHATROOM_STYLES = `
   aside ui-list ui-entry:focus {
     background: rgba(0, 0, 128, 0.8);
     color: #FFFFFF;
+  setStyle(arg0: any) {
+      throw new Error("Method not implemented.");
+  }
   }
 
   aside ui-select {
@@ -248,8 +251,10 @@ export class ChatroomFrame extends Frame {
     this.emit('messages-cleared');
   }
 
-  public setUsers(users: User[]): void {
-    this.users = [...users];
+  public setUsers(users: User[] | null): void {
+    if(users !== null) {
+      this.users = [...users];
+    }
 
     if (this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).setUsers(this.users);
