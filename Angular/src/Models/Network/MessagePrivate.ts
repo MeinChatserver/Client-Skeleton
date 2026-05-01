@@ -1,4 +1,5 @@
 import {Message} from './Message';
+import {User} from '../User';
 
 /**
  * Wird eine private Nachricht an den Nutzer versendet, wird dieses Paket an den Ziel-Clienten versendet.
@@ -11,7 +12,7 @@ import {Message} from './Message';
  **/
 export class MessagePrivate extends Message {
   protected sender: string | null = null;
-  protected users: string[] | null = null;
+  protected users: User[] | null = null;
 
   constructor(data: any = null) {
     super(data);
@@ -22,7 +23,7 @@ export class MessagePrivate extends Message {
     }
 
     if(data.users) {
-      this.users = data.users;
+      this.users = data.users as User[];
     }
   }
 

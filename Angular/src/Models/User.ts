@@ -1,3 +1,5 @@
-export class User {
-
+export interface User {
+  id: number;
+  rank: number;
+  username: string;
 }

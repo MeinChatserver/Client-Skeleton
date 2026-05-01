@@ -1,15 +1,40 @@
 import { ApplicationRef, EnvironmentInjector } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
+import {User} from './Models';
 
 export interface ChatroomConfig extends FrameConfig {
   roomName?: string;
   username?: string;
 }
 
-export interface ChatMessage {
-  username: string;
-  message: string;
+export enum ChatMessageType {
+  ACTION = 'ACTION',
+  PUBLIC = 'PUBLIC',
+  PRIVATE = 'PRIVATE'
+}
+
+export class ChatMessage {
+  user: User | null | '-' = null;
+  users?: User[] | null = null;
+  type: ChatMessageType = ChatMessageType.PUBLIC;
+  message: string | null = null;
   timestamp?: Date;
+
+  constructor(init?: Partial<ChatMessage>) {
+    Object.assign(this, init);
+  }
+
+  getUsername(): string {
+    if(this.user === '-') {
+      return 'System';
+    }
+
+    if(this.user) {
+      return `<span data-action="profile:${this.user.username}">${this.user.username}</span>`;
+    }
+
+    return '';
+  }
 }
 
 export class ChatroomFrame extends Frame {
@@ -248,9 +273,25 @@ export class ChatroomFrame extends Frame {
   }
 
   protected buildMessageHTML(message: ChatMessage): string {
-    return `<ui-text>
-            ${message}
-        </ui-text>`;
+    console.log('buildMessageHTML', message);
+
+    switch(message.type) {
+      case ChatMessageType.ACTION:
+        return `<ui-text>${message.message}</ui-text>`;
+      case ChatMessageType.PUBLIC:
+          return `<ui-text>${message.getUsername()}: ${message.message}</ui-text>`;
+      case ChatMessageType.PRIVATE:
+          let target = '';
+
+          if(message.user && message?.users) {
+            target = ' an ' + message?.users.map(entry => {
+              // @ToDo Check current user for "Dich" output
+              return `<span data-action="profile:${entry}">${entry}</span>`;
+            }).join(', ');
+          }
+
+          return `<ui-text>${message.getUsername()} (privat${target}): ${message.message}</ui-text>`;
+    }
   }
 
   protected scrollToBottom(): void {

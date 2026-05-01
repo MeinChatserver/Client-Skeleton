@@ -1,4 +1,5 @@
 import {Message} from './Message';
+import {User} from '../User';
 
 /**
  * Wird eine Nachricht im Chatraum versendet, wird dieses Paket an alle Ziel-Clienten, die im Raum sind, versendet.
@@ -9,7 +10,7 @@ import {Message} from './Message';
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/MESSAGE_PUBLIC.md
  **/
 export class MessagePublic extends Message {
-  protected sender: string | null = null;
+  protected sender: User | string | null = null;
 
   constructor(data: any = null) {
     super(data);

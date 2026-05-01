@@ -5,6 +5,6 @@ export class MetaInfo {
   }
 
   getVersion() {
-    return 'V1.0.0';
+    return 'V2.0.0';
   }
 }

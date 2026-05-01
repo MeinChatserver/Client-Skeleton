@@ -9,7 +9,7 @@ import {
   ApplicationRef, EnvironmentInjector
 } from '@angular/core';import { CommonModule } from '@angular/common';
 import { Login } from './Login';
-import { Room, MetaInfo, Category } from './Models';
+import {Room, MetaInfo, Category, User} from './Models';
 import {
   Packet,
   PacketFactory,
@@ -35,7 +35,7 @@ import {
   WindowInit
 } from './Models/Network';
 import { WindowManager } from './WindowManager';
-import { ChatMessage } from './ChatroomFrame';
+import {ChatMessage, ChatMessageType} from './ChatroomFrame';
 
 @Component({
   selector: 'body',
@@ -320,7 +320,8 @@ export class Client implements OnInit, OnDestroy {
       const packet = PacketFactory.fromJson(event.data);
       let frame = null;
       let message = null;
-      let user = null;
+      let user: User | null = null;
+      var chatMessage: ChatMessage;
       let roomName = null;
 
       switch (packet.getOperation()) {
@@ -457,32 +458,36 @@ export class Client implements OnInit, OnDestroy {
           }
           break;
         case 'ROOM_USER_ADD':
-          user = packet as RoomUserAdd;
-          frame = this.windowManager.getChatroom(user.getRoom());
+          frame = this.windowManager.getChatroom((packet as RoomUserAdd).getRoom());
 
           if(frame !== null) {
             //frame.addUser(user.getUser());
           }
           break;
         case 'ROOM_USER_REMOVE':
-          user = packet as RoomUserRemove;
-          frame = this.windowManager.getChatroom(user.getRoom());
+          frame = this.windowManager.getChatroom((packet as RoomUserRemove).getRoom());
 
           if(frame !== null) {
             //frame.removeUser(user.getUser());
           }
           break;
         case 'ROOM_USER_FEATURE':
-          user = packet as RoomUserFeature;
-          frame = this.windowManager.getChatroom(user.getRoom());
+          frame = this.windowManager.getChatroom((packet as RoomUserFeature).getRoom());
 
           if(frame !== null) {
             //frame.addFeature('USER', packet.data.name, packet.data.reference);
           }
           break;
         case 'MESSAGE_PRIVATE':
-          message = packet as MessagePrivate;
           roomName = null;
+          message = packet as MessagePrivate;
+          chatMessage = new ChatMessage({
+            type: ChatMessageType.PRIVATE,
+            user: message.getSender() as User | null | '-',
+            users: message.getUsers() as User[] | null,
+            message: message.getText(),
+            timestamp: new Date()
+          });
 
           if(message.hasRoom() && !message.forAll()) {
             roomName = message.getRoom();
@@ -491,7 +496,7 @@ export class Client implements OnInit, OnDestroy {
           /* Publish on all rooms */
           if(roomName === null) {
             this.windowManager.getAllChatrooms().forEach((frame) => {
-              //frame.addMessage('private', message);
+              frame.addMessage(chatMessage);
             });
 
             /* Publish on single room */
@@ -499,13 +504,18 @@ export class Client implements OnInit, OnDestroy {
             frame = this.windowManager.getChatroom(roomName);
 
             if(frame !== null) {
-             //frame.addMessage('private', message);
+              frame.addMessage(chatMessage);
             }
           }
           break;
         case 'MESSAGE_ACTION':
-          message = packet as MessageAction;
           roomName = null;
+          message = packet as MessageAction;
+          chatMessage = new ChatMessage({
+            type: ChatMessageType.ACTION,
+            message: message.getText(),
+            timestamp: new Date()
+          });
 
           if(message.hasRoom() && !message.forAll()) {
             roomName = message.getRoom();
@@ -514,7 +524,7 @@ export class Client implements OnInit, OnDestroy {
           /* Publish on all rooms */
           if(roomName === null) {
             this.windowManager.getAllChatrooms().forEach((frame) => {
-              //frame.addMessage('private', message);
+              frame.addMessage(chatMessage);
             });
 
             /* Publish on single room */
@@ -522,13 +532,19 @@ export class Client implements OnInit, OnDestroy {
             frame = this.windowManager.getChatroom(roomName);
 
             if(frame !== null) {
-              //frame.addMessage('private', message);
+              frame.addMessage(chatMessage);
             }
           }
           break;
         case 'MESSAGE_PUBLIC':
-          message = packet as MessagePublic;
           roomName = null;
+          message = packet as MessagePublic;
+          chatMessage = new ChatMessage({
+            type: ChatMessageType.PUBLIC,
+            user: message.getSender() as User | null | '-',
+            message: message.getText(),
+            timestamp: new Date()
+          });
 
           if(message.hasRoom() && !message.forAll()) {
             roomName = message.getRoom();
@@ -537,20 +553,15 @@ export class Client implements OnInit, OnDestroy {
           /* Publish on all rooms */
           if(roomName === null) {
             this.windowManager.getAllChatrooms().forEach((frame) => {
-              //frame.addMessage('private', message);
+              frame.addMessage(chatMessage);
             });
 
-            /* Publish on single room */
+          /* Publish on single room */
           } else {
             frame = this.windowManager.getChatroom(roomName);
 
             if(frame !== null) {
-              frame.addMessage({
-                username: message.getSender(),
-                message: message.getText(),
-                timestamp: new Date()
-              } as ChatMessage)
-              //frame.addMessage('private', message);
+              frame.addMessage(chatMessage)
             }
           }
           break;
