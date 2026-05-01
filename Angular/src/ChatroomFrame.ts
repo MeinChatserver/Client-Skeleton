@@ -44,7 +44,7 @@ export class ChatroomFrame extends Frame {
       return;
     }
 
-    const appRoot = this.frameDocument.querySelector('#app-root');
+    const appRoot = this.frameDocument.querySelector('body');
 
     if(!appRoot) {
       return;
@@ -62,7 +62,7 @@ export class ChatroomFrame extends Frame {
                 <ui-messages></ui-messages>
                 <canvas width="969" height="651" style="width: 100%; height: 100%;"></canvas></ui-output>
                 <ui-input>
-                    <input type="text" name="message" id="message-input" autocomplete="off"placeholder="Gebe eine Nachricht ein...">
+                    <input type="text" name="message" id="message-input" autocomplete="off" placeholder="Gebe eine Nachricht ein...">
                 </ui-input>
             </main>
             <aside>
@@ -119,7 +119,7 @@ export class ChatroomFrame extends Frame {
               }
 
               main ui-output ui-messages ui-text {
-                padding: 0px 5px;
+                padding: 0 5px;
               }
 
               main ui-output ui-messages ui-text[data-type="action"] {
