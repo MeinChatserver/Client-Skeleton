@@ -127,9 +127,47 @@ export class PopupFrame extends Frame {
         return `<label class="popup-label">${element.label ?? ''}</label>`;
       case 'content':
         return `<div class="popup-content">${element.content ?? ''}</div>`;
+      case 'split':
+        return this.buildSplit(element);
       default:
         return '';
     }
+  }
+
+  protected buildSplit(split: any): string {
+    const direction = split.direction || 'horizontal';
+    const ratios: number[] = split.ratios || Array(split.splits).fill(100 / split.splits);
+    const gap = split.gap || 10;
+
+    const gridTemplateValue = direction === 'horizontal'
+      ? `grid-template-columns: ${ratios.map((r: number) => `${r}fr`).join(' ')}`
+      : `grid-template-rows: ${ratios.map((r: number) => `${r}fr`).join(' ')}`;
+
+    const childrenHTML = (split.children || [])
+      .map((childGroup: any[], index: number) => {
+        const groupHTML = childGroup
+          .map(child => this.buildElement(child))
+          .join('');
+        return `<div class="split-item">${groupHTML}</div>`;
+      })
+      .join('');
+
+    return `
+      <div class="split-container" style="${gridTemplateValue}; gap: ${gap}px;">
+        ${childrenHTML}
+      </div>
+      <style>
+        .split-container {
+          display: grid;
+          width: 100%;
+        }
+        .split-item {
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+        }
+      </style>
+    `;
   }
 
   protected renderOkButton(): void {
