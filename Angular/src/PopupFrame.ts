@@ -74,48 +74,51 @@ export class PopupFrame extends Frame {
     const html = sorted.map(el => this.buildElement(el)).join('');
 
     return `
-      <div class="popup-wrapper">
-        <div class="popup-body">
+      <div class="mcs-popup-wrapper">
+        <div class="mcs-popup-body">
           ${html}
         </div>
-        <div class="popup-footer">
-          <div id="ok-btn" class="popup-footer-btn"></div>
+        <div class="mcs-popup-footer">
+          <div id="ok-btn" class="mcs-popup-footer-btn"></div>
         </div>
       </div>
       <style>
-        .popup-wrapper {
-          display: flex;
-          flex-direction: column;
-          height: 100vh;
-          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        .mcs-popup-wrapper {
+          display: flex !important;
+          flex-direction: column !important;
+          height: 100vh !important;
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+          margin: 0 !important;
+          padding: 0 !important;
         }
-        .popup-body {
-          flex: 1;
-          padding: 20px;
-          overflow-y: auto;
+        .mcs-popup-body {
+          flex: 1 !important;
+          padding: 20px !important;
+          overflow-y: auto !important;
         }
-        .popup-label {
-          display: block;
-          font-weight: 600;
-          font-size: 15px;
-          color: #222;
-          margin-bottom: 10px;
+        .mcs-popup-label {
+          display: block !important;
+          font-weight: 600 !important;
+          font-size: 15px !important;
+          color: #222 !important;
+          margin-bottom: 10px !important;
         }
-        .popup-content {
-          color: #555;
-          line-height: 1.5;
-          font-size: 14px;
+        .mcs-popup-content {
+          color: #555 !important;
+          line-height: 1.5 !important;
+          font-size: 14px !important;
         }
-        .popup-footer {
-          display: flex;
-          justify-content: flex-end;
-          padding: 10px 20px;
-          border-top: 1px solid #e0e0e0;
-          background: #f9f9f9;
+        .mcs-popup-footer {
+          display: flex !important;
+          justify-content: flex-end !important;
+          padding: 10px 20px !important;
+          border-top: 1px solid #e0e0e0 !important;
+          background: #f9f9f9 !important;
+          margin: 0 !important;
         }
-        .popup-footer-btn {
-          min-width: 80px;
-          height: 34px;
+        .mcs-popup-footer-btn {
+          min-width: 80px !important;
+          height: 34px !important;
         }
       </style>
     `;
@@ -124,9 +127,9 @@ export class PopupFrame extends Frame {
   protected buildElement(element: any): string {
     switch(element.type) {
       case 'label':
-        return `<label class="popup-label">${element.label ?? ''}</label>`;
+        return `<label class="mcs-popup-label">${element.label ?? ''}</label>`;
       case 'content':
-        return `<div class="popup-content">${element.content ?? ''}</div>`;
+        return `<div class="mcs-popup-content">${element.content ?? ''}</div>`;
       case 'split':
         return this.buildSplit(element);
       default:
@@ -148,23 +151,23 @@ export class PopupFrame extends Frame {
         const groupHTML = childGroup
           .map(child => this.buildElement(child))
           .join('');
-        return `<div class="split-item">${groupHTML}</div>`;
+        return `<div class="mcs-split-item">${groupHTML}</div>`;
       })
       .join('');
 
     return `
-      <div class="split-container" style="${gridTemplateValue}; gap: ${gap}px;">
+      <div class="mcs-split-container" style="${gridTemplateValue}; gap: ${gap}px;">
         ${childrenHTML}
       </div>
       <style>
-        .split-container {
-          display: grid;
-          width: 100%;
+        .mcs-split-container {
+          display: grid !important;
+          width: 100% !important;
         }
-        .split-item {
-          display: flex;
-          flex-direction: column;
-          gap: 10px;
+        .mcs-split-item {
+          display: flex !important;
+          flex-direction: column !important;
+          gap: 10px !important;
         }
       </style>
     `;
@@ -208,7 +211,7 @@ export class PopupFrame extends Frame {
     const fields = config.fields || [];
     const fieldsHTML = fields.map((field: any) => {
       return `
-        <div class="form-group">
+        <div class="mcs-form-group">
           <label for="${field.id}">${field.label || field.id}</label>
           <input
             type="${field.type || 'text'}"
@@ -222,74 +225,74 @@ export class PopupFrame extends Frame {
     }).join('');
 
     return `
-      <div class="popup-container">
+      <div class="mcs-popup-container">
         <h2>${config.title || 'Formular'}</h2>
         <form id="popup-form">
           ${fieldsHTML}
-          <div class="form-actions">
-            <button type="submit" class="btn-primary">
+          <div class="mcs-form-actions">
+            <button type="submit" class="mcs-btn-primary">
               ${config.submitLabel || 'Absenden'}
             </button>
-            <button type="button" class="btn-secondary" id="cancel-btn">
+            <button type="button" class="mcs-btn-secondary" id="cancel-btn">
               ${config.cancelLabel || 'Abbrechen'}
             </button>
           </div>
         </form>
       </div>
       <style>
-        .popup-container {
-          padding: 20px;
+        .mcs-popup-container {
+          padding: 20px !important;
         }
-        .popup-container h2 {
-          margin-bottom: 20px;
-          color: #333;
+        .mcs-popup-container h2 {
+          margin-bottom: 20px !important;
+          color: #333 !important;
         }
-        .form-group {
-          margin-bottom: 15px;
+        .mcs-form-group {
+          margin-bottom: 15px !important;
         }
-        .form-group label {
-          display: block;
-          margin-bottom: 5px;
-          font-weight: 500;
-          color: #555;
+        .mcs-form-group label {
+          display: block !important;
+          margin-bottom: 5px !important;
+          font-weight: 500 !important;
+          color: #555 !important;
         }
-        .form-group input {
-          width: 100%;
-          padding: 8px 12px;
-          border: 1px solid #ddd;
-          border-radius: 4px;
-          font-size: 14px;
+        .mcs-form-group input {
+          width: 100% !important;
+          padding: 8px 12px !important;
+          border: 1px solid #ddd !important;
+          border-radius: 4px !important;
+          font-size: 14px !important;
         }
-        .form-group input:focus {
-          outline: none;
-          border-color: #0066cc;
+        .mcs-form-group input:focus {
+          outline: none !important;
+          border-color: #0066cc !important;
         }
-        .form-actions {
-          display: flex;
-          gap: 10px;
-          margin-top: 20px;
+        .mcs-form-actions {
+          display: flex !important;
+          gap: 10px !important;
+          margin-top: 20px !important;
         }
-        .btn-primary, .btn-secondary {
-          padding: 10px 20px;
-          border: none;
-          border-radius: 4px;
-          cursor: pointer;
-          font-size: 14px;
-          font-weight: 500;
+        .mcs-btn-primary, .mcs-btn-secondary {
+          padding: 10px 20px !important;
+          border: none !important;
+          border-radius: 4px !important;
+          cursor: pointer !important;
+          font-size: 14px !important;
+          font-weight: 500 !important;
         }
-        .btn-primary {
-          background: #0066cc;
-          color: white;
+        .mcs-btn-primary {
+          background: #0066cc !important;
+          color: white !important;
         }
-        .btn-primary:hover {
-          background: #0052a3;
+        .mcs-btn-primary:hover {
+          background: #0052a3 !important;
         }
-        .btn-secondary {
-          background: #e0e0e0;
-          color: #333;
+        .mcs-btn-secondary {
+          background: #e0e0e0 !important;
+          color: #333 !important;
         }
-        .btn-secondary:hover {
-          background: #d0d0d0;
+        .mcs-btn-secondary:hover {
+          background: #d0d0d0 !important;
         }
       </style>
     `;
@@ -297,33 +300,33 @@ export class PopupFrame extends Frame {
 
   protected buildMessage(config: any): string {
     return `
-      <div class="popup-container message-container">
-        ${config.icon ? `<div class="message-icon">${config.icon}</div>` : ''}
+      <div class="mcs-popup-container mcs-message-container">
+        ${config.icon ? `<div class="mcs-message-icon">${config.icon}</div>` : ''}
         <h2>${config.title || 'Nachricht'}</h2>
         <p>${config.message || ''}</p>
-        <div class="form-actions">
-          <button type="button" class="btn-primary" id="ok-btn">
+        <div class="mcs-form-actions">
+          <button type="button" class="mcs-btn-primary" id="ok-btn">
             ${config.okLabel || 'OK'}
           </button>
         </div>
       </div>
       <style>
-        .message-container {
-          text-align: center;
-          padding: 30px;
+        .mcs-message-container {
+          text-align: center !important;
+          padding: 30px !important;
         }
-        .message-icon {
-          font-size: 48px;
-          margin-bottom: 20px;
+        .mcs-message-icon {
+          font-size: 48px !important;
+          margin-bottom: 20px !important;
         }
-        .message-container h2 {
-          margin-bottom: 15px;
-          color: #333;
+        .mcs-message-container h2 {
+          margin-bottom: 15px !important;
+          color: #333 !important;
         }
-        .message-container p {
-          color: #666;
-          margin-bottom: 25px;
-          line-height: 1.5;
+        .mcs-message-container p {
+          color: #666 !important;
+          margin-bottom: 25px !important;
+          line-height: 1.5 !important;
         }
       </style>
     `;

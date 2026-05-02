@@ -1,6 +1,6 @@
 import { ApplicationRef, ComponentRef, EnvironmentInjector } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
-import { ChatroomComponent } from './ChatroomComponent';
+import { ChatroomComponent, CHATROOM_STYLES } from './ChatroomComponent';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { User } from './Models';
@@ -47,11 +47,8 @@ export class ChatroomFrame extends Frame {
     if (this.frameDocument && !this.frameDocument.getElementById('chatroom-styles')) {
       const style = this.frameDocument.createElement('style');
       style.id = 'chatroom-styles';
-      const componentStyles = (ChatroomComponent as any).ɵcmp.styles;
-      style.textContent = componentStyles?.[0]?.replace(':host', 'body') || '';
-      if (style.textContent) {
-        this.frameDocument.head.appendChild(style);
-      }
+      style.textContent = CHATROOM_STYLES.replace(':host', 'body');
+      this.frameDocument.head.appendChild(style);
     }
 
     const ref = this.renderComponent(ChatroomComponent, {
@@ -128,19 +125,7 @@ export class ChatroomFrame extends Frame {
   }
 
   protected applyStyle(): void {
-    if (!this.style) {
-      return;
-    }
-
-    let doc: Document | null = null;
-
-    try {
-      doc = this.frameWindow?.document ?? this.frameDocument;
-    } catch (e) {
-      return;
-    }
-
-    if (!doc?.head) {
+    if (!this.style || !this.frameDocument) {
       return;
     }
 
@@ -168,12 +153,12 @@ export class ChatroomFrame extends Frame {
       return;
     }
 
-    let el = doc.getElementById('chatroom-theme') as HTMLStyleElement | null;
+    let el = this.frameDocument.getElementById('chatroom-theme') as HTMLStyleElement | null;
 
     if (!el) {
-      el = doc.createElement('style');
+      el = this.frameDocument.createElement('style');
       el.id = 'chatroom-theme';
-      doc.head.appendChild(el);
+      this.frameDocument.head.appendChild(el);
     }
 
     el.textContent = `:root { ${vars.join(' ')} }`;

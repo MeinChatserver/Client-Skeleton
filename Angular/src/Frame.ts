@@ -59,6 +59,7 @@ export class Frame {
 
     this.frameDocument = this.frameWindow.document;
     this.setupInitialDocument();
+    // this.copyParentStyles();  // DEBUG: Deaktiviert
     this.startWatcher();
     this.setupCloseHandler();
   }
@@ -104,6 +105,12 @@ export class Frame {
 
   protected copyParentStyles(): void {
     if(!this.frameDocument) {
+      return;
+    }
+
+    // Nur Styles kopieren, wenn das frameDocument ein separates Dokument ist
+    if (this.frameDocument === document) {
+      console.warn('[Frame] frameDocument ist das gleiche wie das Haupt-Dokument, kopiere keine Styles');
       return;
     }
 
@@ -164,6 +171,7 @@ export class Frame {
           });
         } else {
           this.setupInitialDocument();
+          // this.copyParentStyles();  // DEBUG: Deaktiviert
           this.renderContent();
           this.isRebuilding = false;
         }
