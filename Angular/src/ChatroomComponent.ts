@@ -161,9 +161,13 @@ export const CHATROOM_STYLES = `
 
   aside ui-select {
     font-size: 16px;
-    padding: 4px;
+    margin: 1px;
     background-color: var(--room-background);
     color: var(--room-foreground);
+  }
+
+  aside ui-select select {
+    padding: 4px;
   }
 
   aside .connecting {
