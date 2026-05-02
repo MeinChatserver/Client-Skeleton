@@ -36,7 +36,164 @@ import {ProfileOpen} from './Models/Network/ProfileOpen';
       <ui-select name="chatrooms" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
     </aside>
   `,
-  styles: []
+  styles: [`
+    :host {
+      cursor: default;
+      display: flex;
+      flex-direction: row;
+      background-color: var(--room-background);
+      color: var(--room-foreground);
+      padding: 0;
+      overflow: hidden;
+      width: 100%;
+      height: 100%;
+    }
+
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    main ui-output {
+      position: relative;
+      display: flex;
+      flex: 1;
+      z-index: 0;
+      min-height: 0;
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      background-image: var(--room-background-image);
+    }
+
+    main ui-output canvas {
+      z-index: -1;
+      position: absolute;
+      width: 100%;
+      display: block;
+      height: 100%;
+      order: 0;
+      user-select: none;
+    }
+
+    main ui-output ui-messages {
+      position: relative;
+      flex: 1;
+      min-height: 0;
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+      overflow-y: scroll;
+    }
+
+    main ui-output ui-messages ui-text {
+      padding: 0 5px;
+    }
+
+    main ui-output ui-messages ui-text[data-type="action"] {
+      color: var(--room-blue);
+    }
+
+    main ui-output ui-messages ui-text[data-type="public"] a.sender {
+      font-weight: bold;
+    }
+
+    main ui-output ui-messages ui-text[data-type="private"] a.sender {
+      font-weight: bold;
+      color: var(--room-red);
+    }
+
+    main ui-input {
+      flex: 0;
+    }
+
+    main ui-input input {
+      width: 100%;
+      height: 100%;
+      font-size: 90%;
+      padding: 5px 5px;
+    }
+
+    aside {
+      position: relative;
+      flex: 0 200px;
+      border-top: 1px solid #808080;
+      border-left: 1px solid #808080;
+      display: flex;
+      flex-direction: column;
+    }
+
+    aside ui-list {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      flex: 1 1 auto;
+      overflow-x: hidden;
+      overflow-y: scroll;
+      background: var(--room-background) !important;
+      color: var(--room-foreground) !important;
+      border-color: transparent !important;
+    }
+
+    aside ui-list .list-item {
+      color: var(--room-foreground) !important;
+    }
+
+    aside ui-list .list-item:hover {
+      background: rgba(255, 255, 255, 0.2) !important;
+    }
+
+    aside ui-list .list-item.active {
+      background: rgba(0, 0, 128, 0.8) !important;
+      color: #FFFFFF !important;
+    }
+
+    aside ui-list::after {
+      content: "";
+      position: sticky;
+      display: block;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 1;
+      margin-top: -101%;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      border-top: 1px solid #000000;
+      border-left: 1px solid #000000;
+      overflow: hidden;
+    }
+
+    aside ui-list ui-entry {
+      padding: 2px 6px;
+    }
+
+    aside ui-list ui-entry:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    aside ui-list ui-entry[data-active="true"],
+    aside ui-list ui-entry:active,
+    aside ui-list ui-entry:focus {
+      background: rgba(0, 0, 128, 0.8);
+      color: #FFFFFF;
+    }
+
+    aside ui-select {
+      font-size: 16px;
+      padding: 4px;
+      background-color: var(--room-background);
+      color: var(--room-foreground);
+    }
+
+    aside .connecting {
+      text-align: center;
+      padding: 10px;
+    }
+  `]
 })
 export class ChatroomComponent implements AfterViewChecked {
   @Input() client!: Client;
