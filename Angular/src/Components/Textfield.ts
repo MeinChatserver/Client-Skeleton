@@ -1,4 +1,4 @@
-import {Component, Input, forwardRef, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {Component, Input, forwardRef, CUSTOM_ELEMENTS_SCHEMA, ViewChild, ElementRef} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
@@ -15,10 +15,11 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
     }
   ],
   template: `
-    <input [type]="password ? 'password' : 'text'"
+    <input #inputRef [type]="password ? 'password' : 'text'"
       [value]="value"
       [placeholder]="placeholder"
       (change)="onChange($event)"
+      (keydown.enter)="onEnter()"
       [disabled]="disabled" />`,
   styles: [`
     :host {
@@ -31,14 +32,30 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
     }`]
 })
 export class Textfield implements ControlValueAccessor {
+  @ViewChild('inputRef') inputRef?: ElementRef<HTMLInputElement>;
   @Input() placeholder: string = '';
   @Input() password: boolean = false;
 
-  value: any;
+  value: any = '';
   disabled = false;
 
   private onChangeFn = (value: any) => {};
   private onTouchedFn = () => {};
+
+  getValue(): string {
+    return this.inputRef?.nativeElement.value ?? '';
+  }
+
+  setValue(val: string): void {
+    if (this.inputRef) {
+      this.inputRef.nativeElement.value = val;
+    }
+    this.value = val;
+  }
+
+  onEnter(): void {
+    // Enter key handler
+  }
 
   writeValue(value: any): void {
     this.value = value;
@@ -57,7 +74,7 @@ export class Textfield implements ControlValueAccessor {
   }
 
   onChange(event: Event): void {
-    const target = event.target as HTMLSelectElement;
+    const target = event.target as HTMLInputElement;
     this.value = target.value;
     this.onChangeFn(this.value);
     this.onTouchedFn();

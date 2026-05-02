@@ -29,11 +29,7 @@ import {ProfileOpen} from './Models/Network/ProfileOpen';
         </ui-messages>
         <canvas width="969" height="651" style="width: 100%; height: 100%;"></canvas>
       </ui-output>
-      <ui-input>
-        <input #messageInput type="text" name="message" id="message-input" autocomplete="off"
-               placeholder="Gebe eine Nachricht ein..."
-               (keydown.enter)="onSendMessage(messageInput)">
-      </ui-input>
+      <ui-input #messageInput placeholder="Gebe eine Nachricht ein..." (keydown.enter)="onSendMessage()"></ui-input>
     </main>
     <aside>
       <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)"></ui-list>
@@ -49,6 +45,7 @@ export class ChatroomComponent implements AfterViewChecked {
   @Output() chatroomSelect = new EventEmitter<{ type: string; item: ListItem }>();
 
   @ViewChild('messagesContainer') messagesContainer?: ElementRef<HTMLElement>;
+  @ViewChild('messageInput') messageInput?: any;
 
   messages = signal<ChatMessage[]>([]);
   users = signal<User[]>([]);
@@ -111,12 +108,15 @@ export class ChatroomComponent implements AfterViewChecked {
     this.users.update(users => users.filter(u => u.id !== user.id));
   }
 
-  onSendMessage(input: HTMLInputElement): void {
-    const value = input.value.trim();
+  onSendMessage(): void {
+    if (!this.messageInput) {
+      return;
+    }
 
+    const value = this.messageInput.getValue().trim();
     if (value) {
       this.sendMessage.emit(value);
-      input.value = '';
+      this.messageInput.setValue('');
     }
   }
 
