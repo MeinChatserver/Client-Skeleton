@@ -164,6 +164,44 @@ export class ChatroomFrame extends Frame {
     el.textContent = `:root { ${vars.join(' ')} }`;
   }
 
+  public addFeature(type: string): void {
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).addFeature(type);
+    }
+  }
+
+  public removeFeature(type: string): void {
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).removeFeature(type);
+    }
+  }
+
+  public removeAllFeatures(): void {
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).removeAllFeatures();
+    }
+  }
+
+  public hasFeature(type: string): boolean {
+    if (this.componentRef) {
+      return (this.componentRef.instance as ChatroomComponent).hasFeature(type);
+    }
+    return false;
+  }
+
+  public getSelectedUsers(): User[] {
+    if (this.componentRef) {
+      return (this.componentRef.instance as ChatroomComponent).getSelectedUsers();
+    }
+    return [];
+  }
+
+  public setConnected(connected: boolean): void {
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).setConnected(connected);
+    }
+  }
+
   public on(eventName: string, callback: Function): void {
     if (!this.eventListeners.has(eventName)) {
       this.eventListeners.set(eventName, []);

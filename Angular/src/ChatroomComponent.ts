@@ -2,7 +2,7 @@ import {
   Component, Input, Output, EventEmitter,
   signal, computed, CUSTOM_ELEMENTS_SCHEMA,
   ViewEncapsulation, ViewChild, ElementRef,
-  AfterViewChecked
+  AfterViewChecked, OnDestroy, inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
@@ -11,6 +11,7 @@ import {List, Select, Textfield} from './Components';
 import { ListItem, Room, User } from './Models';
 import {Disconnect} from './Models/Network';
 import {ProfileOpen} from './Models/Network/ProfileOpen';
+import { FeatureService, FeatureType } from './Features/FeatureService';
 
 export const CHATROOM_STYLES = `
   :host {
@@ -191,18 +192,18 @@ export const CHATROOM_STYLES = `
             <ui-text [attr.data-type]="getMessageType(message)" [innerHTML]="getMessageContent(message)"></ui-text>
           }
         </ui-messages>
-        <canvas width="969" height="651" style="width: 100%; height: 100%;"></canvas>
+        <canvas #featureCanvas width="969" height="651" style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></canvas>
       </ui-output>
       <ui-input #messageInput placeholder="Gebe eine Nachricht ein..." (keydown.enter)="onSendMessage()"></ui-input>
     </main>
     <aside>
-      <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)"></ui-list>
+      <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
       <ui-select name="chatrooms" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
     </aside>
   `,
   styles: []  // Styles werden von ChatroomFrame injiziert!
 })
-export class ChatroomComponent implements AfterViewChecked {
+export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   @Input() client!: Client;
   @Input() roomName: string = '';
   @Output() sendMessage = new EventEmitter<string>();
@@ -210,9 +211,14 @@ export class ChatroomComponent implements AfterViewChecked {
 
   @ViewChild('messagesContainer') messagesContainer?: ElementRef<HTMLElement>;
   @ViewChild('messageInput') messageInput?: any;
+  @ViewChild('featureCanvas') featureCanvas?: ElementRef<HTMLCanvasElement>;
+
+  private featureService = inject(FeatureService);
 
   messages = signal<ChatMessage[]>([]);
   users = signal<User[]>([]);
+  selectedUsers = signal<User[]>([]);
+  isConnected = signal<boolean>(false);
   private pendingScroll = false;
 
   userItems = computed((): ListItem[] =>
@@ -238,6 +244,28 @@ export class ChatroomComponent implements AfterViewChecked {
       el.scrollTop = el.scrollHeight;
       this.pendingScroll = false;
     }
+
+    this.initializeCanvasIfNeeded();
+  }
+
+  ngOnDestroy(): void {
+    this.featureService.cleanup();
+  }
+
+  private initializeCanvasIfNeeded(): void {
+    if (!this.featureCanvas?.nativeElement) return;
+
+    const canvas = this.featureCanvas.nativeElement;
+    if ((canvas as any).__initialized) return;
+
+    const context = canvas.getContext('2d');
+    if (!context) {
+      console.warn('[ChatroomComponent] Failed to get canvas context');
+      return;
+    }
+
+    this.featureService.initialize(canvas, context);
+    (canvas as any).__initialized = true;
   }
 
   initMessages(messages: ChatMessage[]): void {
@@ -288,8 +316,55 @@ export class ChatroomComponent implements AfterViewChecked {
     this.client.send(new ProfileOpen(item.label));
   }
 
+  onUserSelectionChange(items: ListItem[]): void {
+    const selectedUsers = items
+      .map(item => this.users().find(u => u.username === item.label))
+      .filter((u): u is User => u !== undefined);
+
+    this.selectedUsers.set(selectedUsers);
+  }
+
   onChatroomSelect(type: string, item: ListItem): void {
     this.chatroomSelect.emit({ type, item });
+  }
+
+  addFeature(type: string): void {
+    const featureType = type.toUpperCase() as FeatureType;
+    if (Object.values(FeatureType).includes(featureType)) {
+      this.featureService.addFeature(featureType);
+      this.featureService.startAnimation();
+    } else {
+      console.warn(`[ChatroomComponent] Unknown feature type: ${type}`);
+    }
+  }
+
+  removeFeature(type: string): void {
+    const featureType = type.toUpperCase();
+    this.featureService.removeFeature(featureType);
+
+    if (!this.featureService.hasFeature(FeatureType.SNOW) &&
+        !this.featureService.hasFeature(FeatureType.GLOW) &&
+        !this.featureService.hasFeature(FeatureType.BURN)) {
+      this.featureService.stopAnimation();
+    }
+  }
+
+  removeAllFeatures(): void {
+    this.featureService.removeAllFeatures();
+    this.featureService.stopAnimation();
+  }
+
+  hasFeature(type: string): boolean {
+    const featureType = type.toUpperCase();
+    return this.featureService.hasFeature(featureType);
+  }
+
+  getSelectedUsers(): User[] {
+    return this.selectedUsers();
+  }
+
+  setConnected(connected: boolean): void {
+    this.isConnected.set(connected);
   }
 
   getMessageType(message: ChatMessage): string {

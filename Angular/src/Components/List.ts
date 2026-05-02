@@ -111,6 +111,7 @@ export class List {
   @Input() multiselect: boolean = false;
   @Output() itemClick = new EventEmitter<ListItem>();
   @Output() itemRightClick = new EventEmitter<ListItem>();
+  @Output() selectionChange = new EventEmitter<ListItem[]>();
   selectedItem: ListItem | null = null;
   selectedItems: ListItem[] = [];
 
@@ -133,6 +134,7 @@ export class List {
       } else {
         this.selectedItems = [...this.selectedItems, item];
       }
+      this.selectionChange.emit([...this.selectedItems]);
     } else if (!this.multiselect) {
       this.selectedItem = item;
     }
