@@ -170,6 +170,12 @@ export class ChatroomFrame extends Frame {
     }
   }
 
+  public addUserFeature(type: string, userId: string): void {
+    if (this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).addUserFeature(type, userId);
+    }
+  }
+
   public removeFeature(type: string): void {
     if (this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).removeFeature(type);

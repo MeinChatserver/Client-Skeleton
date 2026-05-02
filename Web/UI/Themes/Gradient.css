@@ -1,0 +1,48 @@
+html[data-theme="Gradient"] *,
+div[data-view="login"][data-theme="Gradient"] * {
+    scrollbar-color: rgba(255, 255, 255, 0.5) rgba(0, 0, 0, 0.25);
+}
+
+html[data-theme="Gradient"] button,
+div[data-view="login"][data-theme="Gradient"] button {
+    background: linear-gradient(to bottom, #b1bef6 0%,#6e84db 50%,#2547b2 51%,#2547b2 100%);
+	border: 1px solid #000000;
+    border-radius: 5px;
+    padding: 5px 20px 5px 20px;
+    border-radius: 4px;
+    display: inline-block;
+    cursor: pointer !important;
+	font-size: 13px;
+	font-weight: bold;
+	color: #FFFFFF;
+	text-shadow: 1px 1px 1px #000000, -1px -1px 1px #000000;
+}
+
+html[data-theme="Gradient"] button:hover,
+div[data-view="login"][data-theme="Gradient"] button:hover {
+    background: linear-gradient(to bottom, #bac2fc 0%,#8e99ec 50%,#404fc2 51%,#404fc2 100%);
+}
+
+html[data-theme="Gradient"] button:active,
+div[data-view="login"][data-theme="Gradient"] button:active {
+    background: linear-gradient(to bottom, #2547b2 0%,#2547b2 49%,#6e84db 50%,#b1bef6 100%);
+}
+
+html[data-theme="Gradient"] input,
+html[data-theme="Gradient"] select,
+div[data-view="login"][data-theme="Gradient"] input,
+div[data-view="login"][data-theme="Gradient"] select {
+    color: #444444;
+    font-weight: 400;
+    font-size: 14px;
+	border: 1px solid #767676;
+	box-shadow: inset 0px 1px 0px 0px #FFFFFF;
+    border-radius: 2px;
+    display: inline-block;
+    cursor: pointer !important;
+}
+
+html[data-theme="Gradient"] input,
+div[data-view="login"][data-theme="Gradient"] input {
+    padding: 3px 5px;
+}

@@ -69,7 +69,7 @@
 	display: flex;
 	text-align: center;
 	align-content: center;
-	flex-direction: row;
+    flex-direction:  row !important;
 }
 
 [data-view="login"] aside .content:empty::before,
@@ -81,7 +81,7 @@
 	align-self: center;
 	flex: 1;
 	align-content: center;
-	
+    border: none;
 }
 
 [data-view="login"] aside .content:empty::before {
@@ -92,8 +92,9 @@
 
 [data-view="login"] aside .content[data-state=""]:empty::before {
 	content: "Verbinde";
-	text-align: right;
+	text-align: center;
 	padding: 0 0 0 50px;
+    display: inline-block;
 }
 
 [data-view="login"] aside .content:empty::after {
@@ -105,5 +106,5 @@
 }
 
 [data-view="login"] aside .content[data-state=""]:empty::after {
-	display: block;
+	display: inline-block;
 }

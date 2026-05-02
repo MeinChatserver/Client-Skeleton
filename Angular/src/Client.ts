@@ -446,11 +446,11 @@ export class Client implements OnInit, OnDestroy {
           break;
         case 'ROOM_FEATURE':
           const feature = packet as RoomFeature;
+          frame = this.windowManager.getChatroom(feature.getReference() ?? '');
 
-          //frame = this.windowManager.getFrame(feature.getName());
-
-          if(frame !== null) {
-            //frame.addFeature('ROOM', packet.data.name);
+          if(frame !== null && feature.getName()) {
+            frame.addFeature(feature.getName() ?? '');
+            console.log(`[ROOM_FEATURE] Added feature "${feature.getName()}" to room ${feature.getReference()}`);
           }
           break;
         case 'ROOM_UPDATE':
@@ -484,10 +484,12 @@ export class Client implements OnInit, OnDestroy {
           }
           break;
         case 'ROOM_USER_FEATURE':
-          frame = this.windowManager.getChatroom((packet as RoomUserFeature).getRoom());
+          const userFeature = packet as RoomUserFeature;
+          frame = this.windowManager.getChatroom(userFeature.getRoom() ?? '');
 
-          if(frame !== null) {
-            //frame.addFeature('USER', packet.data.name, packet.data.reference);
+          if(frame !== null && userFeature.getName()) {
+            frame.addUserFeature(userFeature.getName() ?? '', userFeature.getReference() ?? '');
+            console.log(`[ROOM_USER_FEATURE] Added user feature "${userFeature.getName()}" for user ${userFeature.getReference()} in room ${userFeature.getRoom()}`);
           }
           break;
         case 'MESSAGE_PRIVATE':

@@ -1,0 +1,50 @@
+/**
+ * Mein Chatserver
+ * ▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔▔
+ * Licensed Materials - Property of mein-chatserver.de.
+ * © Copyright 2024. All Rights Reserved.
+ *
+ * @version 1.0.0
+ * @author  Adrian Preuß
+ */
+
+/* Globals */
+:not(input, textarea)::selection {
+    background: transparent;
+}
+
+* {
+    outline: none;
+    box-sizing: border-box;
+    font-smoothing: antialiased;
+    font-smooth: always;
+    text-rendering: optimizeLegibility;
+}
+
+html, body {
+    display: flex;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+    flex-direction: column;
+}
+
+body {
+    font-family: 'Open Sans', 'Lucida Sans Unicode', 'Lucida Grande', Arial, sans-serif;
+    font-size: 90%;
+    background: white;
+    min-height: 100px;
+    overflow: auto;
+    transition: all 0.2s;
+    padding: 20px;
+}
+
+/* Buttons */
+button {
+    cursor: pointer;
+}
+
+ui-grid {
+    height: 100vh;
+}

@@ -8,7 +8,9 @@
  * @version 1.0.0
  * @author  Adrian Preuß
  */
- 
+
+import I18N from './I18N.js';
+
 export default (new class Login {
 	Watcher			= null;
 	Container		    = null;
@@ -25,9 +27,9 @@ export default (new class Login {
 		/* Form */
 		let main			= document.createElement('main');
 		let grid			= document.createElement('ui-grid');
-		let panel_north		= document.createElement('ui-panel');
+		let panel_north	= document.createElement('ui-panel');
 		let panel_center	= document.createElement('ui-panel');
-		let panel_south		= document.createElement('ui-panel');
+		let panel_south	= document.createElement('ui-panel');
 		this.SelectCategory	= document.createElement('select');
 		this.InputUsername	= document.createElement('input');
 		this.InputPassword	= document.createElement('input');
@@ -35,15 +37,15 @@ export default (new class Login {
 		this.ButtonLogin	= document.createElement('button');
 		
 		panel_north.dataset.position	= 'north';
-		panel_north.appendChild(this.addForm('categories', 'Kategorie', this.SelectCategory)); // @ToDo I18N
+		panel_north.appendChild(this.addForm('categories', 'Category', this.SelectCategory));
 		
 		this.SelectCategory.addEventListener('change', this.onCategorySelect.bind(Login), true);
 					
 		this.InputPassword.type			= 'password';
 		panel_center.dataset.position	= 'center';
-		panel_center.appendChild(this.addForm('username', 'Benutzername', this.InputUsername)); // @ToDo I18N
-		panel_center.appendChild(this.addForm('password', 'Passwort', this.InputPassword)); // @ToDo I18N
-		panel_center.appendChild(this.addForm('chatroom', 'Chatraum', this.InputRoom)); // @ToDo I18N
+		panel_center.appendChild(this.addForm('username', 'Username', this.InputUsername));
+		panel_center.appendChild(this.addForm('password', 'Password', this.InputPassword));
+		panel_center.appendChild(this.addForm('chatroom', 'Chatroom', this.InputRoom));
 		
 		this.InputUsername.addEventListener('keydown', (event) => {
 			if(event.keyCode === 13 || event.key === 'Enter') {
@@ -58,7 +60,7 @@ export default (new class Login {
 		});
 		
 		panel_south.dataset.position	= 'south';
-		this.ButtonLogin.innerText		= 'Verbinde...'; // @ToDo I18N
+        this.ButtonLogin.innerText		= I18N._('Connect...').binding(this.ButtonLogin, 'innerText');
 		this.ButtonLogin.addEventListener('click', this.onLogin.bind(this), true);
 		
 		panel_south.appendChild(this.ButtonLogin);
@@ -81,8 +83,8 @@ export default (new class Login {
 		tab_input.name		= 'tabs';
 		tab_input.checked	= true;
 		
-		tab_label.for		= 'tab1';
-		tab_label.innerText	= 'Räume'; // @ToDo I18N
+		tab_label.htmlFor	= 'tab1';
+		tab_label.innerText	= I18N._('Rooms').binding(tab_label, 'innerText');
 		
 		this.RoomList.dataset.state	= '';
 		this.RoomList.id			= 'tab-content1';
@@ -95,40 +97,52 @@ export default (new class Login {
 		aside.appendChild(tabs);
 		this.Container.appendChild(aside);
 		
-		this.addCategory({ id: 0, name: 'Alle Chaträume' });
+		this.addCategory({ id: 0, name: 'All Chatrooms' });
 	}
 	
 	addForm(name, text, element) {
-		let form	= document.createElement('ui-form');
+		let form	    = document.createElement('ui-form');
 		let label	= document.createElement('label');
 		
 		element.id		= name;
 		element.name	= name;
 		
 		label.for		= name;
-		label.innerText	= text + ':';
+		label.innerText	= I18N._(text).binding(label, 'innerText') + ':';
 		
 		form.appendChild(label);
 		form.appendChild(element);
 		return form;
 	}
-	
+
+    enableEnterButton() {
+        this.ButtonLogin.disabled   = false;
+        this.ButtonLogin.innerHTML	= I18N._('Login').binding(this.ButtonLogin, 'innerHTML');
+    }
+
 	setConnected() {
+        if(this.Watcher) {
+            clearInterval(this.Watcher);
+            this.Watcher = null;
+        }
+
 		this.RoomList.dataset.state = '';
 		this.RoomList.innerHTML		= '&nbsp;';
-		this.ButtonLogin.innerHTML	= 'Einloggen'; // @ToDo I18N
+		this.ButtonLogin.innerHTML	= I18N._('Login').binding(this.ButtonLogin, 'innerHTML');
+        this.ButtonLogin.disabled   = false;
 	}
 	
 	setDisconnected() {
-		this.RoomList.innerHTML		= '';
-		this.RoomList.dataset.state = 'Verbindung verloren'; // @ToDo I18N
-		this.ButtonLogin.innerHTML	= 'Erneut verbinden'; // @ToDo I18N
-		
-		if(this.Watcher) {
-			clearInterval(this.Watcher);
-		}
-		
-		let seconds		= 30;		
+        if(this.Watcher) {
+            clearInterval(this.Watcher);
+            this.Watcher = null;
+        }
+
+        this.RoomList.innerHTML		= '';
+		this.RoomList.dataset.state = I18N._('Connection lost').binding(this.RoomList, 'dataset.state');
+		this.ButtonLogin.innerHTML	= I18N._('Reconnect').binding(this.ButtonLogin, 'innerHTML');
+        this.ButtonLogin.disabled   = false;
+		let seconds		    = 30;
 		this.Watcher	= setInterval(() => {
 			if(seconds <= 1) {
 				seconds = 1;
@@ -137,7 +151,7 @@ export default (new class Login {
 			this.RoomList.dataset.state = 'Versuche erneut zu verbinden (' + --seconds + 's).';
 		}, 1000);
 	}
-	
+
 	showLoginButton() {
 		this.RoomList.dataset.state = '';
 	}
@@ -147,9 +161,9 @@ export default (new class Login {
 	}
 	
 	addCategory(category) {
-		let option			= document.createElement('option');
-		option.value		= category.id;
-		option.innerHTML	= category.name;
+		let option		= document.createElement('option');
+		option.value		            = category.id;
+		option.textContent	            = I18N._(category.name).binding(option, 'textContent');
 		this.SelectCategory.appendChild(option);
 	}
 	
@@ -158,13 +172,13 @@ export default (new class Login {
 	}
 	
 	addChatroom(room) {
-		if(room === null) {
-			return;
-		}
+        if(!room?.name) {
+            return;
+        }
 		
 		try {
-			let element				= document.createElement('ui-entry');
-			element.innerHTML		= room.name + ' (' + room.users.length + ')';
+			let element = document.createElement('ui-entry');
+            element.textContent     = `${room.name} (${room.users?.length ?? 0})`;
 			element.dataset.name	= room.name;
 			element.dataset.id		= room.id;
 			element.addEventListener('click', this.onRoomSelect.bind(this), true);
@@ -185,8 +199,9 @@ export default (new class Login {
 	}
 	
 	onLogin(event) {
-		this.ButtonLogin.innerText		= 'Betrete...'; // @ToDo I18N
-		
+		this.ButtonLogin.innerText		= I18N._('Enter...').binding(this.ButtonLogin, 'innerHTML');
+		this.ButtonLogin.disabled       = true;
+
 		Client.send({
 			operation: 'LOGIN',
 			data: {
@@ -200,7 +215,7 @@ export default (new class Login {
 	onCategorySelect(event) {
 		Client.send({
 			operation:	'CATEGORY_CHANGE',
-			data:		parseInt(event.target.value, 10)
+			data:		Number(event.target.value)
 		});
 	}
 	

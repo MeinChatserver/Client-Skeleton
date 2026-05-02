@@ -10,15 +10,16 @@
  */
  
 import Login from './Login.js';
-import WindowManager from './WindowManager.js'
+import I18N from './I18N.js';
+import WindowManager from './WindowManager.js';
 
 window.Client = (new class Client {
-	Client			= 'WebChat';
-	Version			= 'V1.0.1';
+	Client		= 'WebChat';
+	Version		= 'V1.0.2';
 	Hostname	    = null;
-	Port			= 2710;
+	Port		= 2710;
 	Socket		    = null;
-	Ping		    = null;
+	Ping	        = null;
 	
 	constructor() {
 		window.addEventListener('unload', () => {
@@ -31,13 +32,13 @@ window.Client = (new class Client {
 	}
 	
 	init() {
-		console.log('%cwww.mein-chatserver.de - ' + this.Client + ' ' + this.Version, 'background: #c8c5fb; font-size: 16px; padding: 2px 10px;', 'Copyright © 2024 by Mein Chatserver. All Rights Reserved.');
+		console.log('%cwww.mein-chatserver.de - ' + this.Client + ' ' + this.Version, 'background: #3b2caf; font-size: 16px; padding: 2px 10px;', 'Copyright © 2024 by Mein Chatserver. All Rights Reserved.');
 		
 		/* Load Hostname */
-		if(window.location.protocol !== 'file:') {
+		if(window.location.protocol !== 'file:' && window.location.hostname !== 'localhost') {
 			this.Hostname = window.location.hostname;
 		}
-		
+
 		/* Load Defaults */
 		try {
 			Object.entries(window.Defaults.style).forEach(([ name, value ]) => {
@@ -107,11 +108,17 @@ window.Client = (new class Client {
 						case 'suggestion':
 							Login.setSuggestedRoom(value);
 						break;
+						case 'theme':
+                            document.documentElement.dataset.theme = value;
+						break;
+						case 'language':
+                            I18N.load(value, true);
+						break;
 						case 'port':
 							this.Port = value;
 						break;
 						default:
-							console.warn('Unsupported Parameter:', name, value);
+							console.warn('Unsupported Parameter:', name, ':', value);
 						break;
 					}
 				}
@@ -119,7 +126,7 @@ window.Client = (new class Client {
 		} catch(e) {
 			console.error(e);
 		}
-		
+
 		/* Prepare Socket */
 		this.connect();
 	}
@@ -138,9 +145,7 @@ window.Client = (new class Client {
 	}
 	
 	connect(hard) {
-		if(hard) {
-			this.disconnect();
-		}
+		this.disconnect(hard);
 		
 		this.Socket				= new WebSocket(`wss://${this.getHostname()}:${this.getPort()}/`);
 		this.Socket.onopen		= this.onOpen.bind(this);
@@ -269,13 +274,29 @@ window.Client = (new class Client {
 				case 'PONG':
 					// @ToDo
 				break;
-				case 'POPUP':
+				case 'ALERT':
 					alert(packet.data);
+
+					Login.enableEnterButton();
+				break;
+				case 'POPUP':
+					const popup = WindowManager.createPopup(packet.data.name, packet.data.width, packet.data.height, packet.data.elements);
+
+					if(popup) {
+						if(packet?.data?.title) {
+							popup.setTitle(packet.data.title);
+						}
+
+						popup.focus();
+					}
+
+					Login.enableEnterButton();
 				break;
 				case 'ROOMS_CATEGORIES':
                     WindowManager.clearChatrooms();
 					Login.clearCategories();
-					Login.addCategory({ id: 0, name: 'Alle Chaträume' });
+
+					Login.addCategory({ id: 0, name: 'All Chatrooms' });
 					packet.data.forEach(Login.addCategory.bind(Login));
 				break;
 				case 'ROOMS':
@@ -289,6 +310,7 @@ window.Client = (new class Client {
 					}
 				break;
 				case 'WINDOW_ROOM':
+                    Login.enableEnterButton();
 					frame = WindowManager.create(packet.data.name, packet.data.width, packet.data.height);
 					frame.setTitle(packet.data.title);
 					frame.setStyle(packet.data.room.style, packet.data.ranks);
@@ -316,6 +338,13 @@ window.Client = (new class Client {
                         frame.focus();
                     }
 				break;
+                case 'ROOM_FEATURE':
+                    frame = WindowManager.get(packet.data.reference);
+
+                    if(frame !== null) {
+                        frame.addFeature('ROOM', packet.data.name);
+                    }
+                break;
 				case 'ROOM_UPDATE':
 					frame = WindowManager.get(packet.data.name);
 					
@@ -343,6 +372,13 @@ window.Client = (new class Client {
 						frame.removeUser(packet.data.user);
 					}
 				break;
+                case 'ROOM_USER_FEATURE':
+                    frame = WindowManager.get(packet.data.room);
+
+                    if(frame !== null) {
+                        frame.addFeature('USER', packet.data.name, packet.data.reference);
+                    }
+                break;
 				case 'MESSAGE_PRIVATE':					
 					if(typeof(packet.data.room) !== 'undefined') {
 						room = packet.data.room;

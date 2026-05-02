@@ -11,7 +11,7 @@
 
 export default class List {
     constructor(element, data, options = {}) {
-        this.element     = element;
+        this.element    = element;
         this.options    = {
             ...options,
             value:  options.value || 'id',

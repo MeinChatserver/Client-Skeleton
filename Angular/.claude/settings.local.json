@@ -7,7 +7,13 @@
       "Bash(Select-Object Name, FullName)",
       "Bash(npx tsc *)",
       "Bash(npm run *)",
-      "Bash(Remove-Item *)"
+      "Bash(Remove-Item *)",
+      "Bash(Get-ChildItem -Recurse -Path \"src\" -Include \"*.ts\")",
+      "Bash(Select-Object -ExpandProperty Name)",
+      "Bash(Sort-Object)",
+      "Bash(git checkout *)",
+      "Bash(git add *)",
+      "Bash(git commit -m ' *)"
     ]
   }
 }

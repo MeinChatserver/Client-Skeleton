@@ -13,8 +13,8 @@ export class SnowFeature implements Feature {
   private canvas: HTMLCanvasElement | null = null;
   private context: CanvasRenderingContext2D | null = null;
   private snowflakes: Snowflake[] = [];
-  private particleCount = 100;
-  private gravity = 0.1;
+  private particleCount = 150;
+  private gravity = 0.02;
   private wind = 0.05;
   private windVariance = 0.01;
   private currentWind = 0;
@@ -23,6 +23,7 @@ export class SnowFeature implements Feature {
     this.canvas = canvas;
     this.context = context;
     this.initializeSnowflakes();
+    console.log(`[SnowFeature] Initialized with ${this.snowflakes.length} snowflakes on canvas ${canvas.width}x${canvas.height}`);
   }
 
   onStart(): void {
@@ -46,7 +47,9 @@ export class SnowFeature implements Feature {
     for (const snowflake of this.snowflakes) {
       snowflake.x += snowflake.vx + this.currentWind;
       snowflake.y += snowflake.vy;
-      snowflake.vy += this.gravity;
+
+      // Cap velocity to prevent infinite acceleration
+      snowflake.vy = Math.min(snowflake.vy + this.gravity, 0.5);
 
       // Wrap around canvas
       if (snowflake.x < 0) snowflake.x = this.canvas.width;
@@ -54,6 +57,7 @@ export class SnowFeature implements Feature {
       if (snowflake.y > this.canvas.height) {
         snowflake.y = -snowflake.radius;
         snowflake.x = Math.random() * this.canvas.width;
+        snowflake.vy = Math.random() * 0.2 + 0.05;
       }
 
       // Draw snowflake
@@ -75,9 +79,9 @@ export class SnowFeature implements Feature {
       this.snowflakes.push({
         x: Math.random() * this.canvas.width,
         y: Math.random() * this.canvas.height,
-        vx: (Math.random() - 0.5) * 0.5,
-        vy: Math.random() * 0.5 + 0.2,
-        radius: Math.random() * 1.5 + 0.5,
+        vx: (Math.random() - 0.5) * 0.3,
+        vy: Math.random() * 0.2 + 0.05,
+        radius: Math.random() * 2.5 + 1.5,
         opacity: Math.random() * 0.7 + 0.3
       });
     }

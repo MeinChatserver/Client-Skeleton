@@ -1,13 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Feature } from './Feature';
 import { SnowFeature } from './SnowFeature';
-import { GlowFeature } from './GlowFeature';
-import { BurnFeature } from './BurnFeature';
 
 export enum FeatureType {
-  SNOW = 'SNOW',
-  GLOW = 'GLOW',
-  BURN = 'BURN'
+  SNOW = 'SNOW'
 }
 
 @Injectable({
@@ -23,27 +19,34 @@ export class FeatureService {
   initialize(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D): void {
     this.canvas = canvas;
     this.context = context;
+    console.log(`[FeatureService] Initialized with canvas ${canvas.width}x${canvas.height}`);
+    console.log(`[FeatureService] Canvas visible: ${canvas.offsetWidth}x${canvas.offsetHeight}, display: ${window.getComputedStyle(canvas).display}`);
   }
 
   addFeature(type: FeatureType): void {
+    // Use type as key by default
+    this.addFeatureWithKey(type, type);
+  }
+
+  addFeatureWithKey(type: FeatureType, key: string): void {
+    console.log(`[FeatureService] addFeatureWithKey called: type=${type}, key=${key}`);
+    console.log(`[FeatureService] Canvas initialized: ${!!this.canvas}, Context: ${!!this.context}`);
+
     if (!this.canvas || !this.context) {
       console.warn('[FeatureService] Canvas not initialized');
       return;
     }
 
-    // Remove existing feature of same type
-    this.removeFeature(type);
+    // Don't remove existing features - allow multiple features to coexist
+    if (this.features.has(key)) {
+      console.log(`[FeatureService] Feature with key ${key} already exists`);
+      return;
+    }
 
     let feature: Feature;
     switch (type) {
       case FeatureType.SNOW:
         feature = new SnowFeature();
-        break;
-      case FeatureType.GLOW:
-        feature = new GlowFeature();
-        break;
-      case FeatureType.BURN:
-        feature = new BurnFeature();
         break;
       default:
         console.warn(`[FeatureService] Unknown feature type: ${type}`);
@@ -52,7 +55,7 @@ export class FeatureService {
 
     feature.onInit(this.canvas, this.context);
     feature.onStart();
-    this.features.set(type, feature);
+    this.features.set(key, feature);
   }
 
   removeFeature(type: FeatureType | string): void {
@@ -81,6 +84,7 @@ export class FeatureService {
   startAnimation(): void {
     if (this.isRunning) return;
 
+    console.log(`[FeatureService] Starting animation with ${this.features.size} features`);
     this.isRunning = true;
     const animate = (timestamp: number) => {
       if (!this.canvas || !this.context) return;

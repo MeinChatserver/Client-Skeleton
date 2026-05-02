@@ -24,7 +24,6 @@
 	background-repeat: no-repeat;
 	background-position: center center;
 	background-size: auto;
-	
 }
 
 /* SCALED_HEIGHT_RIGHT - Skaliert auf Höhe (Rechts) */
@@ -96,7 +95,7 @@
 	background-size: 200%;
 }
 
-/* TILED_COLUMS_ZOOM_3 - Gekachelt (Spaltenweise, 3fache Größe) */
+/* TILED_COLUMS_ZOOM_3 - Gekachelt (Spaltenw eise, 3fache Größe) */
 [data-position="TILED_COLUMS_ZOOM_3"] {
 	background-repeat: repeat-y;
 	background-size: 300%;	
@@ -105,16 +104,19 @@
 /* CENTERED - Zentriert */
 [data-position="CENTERED"] {
 	background-position: 50% 50%;
+    background-repeat: no-repeat;
 }
 
 /* CENTERED_2 - Zentriert (2fache Größe) */
 [data-position="CENTERED_2"] {
 	background-position: 50% 50%;
+    background-repeat: no-repeat;
 	background-size: 200%;
 }
 
 /* CENTERED_2 - Zentriert (3fache Größe)*/
 [data-position="CENTERED_3"] {
 	background-position: 50% 50%;
+    background-repeat: no-repeat;
 	background-size: 300%;
 }
