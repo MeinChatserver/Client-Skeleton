@@ -9,6 +9,8 @@ import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { Client } from './Client';
 import {List, Select, Textfield} from './Components';
 import { ListItem, Room, User } from './Models';
+import {Disconnect} from './Models/Network';
+import {ProfileOpen} from './Models/Network/ProfileOpen';
 
 @Component({
   selector: 'app-chatroom',
@@ -57,7 +59,10 @@ export class ChatroomComponent implements AfterViewChecked {
   );
 
   chatrooms = computed(() => {
-    if (!this.client) return [];
+    if (!this.client) {
+      return [];
+    }
+
     return this.client.chatRooms()
       .filter(room => room.getName() !== null)
       .map(room => ({
@@ -94,7 +99,10 @@ export class ChatroomComponent implements AfterViewChecked {
 
   addUser(user: User): void {
     this.users.update(users => {
-      if (users.some(u => u.id === user.id)) return users;
+      if (users.some(u => u.id === user.id)) {
+        return users;
+      }
+
       return [...users, user];
     });
   }
@@ -105,6 +113,7 @@ export class ChatroomComponent implements AfterViewChecked {
 
   onSendMessage(input: HTMLInputElement): void {
     const value = input.value.trim();
+
     if (value) {
       this.sendMessage.emit(value);
       input.value = '';
@@ -112,7 +121,7 @@ export class ChatroomComponent implements AfterViewChecked {
   }
 
   onUserSelect(item: ListItem): void {
-    // Handle user selection
+    this.client.send(new ProfileOpen(item.label));
   }
 
   onChatroomSelect(type: string, item: ListItem): void {
