@@ -4,4 +4,5 @@ export interface ListItem {
   count: number;
   prefixIcon?: string;
   suffixIcon?: string;
+  rank?: number;
 }

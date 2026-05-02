@@ -209,7 +209,7 @@ export class ChatroomComponent implements AfterViewChecked {
   private pendingScroll = false;
 
   userItems = computed((): ListItem[] =>
-    this.users().map(user => ({ id: user.id, label: user.username, count: 0 }))
+    this.users().map(user => ({ id: user.id, label: user.username, count: 0, rank: user.rank }))
   );
 
   chatrooms = computed(() => {

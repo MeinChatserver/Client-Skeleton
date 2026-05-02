@@ -18,7 +18,7 @@ import {ListItem} from '../Models';
             <i [class]="item.prefixIcon" class="prefix-icon"></i>
         }
 
-        <span class="label">{{ item.label }}</span>
+        <span class="label" [style.color]="getRankColor(item.rank)">{{ item.label }}</span>
         @if(item.count) {
           <small class="count">({{ item.count }})</small>
         }
@@ -144,5 +144,10 @@ export class List {
     event.preventDefault();
 
     this.itemRightClick.emit(item);
+  }
+
+  getRankColor(rank?: number): string {
+    if (!rank) return 'inherit';
+    return `var(--room-rank-${rank}, inherit)`;
   }
 }
