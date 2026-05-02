@@ -10,7 +10,7 @@ import {ListItem} from '../Models';
     @for (item of items; track item.label) {
       <div
         class="list-item"
-        [class.active]="item === selectedItem"
+        [class.active]="isItemSelected(item)"
         (click)="onItemClick($event, item)"
         (contextmenu)="onItemRightClick($event, item)">
 
@@ -81,6 +81,10 @@ import {ListItem} from '../Models';
       color: var(--ui-list-active-color, #FFFFFF);
     }
 
+    .list-item.active:not(.multiselect) {
+      cursor: text;
+    }
+
     .prefix-icon {
       margin-right: 8px;
       color: #666;
@@ -104,12 +108,34 @@ import {ListItem} from '../Models';
 })
 export class List {
   @Input() items: ListItem[] = [];
+  @Input() multiselect: boolean = false;
   @Output() itemClick = new EventEmitter<ListItem>();
   @Output() itemRightClick = new EventEmitter<ListItem>();
   selectedItem: ListItem | null = null;
+  selectedItems: ListItem[] = [];
+
+  isItemSelected(item: ListItem): boolean {
+    if (this.multiselect) {
+      return this.selectedItems.some(selected => this.isSameItem(selected, item));
+    }
+    return this.selectedItem ? this.isSameItem(this.selectedItem, item) : false;
+  }
+
+  private isSameItem(a: ListItem, b: ListItem): boolean {
+    return (a.id && b.id && a.id === b.id) || a.label === b.label;
+  }
 
   onItemClick(event: MouseEvent, item: ListItem) {
-    this.selectedItem = item;
+    if (this.multiselect && event.ctrlKey) {
+      const isSelected = this.selectedItems.some(selected => this.isSameItem(selected, item));
+      if (isSelected) {
+        this.selectedItems = this.selectedItems.filter(selected => !this.isSameItem(selected, item));
+      } else {
+        this.selectedItems = [...this.selectedItems, item];
+      }
+    } else if (!this.multiselect) {
+      this.selectedItem = item;
+    }
 
     this.itemClick.emit(item);
   }

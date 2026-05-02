@@ -34,7 +34,7 @@ import { ListItem, Room, User } from './Models';
       </ui-input>
     </main>
     <aside>
-      <ui-list [items]="userItems()"></ui-list>
+      <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)"></ui-list>
       <ui-select name="chatrooms" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
     </aside>
   `,
@@ -53,7 +53,7 @@ export class ChatroomComponent implements AfterViewChecked {
   private pendingScroll = false;
 
   userItems = computed((): ListItem[] =>
-    this.users().map(user => ({ label: user.username, count: 0 }))
+    this.users().map(user => ({ id: user.id, label: user.username, count: 0 }))
   );
 
   chatrooms = computed(() => {
@@ -109,6 +109,10 @@ export class ChatroomComponent implements AfterViewChecked {
       this.sendMessage.emit(value);
       input.value = '';
     }
+  }
+
+  onUserSelect(item: ListItem): void {
+    // Handle user selection
   }
 
   onChatroomSelect(type: string, item: ListItem): void {
