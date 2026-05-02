@@ -116,7 +116,7 @@ export const CHATROOM_STYLES = `
 
   aside ui-list .list-item {
     color: var(--room-foreground) !important;
-    background: var(--room-background) !important;
+    background-color: var(--room-background) !important;
   }
 
   aside ui-list .list-item:hover {
@@ -516,16 +516,22 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     console.log(`[addUserFeature] FOUND item for ${user.username}, applying ${featureType}`);
 
     if (featureType === 'BURN') {
+      console.log(`[addUserFeature] Initializing BURN feature for`, listItem);
       const burnFeature = new ListBurnFeature();
-      burnFeature.onInit(document.createElement('canvas'), null as any, listItem);
+      const dummyCanvas = document.createElement('canvas');
+      burnFeature.onInit(dummyCanvas, null as any, listItem);
       burnFeature.onStart();
+      console.log(`[addUserFeature] Starting BURN animation`);
       // Start animation loop for this user feature
       this.startUserFeatureAnimation(user.username, burnFeature);
       console.log(`[addUserFeature] BURN feature applied`);
     } else if (featureType === 'GLOW') {
+      console.log(`[addUserFeature] Initializing GLOW feature for`, listItem);
       const glowFeature = new ListGlowFeature();
-      glowFeature.onInit(document.createElement('canvas'), null as any, listItem);
+      const dummyCanvas = document.createElement('canvas');
+      glowFeature.onInit(dummyCanvas, null as any, listItem);
       glowFeature.onStart();
+      console.log(`[addUserFeature] Starting GLOW animation`);
       // Start animation loop for this user feature
       this.startUserFeatureAnimation(user.username, glowFeature);
       console.log(`[addUserFeature] GLOW feature applied`);

@@ -4,3 +4,4 @@
 # Java
 /Java/target/*
 !/Java/target/*.jar
+/Angular/.claude/*
