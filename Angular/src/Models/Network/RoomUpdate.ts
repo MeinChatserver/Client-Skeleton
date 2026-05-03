@@ -1,5 +1,6 @@
 import {Packet} from './Packet';
 import {Category} from '../Category';
+import {RoomStyle} from '../RoomStyle';
 
 /**
  * Wird ein Chatraum verändert, wird dies dem Clienten direkt mitgeteilt.
@@ -29,7 +30,7 @@ export class RoomUpdate extends Packet {
     }
 
     if(data.style) {
-      this.style = data.style;
+      this.style = data.style instanceof RoomStyle ? data.style : new RoomStyle(data.style);
     }
 
     if(data.users) {

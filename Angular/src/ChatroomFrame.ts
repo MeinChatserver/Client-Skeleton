@@ -3,7 +3,7 @@ import { Frame, FrameConfig } from './Frame';
 import { ChatroomComponent, CHATROOM_STYLES } from './ChatroomComponent';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
-import { User } from './Models';
+import { User, RoomStyle } from './Models';
 export { ChatMessage, ChatMessageType } from './ChatMessage';
 
 export interface ChatroomConfig extends FrameConfig {
@@ -15,7 +15,7 @@ export class ChatroomFrame extends Frame {
   protected roomName: string;
   protected messages: ChatMessage[] = [];
   protected users: User[] = [];
-  protected style: any = null;
+  protected style: RoomStyle | null = null;
   protected eventListeners: Map<string, Function[]> = new Map();
 
   constructor(
@@ -123,7 +123,7 @@ export class ChatroomFrame extends Frame {
   }
 
   public setStyle(style: any): void {
-    this.style = style;
+    this.style = style instanceof RoomStyle ? style : (style ? new RoomStyle(style) : null);
     this.applyStyle();
   }
 
@@ -133,39 +133,37 @@ export class ChatroomFrame extends Frame {
     }
 
     const vars: string[]  = [];
-    const bg         = this.style.background;
-    const output     = this.style.output;
-    const ranks      = this.style.ranks;
+    const bg         = this.style.getBackground();
+    const output     = this.style.getOutput();
+    const ranks      = this.style.getRanks();
 
-    if(bg?.color) {
-      vars.push(`--room-background: ${bg.color};`);
+    if(bg?.getColor()) {
+      vars.push(`--room-background: ${bg.getColor()};`);
     }
 
-    if(bg?.image?.file) {
-      vars.push(`--room-background-image: url('https://${this.client.getHostname()}${bg.image.file}');`);
+    if(bg?.getImage()?.getFile()) {
+      vars.push(`--room-background-image: url('https://${this.client.getHostname()}${bg.getImage()?.getFile()}');`);
     }
 
-    if(output?.blue) {
-      vars.push(`--room-blue: ${output.blue};`);
+    if(output?.getBlue()) {
+      vars.push(`--room-blue: ${output.getBlue()};`);
     }
 
-    if(output?.red) {
-      vars.push(`--room-red: ${output.red};`);
+    if(output?.getRed()) {
+      vars.push(`--room-red: ${output.getRed()};`);
     }
 
-    if(output?.green) {
-      vars.push(`--room-green: ${output.green};`);
+    if(output?.getGreen()) {
+      vars.push(`--room-green: ${output.getGreen()};`);
     }
 
-    if(output?.default) {
-      vars.push(`--room-foreground: ${output.default};`);
+    if(output?.getDefault()) {
+      vars.push(`--room-foreground: ${output.getDefault()};`);
     }
 
-    if(ranks?.enabled) {
-      Object.entries(ranks).forEach(([key, value]) => {
-        if(key !== 'enabled' && typeof value === 'string') {
-          vars.push(`--room-rank-${key}: ${value};`);
-        }
+    if(ranks?.isEnabled()) {
+      ranks.getAllColors().forEach((color, rankId) => {
+        vars.push(`--room-rank-${rankId}: ${color};`);
       });
     }
 

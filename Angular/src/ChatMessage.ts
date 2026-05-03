@@ -18,7 +18,7 @@ export class ChatMessage {
   }
 
   getUsername(): string {
-    if(this.user === '-') {
+    if(this.user === null || this.user === '-') {
       return 'System';
     }
 

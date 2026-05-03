@@ -1,6 +1,6 @@
 export class Category {
-  private id: number | null = null;
-  private name: string | null = null;
+  private readonly id: number | null = null;
+  private readonly name: string | null = null;
 
   constructor(data: any) {
     if(data.id) {

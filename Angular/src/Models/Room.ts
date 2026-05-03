@@ -30,7 +30,7 @@ export class Room {
     }
 
     if(data.configuration) {
-      this.configuration = data.configuration;
+      this.configuration = data.configuration instanceof RoomConfiguration ? data.configuration : new RoomConfiguration(data.configuration);
     }
 
     if(data.users) {
@@ -38,7 +38,7 @@ export class Room {
     }
 
     if(data.style) {
-      this.style = data.style as RoomStyle;
+      this.style = data.style instanceof RoomStyle ? data.style : new RoomStyle(data.style);
     }
   }
 
