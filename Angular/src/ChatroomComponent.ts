@@ -170,8 +170,8 @@ export const CHATROOM_STYLES = `
   }
 
   aside ui-select {
-    font-size: 18px;
-    margin: 2px;
+    font-size: 14px;
+    margin: 1px;
     background-color: var(--room-background);
     color: var(--room-foreground);
   }
