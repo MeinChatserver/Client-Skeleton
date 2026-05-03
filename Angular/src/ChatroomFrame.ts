@@ -49,7 +49,7 @@ export class ChatroomFrame extends Frame {
 
     const ref = this.renderComponent(ChatroomComponent, {
       client:   this.client,
-      roomName: this.roomName
+      frame:    this
     }) as ComponentRef<ChatroomComponent> | null;
 
     if(!ref) {
@@ -66,6 +66,14 @@ export class ChatroomFrame extends Frame {
     );
 
     ref.changeDetectorRef.detectChanges();
+  }
+
+  public updateRoomName(name: string | null): void {
+    this.roomName = name || 'Chat';
+  }
+
+  public getRoomName(): string {
+    return this.roomName;
   }
 
   public addMessage(message: ChatMessage): void {

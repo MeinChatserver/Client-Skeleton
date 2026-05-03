@@ -411,6 +411,8 @@ export class Client implements OnInit, OnDestroy {
             chatroom.setUsers(windowRoom.getUsers());
           }
 
+          chatroom.updateRoomName(windowRoom.getName());
+
           this.send(new WindowInit(chatroom.getId()));
         break;
         case 'WINDOW_ROOM_CLOSE':

@@ -10,9 +10,10 @@ import { Client } from './Client';
 import {List, Select, Textfield} from './Components';
 import { ListItem, User } from './Models';
 import {ProfileOpen} from './Models/Network/ProfileOpen';
-import { FeatureService, FeatureType } from './Features';
-import { ListBurnFeature } from './Features/ListBurnFeature';
-import { ListGlowFeature } from './Features/ListGlowFeature';
+import { FeatureService, FeatureType, ListBurnFeature, ListGlowFeature } from './Features';
+import {CategoryChange} from './Models/Network';
+import {FormsModule} from '@angular/forms';
+import {ChatroomFrame} from './ChatroomFrame';
 
 export const CHATROOM_STYLES = `
   :host {
@@ -183,7 +184,7 @@ export const CHATROOM_STYLES = `
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, List, Select, Textfield],
+  imports: [CommonModule, List, Select, Textfield, FormsModule],
   template: `
     <ui-loading class="hidden"></ui-loading>
     <main>
@@ -199,14 +200,14 @@ export const CHATROOM_STYLES = `
     </main>
     <aside>
       <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
-      <ui-select name="chatrooms" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
+      <ui-select name="chatrooms" [(ngModel)]="selectedChatroom" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
     </aside>
   `,
   styles: []  // Styles werden von ChatroomFrame injiziert!
 })
 export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   @Input() client!: Client;
-  @Input() roomName: string = '';
+  @Input() frame!: ChatroomFrame;
   @Output() sendMessage = new EventEmitter<string>();
   @Output() chatroomSelect = new EventEmitter<{ type: string; item: ListItem }>();
 
@@ -217,6 +218,20 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private featureService = inject(FeatureService);
   private userFeatureServices: Map<string, FeatureService> = new Map();
   private elementRef = inject(ElementRef);
+
+  private _selectedChatroom: number | null = null;
+  get selectedChatroom(): number | null { return this._selectedChatroom; }
+  set selectedChatroom(value: number | null) {
+    this._selectedChatroom = value;
+
+    this.client.send({
+      operation: 'ROOM_MESSAGE',
+      data: {
+        room: this.frame.getRoomName(),
+        text: `/go ${value}`
+      }
+    });
+  }
 
   messages = signal<ChatMessage[]>([]);
   users = signal<User[]>([]);
@@ -261,27 +276,32 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   }
 
   private initializeCanvasIfNeeded(): void {
-    if (!this.featureCanvas?.nativeElement) return;
-
-    const canvas = this.featureCanvas.nativeElement;
-    if ((canvas as any).__initialized) return;
-
-    const context = canvas.getContext('2d');
-    if (!context) {
-      console.warn('[ChatroomComponent] Failed to get canvas context');
+    if (!this.featureCanvas?.nativeElement) {
       return;
     }
 
-    // Resize canvas to match container
+    const canvas = this.featureCanvas.nativeElement;
+
+    if ((canvas as any).__initialized) {
+      return;
+    }
+
+    const context = canvas.getContext('2d');
+
+    if (!context) {
+      return;
+    }
+
     this.resizeCanvasToContainer(canvas);
 
-    // Set up ResizeObserver for responsive resizing
     if (!this.resizeObserver) {
       const container = canvas.parentElement;
+
       if (container) {
         this.resizeObserver = new ResizeObserver(() => {
           this.resizeCanvasToContainer(canvas);
         });
+
         this.resizeObserver.observe(container);
       }
     }
@@ -292,86 +312,72 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   private resizeCanvasToContainer(canvas: HTMLCanvasElement): void {
     const container = canvas.parentElement;
-    if (!container) return;
+
+    if (!container) {
+      return;
+    }
 
     const rect = container.getBoundingClientRect();
 
-    // Only resize if container has actual dimensions
     if (rect.width <= 0 || rect.height <= 0) {
       return;
     }
 
     canvas.width = Math.floor(rect.width);
     canvas.height = Math.floor(rect.height);
-
-    console.log(`[ChatroomComponent] Canvas resized to ${canvas.width}x${canvas.height}`);
   }
 
   private getOrCreateUserFeatureService(userId: string): FeatureService | null {
-    // Finde den User nach Username
     const user = this.users().find(u => u.username === userId || String(u.id) === userId);
+
     if (!user) {
-      console.warn(`[ChatroomComponent] User not found: ${userId}`);
       return null;
     }
 
-    // Suche das ListItem Element nach dem Label-Text
     let listItem: HTMLElement | null = null;
     const listItems = document.querySelectorAll('.list-item');
-    console.log(`[ChatroomComponent] Searching for user "${user.username}" in ${listItems.length} list items`);
 
     for (const item of listItems) {
       const label = item.querySelector('.label');
+
       if (label && label.textContent?.trim() === user.username) {
         listItem = item as HTMLElement;
-        console.log(`[ChatroomComponent] Found list item for user: ${user.username}`);
         break;
       }
     }
 
     if (!listItem) {
-      console.warn(`[ChatroomComponent] Could not find list item for user ${user.username}`);
-      // Debug: Zeige alle Labels
-      const labels = Array.from(listItems).map((item: any) => item.querySelector('.label')?.textContent?.trim());
-      console.log(`[ChatroomComponent] Available user labels:`, labels);
       return null;
     }
 
-    // Finde das Canvas innerhalb dieses ListItems
     const canvasElement = listItem.querySelector('canvas') as HTMLCanvasElement | null;
+
     if (!canvasElement) {
-      console.warn(`[ChatroomComponent] Canvas not found in list item for user ${user.username} (id ${user.id})`);
       return null;
     }
 
-    console.log(`[ChatroomComponent] Found canvas for user ${user.username} (id ${user.id})`);
-
-    // Wenn Service bereits existiert, gib ihn zurück
     if (this.userFeatureServices.has(userId)) {
       return this.userFeatureServices.get(userId) || null;
     }
 
-    // Erstelle neuen Service für diesen User
     const context = canvasElement.getContext('2d');
+
     if (!context) {
-      console.warn(`[ChatroomComponent] Failed to get context for user ${userId}`);
       return null;
     }
 
-    // Dimensioniere Canvas auf die ListItem-Größe
     const parentElement = canvasElement.parentElement;
+
     if (parentElement) {
       const rect = parentElement.getBoundingClientRect();
       canvasElement.width = Math.max(1, Math.floor(rect.width));
       canvasElement.height = Math.max(1, Math.floor(rect.height));
-      console.log(`[ChatroomComponent] Canvas for user ${userId} sized to ${canvasElement.width}x${canvasElement.height}`);
     }
 
     const service = new FeatureService();
     service.initialize(canvasElement, context);
     this.userFeatureServices.set(userId, service);
 
-    console.log(`[ChatroomComponent] Created user feature service for user ${userId}`);
     return service;
   }
 
@@ -413,6 +419,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     }
 
     const value = this.messageInput.getValue().trim();
+
     if (value) {
       this.sendMessage.emit(value);
       this.messageInput.setValue('');
@@ -424,11 +431,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   }
 
   onUserSelectionChange(items: ListItem[]): void {
-    const selectedUsers = items
-      .map(item => this.users().find(u => u.username === item.label))
-      .filter((u): u is User => u !== undefined);
-
-    this.selectedUsers.set(selectedUsers);
+    this.selectedUsers.set(items.map(item => this.users().find(u => u.username === item.label)).filter((u): u is User => u !== undefined));
   }
 
   onChatroomSelect(type: string, item: ListItem): void {
@@ -437,71 +440,38 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   addFeature(type: string): void {
     const featureType = type.toUpperCase() as FeatureType;
+
     if (Object.values(FeatureType).includes(featureType)) {
-      // Nur hinzufügen, wenn noch nicht vorhanden
       if (!this.featureService.hasFeature(featureType)) {
         this.featureService.addFeature(featureType);
         this.featureService.startAnimation();
       }
-      console.log(`[ChatroomComponent] Feature "${type}" added`);
-    } else {
-      console.warn(`[ChatroomComponent] Unknown feature type: ${type}`);
     }
   }
 
   addUserFeature(type: string, userId: string): void {
-    console.log(`\n========== [addUserFeature] START ==========`);
-    console.log(`Type: ${type}, UserId: ${userId}`);
-    console.log(`Users in component:`, this.users().map(u => u.username));
-
     const featureType = type.toUpperCase();
-
     const user = this.users().find(u => u.username === userId || String(u.id) === userId);
+
     if (!user) {
-      console.warn(`[addUserFeature] User not found: ${userId}`);
       return;
     }
-    console.log(`[addUserFeature] Found user:`, user.username);
 
-    // Use the component's ownerDocument
     const doc = this.elementRef.nativeElement.ownerDocument;
-    console.log(`[addUserFeature] Doc location:`, (doc as any).location?.href || 'frame document');
-
     const userListContainer = doc.querySelector('aside ui-list');
-    console.log(`[addUserFeature] Container found:`, !!userListContainer);
 
     if (!userListContainer) {
-      console.warn(`[addUserFeature] User list container not found`);
-      console.log(`[addUserFeature] All ui-list elements:`, doc.querySelectorAll('ui-list').length);
       return;
     }
 
-    console.log(`[addUserFeature] Container HTML length:`, (userListContainer as any).innerHTML?.length || 0);
     const html = (userListContainer as any).innerHTML || '';
-    console.log(`[addUserFeature] Container has content:`, html.length > 0);
-    if (html.length > 0) {
-      console.log(`[addUserFeature] First 500 chars:`, html.substring(0, 500));
-    }
-
     let listItem: HTMLElement | null = null;
     const listItems = userListContainer.querySelectorAll('.list-item');
-    console.log(`[addUserFeature] Found ${listItems.length} .list-item elements`);
-
-    // Try to find in the entire document as fallback
-    if (listItems.length === 0) {
-      console.log(`[addUserFeature] No .list-item found in container, trying entire doc`);
-      const allItems = doc.querySelectorAll('.list-item');
-      console.log(`[addUserFeature] Total .list-item in doc:`, allItems.length);
-      allItems.forEach((item: Element, idx: number) => {
-        const label = item.querySelector('.label');
-        console.log(`[addUserFeature] Item ${idx}: "${label?.textContent?.trim()}"`);
-      });
-    }
 
     for (const item of listItems) {
       const label = item.querySelector('.label');
       const labelText = label?.textContent?.trim();
-      console.log(`[addUserFeature] Checking: "${labelText}" vs "${user.username}"`);
+
       if (labelText === user.username) {
         listItem = item as HTMLElement;
         break;
@@ -509,39 +479,28 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     }
 
     if (!listItem) {
-      console.warn(`[addUserFeature] User list item not found for: ${user.username}`);
       return;
     }
 
-    console.log(`[addUserFeature] FOUND item for ${user.username}, applying ${featureType}`);
-
     if (featureType === 'BURN') {
-      console.log(`[addUserFeature] Initializing BURN feature for`, listItem);
       const burnFeature = new ListBurnFeature();
       const dummyCanvas = document.createElement('canvas');
       burnFeature.onInit(dummyCanvas, null as any, listItem);
       burnFeature.onStart();
-      console.log(`[addUserFeature] Starting BURN animation`);
-      // Start animation loop for this user feature
       this.startUserFeatureAnimation(user.username, burnFeature);
-      console.log(`[addUserFeature] BURN feature applied`);
     } else if (featureType === 'GLOW') {
-      console.log(`[addUserFeature] Initializing GLOW feature for`, listItem);
       const glowFeature = new ListGlowFeature();
       const dummyCanvas = document.createElement('canvas');
       glowFeature.onInit(dummyCanvas, null as any, listItem);
       glowFeature.onStart();
-      console.log(`[addUserFeature] Starting GLOW animation`);
-      // Start animation loop for this user feature
       this.startUserFeatureAnimation(user.username, glowFeature);
-      console.log(`[addUserFeature] GLOW feature applied`);
     }
   }
 
   removeFeature(type: string): void {
-    const featureType = type.toUpperCase();
-    this.featureService.removeFeature(featureType);
+    this.featureService.removeFeature(type.toUpperCase());
 
+    // @ToDo
     if (!this.featureService.hasFeature(FeatureType.SNOW)) {
       this.featureService.stopAnimation();
     }
@@ -553,8 +512,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   }
 
   hasFeature(type: string): boolean {
-    const featureType = type.toUpperCase();
-    return this.featureService.hasFeature(featureType);
+    return this.featureService.hasFeature(type.toUpperCase());
   }
 
   private startUserFeatureAnimation(userId: string, feature: any): void {
@@ -562,6 +520,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       feature.onPaint(null, timestamp);
       requestAnimationFrame(animate);
     };
+
     requestAnimationFrame(animate);
   }
 
