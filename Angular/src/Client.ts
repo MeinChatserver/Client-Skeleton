@@ -126,16 +126,16 @@ import {ChatMessage, ChatMessageType} from './ChatMessage';
 export class Client implements OnInit, OnDestroy {
   @ViewChild(Login) loginComponent!: Login;
   @HostBinding('class.embedded')
-  isEmbedded: boolean = false;
-  hostname: string | null = null;
-  port: number = 2710;
-  pingInterval: number | null = null;
-  meta: MetaInfo = new MetaInfo();
-  socket: WebSocket | null = null;
-  connectionStatus: string = 'disconnected';
-  private reconnectAttempts: number = 0;
-  private maxReconnectAttempts: number = 5;
-  chatRooms = signal<Room[]>([]);
+  isEmbedded: boolean                   = false;
+  hostname: string | null               = null;
+  port: number                          = 2710;
+  pingInterval: number | null           = null;
+  meta: MetaInfo                        = new MetaInfo();
+  socket: WebSocket | null              = null;
+  connectionStatus: string              = 'disconnected';
+  private reconnectAttempts: number     = 0;
+  private maxReconnectAttempts: number  = 5;
+  chatRooms         = signal<Room[]>([]);
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -147,9 +147,9 @@ export class Client implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    console.log('%cwww.mein-chatserver.de - ' + this.meta.getClient() + ' ' + this.meta.getVersion(), 'background: #3b2caf; font-size: 16px; padding: 2px 10px;', 'Copyright © 2024 by Mein Chatserver. All Rights Reserved.');
+    console.log('%cwww.mein-chatserver.de - ' + this.meta.getClient() + ' ' + this.meta.getVersion(), 'background: #3B2CAF; font-size: 16px; padding: 2px 10px;', 'Copyright © 2024 by Mein Chatserver. All Rights Reserved.');
 
-    this.isEmbedded = window.self !== window.top;
+    this.isEmbedded = (window.self !== window.top);
 
     /* Load Hostname */
     if(window.location.protocol !== 'file:' && window.location.hostname !== 'localhost') {
@@ -163,37 +163,38 @@ export class Client implements OnInit, OnDestroy {
 
     /* Load Defaults */
     try {
-      Object.entries((window as any).Defaults.style).forEach(([name, value]) => {
-        if (!name || !value) {
+      Object.entries(window.Defaults.style).forEach(([name, value]) => {
+        if(!name || !value) {
           return;
         }
 
         this.updateConfigurations(name, String(value));
       });
 
-      this.port = (window as any).Defaults.port;
+      this.port = window.Defaults.port;
 
-      if ((window as any).Defaults.suggestion) {
-        this.loginComponent.chatroom = (window as any).Defaults.suggestion;
+      if(window.Defaults.suggestion) {
+        this.loginComponent.chatroom = window.Defaults.suggestion;
       }
     } catch (e) {
+      /* Do Nothing */
     }
 
     /* Load Parameters */
     try {
       const parentDoc = window.parent?.document || window.top?.document;
 
-      if (parentDoc) {
+      if(parentDoc) {
         const objectElement = parentDoc.querySelector('object');
 
-        if (objectElement) {
+        if(objectElement) {
           const params = objectElement.querySelectorAll('param');
 
           params.forEach(param => {
-            const name = param.getAttribute('name');
-            let value = param.getAttribute('value');
+            const name  = param.getAttribute('name');
+            let value   = param.getAttribute('value');
 
-            if (name && value) {
+            if(name && value) {
               this.updateConfigurations(name, value);
             }
           });
@@ -212,33 +213,35 @@ export class Client implements OnInit, OnDestroy {
   }
 
   private updateConfigurations(name: string, value: string | null) {
-    switch (name) {
+    const style = document.documentElement.style;
+
+    switch(name) {
       case 'port':
         this.port = Number(value);
-        break;
+      break;
       case 'suggestion':
-        if (value) {
+        if(value) {
           this.loginComponent.chatroom = value;
         }
-        break;
+      break;
       case 'backgroundImage':
-        document.documentElement.style.setProperty('--login-background-image', 'url(' + value + ')');
-        break;
+        style.setProperty('--login-background-image', `url('https://${this.getHostname()}${value}')`);
+      break;
       case 'background':
-        document.documentElement.style.setProperty('--login-background', value);
-        break;
+        style.setProperty('--login-background', value);
+      break;
       case 'foreground':
-        document.documentElement.style.setProperty('--login-foreground', value);
-        break;
+        style.setProperty('--login-foreground', value);
+      break;
       case 'backgroundList':
-        document.documentElement.style.setProperty('--login-background-list', value);
-        break;
+        style.setProperty('--login-background-list', value);
+      break;
       case 'foregroundList':
-        document.documentElement.style.setProperty('--login-foreground-list', value);
-        break;
+        style.setProperty('--login-foreground-list', value);
+      break;
       default:
         console.warn('Unsupported Parameter:', name, value);
-        break;
+      break;
     }
   }
 
@@ -273,8 +276,8 @@ export class Client implements OnInit, OnDestroy {
 
   private onOpen() {
     console.log('WebSocket connected');
-    this.connectionStatus = 'connected';
-    this.reconnectAttempts = 0;
+    this.connectionStatus   = 'connected';
+    this.reconnectAttempts  = 0;
 
     if(this.pingInterval) {
       clearInterval(this.pingInterval);
@@ -285,7 +288,7 @@ export class Client implements OnInit, OnDestroy {
     handshake.setVersion(this.meta.getVersion());
 
     try {
-      if (!window.top) {
+      if(!window.top) {
         throw new Error('Can\'t find Top-Window.');
       }
 
@@ -307,7 +310,7 @@ export class Client implements OnInit, OnDestroy {
     this.disconnect();
     this.attemptReconnect();
 
-    console.warn('WebSocket: onClose', event);
+    console.warn('WebSocket: onClose');
   }
 
   private onError(error: any) {
@@ -317,26 +320,26 @@ export class Client implements OnInit, OnDestroy {
 
   private onReceive(event: MessageEvent): void {
     try {
-      const packet = PacketFactory.fromJson(event.data);
-      let frame = null;
-      let message = null;
-      let user: User | null = null;
+      const packet    = PacketFactory.fromJson(event.data);
+      let frame         = null;
+      let message       = null;
+      let user: User | null  = null;
+      let roomName      = null;
       var chatMessage: ChatMessage;
-      let roomName = null;
 
       switch (packet.getOperation()) {
         case 'CONFIGURATION':
           const config = packet as Configuration;
 
-          if (this.loginComponent) {
-            const suggestion = config.getSuggestion();
-            const style = config.getStyle();
+          if(this.loginComponent) {
+            const suggestion  = config.getSuggestion();
+            const style   = config.getStyle();
 
-            if (suggestion) {
+            if(suggestion) {
               this.loginComponent.chatroom = suggestion;
             }
 
-            if (style) {
+            if(style) {
               this.updateConfigurations('background', style.getBackground());
               this.updateConfigurations('backgroundList', style.getBackgroundList());
               this.updateConfigurations('backgroundImage', style.getBackgroundImage());
@@ -350,27 +353,27 @@ export class Client implements OnInit, OnDestroy {
           this.pingInterval = setInterval(() => {
             this.send(new Ping());
           }, 10000);
-          break;
+        break;
         case 'ROOMS':
           this.chatRooms.set((packet as Rooms).getRooms());
-          break;
+        break;
         case 'ROOMS_CATEGORIES':
           const roomCategories = packet as RoomsCategories;
 
-          if (this.loginComponent && roomCategories.hasData()) {
+          if(this.loginComponent && roomCategories.hasData()) {
             this.loginComponent.categories = [
               new Category({
-                id: null,
+                id:   null,
                 name: 'Alle Chaträume'
               }),
               ...roomCategories.getCategories()
             ];
             this.cdr.detectChanges();
           }
-          break;
-          case 'PING':
-            this.send(new Pong());
-            break;
+        break;
+        case 'PING':
+          this.send(new Pong());
+        break;
         case 'PONG':
           if(this.pingInterval) {
             clearInterval(this.pingInterval);
@@ -379,13 +382,13 @@ export class Client implements OnInit, OnDestroy {
           this.pingInterval = setInterval(() => {
             this.send(new Ping());
           }, 10000);
-          break;
+        break;
         case 'ALERT':
           alert(packet.getData() as string);
-          break;
+        break;
         case 'POPUP':
           this.windowManager.createPopup(packet as Popup);
-          break;
+        break;
         case 'WINDOW_ROOM':
           let windowRoom = packet as WindowRoom;
           let chatroom = this.windowManager.createChatroom(windowRoom, this);
@@ -409,8 +412,7 @@ export class Client implements OnInit, OnDestroy {
           }
 
           this.send(new WindowInit(chatroom.getId()));
-
-          break;
+        break;
         case 'WINDOW_ROOM_CLOSE':
           const closing = packet as WindowRoomClose;
 
@@ -423,11 +425,9 @@ export class Client implements OnInit, OnDestroy {
           if(frame !== null) {
             frame.close();
           }
-          break;
+        break;
         case 'WINDOW_ROOM_UPDATE':
-          const updating = packet as WindowRoomUpdate;
-
-          // reference = old room name to find the existing frame
+          const updating                        = packet as WindowRoomUpdate;
           const updatingFrame = this.windowManager.getChatroom(updating.getReference());
 
           if(updatingFrame !== null) {
@@ -443,21 +443,18 @@ export class Client implements OnInit, OnDestroy {
 
             updatingFrame.focus();
           }
-          break;
+        break;
         case 'ROOM_FEATURE':
           const feature = packet as RoomFeature;
-          frame = this.windowManager.getChatroom(feature.getReference() ?? '');
+          frame         = this.windowManager.getChatroom(feature.getReference() ?? '');
 
           if(frame !== null && feature.getName()) {
             frame.addFeature(feature.getName() ?? '');
-            console.log(`[ROOM_FEATURE] Added feature "${feature.getName()}" to room ${feature.getReference()}`);
           }
-          break;
+        break;
         case 'ROOM_UPDATE':
-          const updt = packet as RoomUpdate;
-          frame = this.windowManager.getChatroom(updt.getName());
-
-          console.log('[ROOM_UPDATE] name:', updt.getName(), '| frame found:', frame !== null, '| style:', updt.getStyle(), '| users:', updt.getUsers());
+          const updt  = packet as RoomUpdate;
+          frame       = this.windowManager.getChatroom(updt.getName());
 
           if(frame !== null) {
             if(updt.getUsers()) {
@@ -468,39 +465,38 @@ export class Client implements OnInit, OnDestroy {
               frame.setStyle(updt.getStyle());
             }
           }
-          break;
+        break;
         case 'ROOM_USER_ADD':
           frame = this.windowManager.getChatroom((packet as RoomUserAdd).getRoom());
 
           if(frame !== null) {
             frame.addUser((packet as RoomUserAdd).getUser());
           }
-          break;
+        break;
         case 'ROOM_USER_REMOVE':
           frame = this.windowManager.getChatroom((packet as RoomUserRemove).getRoom());
 
           if(frame !== null) {
             frame.removeUser((packet as RoomUserRemove).getUser());
           }
-          break;
+        break;
         case 'ROOM_USER_FEATURE':
           const userFeature = packet as RoomUserFeature;
-          frame = this.windowManager.getChatroom(userFeature.getRoom() ?? '');
+          frame             = this.windowManager.getChatroom(userFeature.getRoom() ?? '');
 
           if(frame !== null && userFeature.getName()) {
             frame.addUserFeature(userFeature.getName() ?? '', userFeature.getReference() ?? '');
-            console.log(`[ROOM_USER_FEATURE] Added user feature "${userFeature.getName()}" for user ${userFeature.getReference()} in room ${userFeature.getRoom()}`);
           }
-          break;
+        break;
         case 'MESSAGE_PRIVATE':
-          roomName = null;
-          message = packet as MessagePrivate;
+          roomName    = null;
+          message     = packet as MessagePrivate;
           chatMessage = new ChatMessage({
-            type: ChatMessageType.PRIVATE,
-            user: message.getSender() as User | null | '-',
-            users: message.getUsers() as User[] | null,
-            message: message.getText(),
-            timestamp: new Date()
+            type:       ChatMessageType.PRIVATE,
+            user:       message.getSender() as User | null | '-',
+            users:      message.getUsers() as User[] | null,
+            message:    message.getText(),
+            timestamp:  new Date()
           });
 
           if(message.hasRoom() && !message.forAll()) {
@@ -513,7 +509,7 @@ export class Client implements OnInit, OnDestroy {
               frame.addMessage(chatMessage);
             });
 
-            /* Publish on single room */
+          /* Publish on single room */
           } else {
             frame = this.windowManager.getChatroom(roomName);
 
@@ -521,14 +517,14 @@ export class Client implements OnInit, OnDestroy {
               frame.addMessage(chatMessage);
             }
           }
-          break;
+        break;
         case 'MESSAGE_ACTION':
-          roomName = null;
-          message = packet as MessageAction;
+          roomName    = null;
+          message     = packet as MessageAction;
           chatMessage = new ChatMessage({
-            type: ChatMessageType.ACTION,
-            message: message.getText(),
-            timestamp: new Date()
+            type:       ChatMessageType.ACTION,
+            message:    message.getText(),
+            timestamp:  new Date()
           });
 
           if(message.hasRoom() && !message.forAll()) {
@@ -549,15 +545,15 @@ export class Client implements OnInit, OnDestroy {
               frame.addMessage(chatMessage);
             }
           }
-          break;
+        break;
         case 'MESSAGE_PUBLIC':
-          roomName = null;
-          message = packet as MessagePublic;
+          roomName    = null;
+          message     = packet as MessagePublic;
           chatMessage = new ChatMessage({
-            type: ChatMessageType.PUBLIC,
-            user: message.getSender() as User | null | '-',
-            message: message.getText(),
-            timestamp: new Date()
+            type:       ChatMessageType.PUBLIC,
+            user:       message.getSender() as User | null | '-',
+            message:    message.getText(),
+            timestamp:  new Date()
           });
 
           if(message.hasRoom() && !message.forAll()) {
@@ -578,8 +574,9 @@ export class Client implements OnInit, OnDestroy {
               frame.addMessage(chatMessage)
             }
           }
-          break;
+        break;
       }
+
       console.log('Received message:', packet);
     } catch (error) {
       console.error('Error parsing WebSocket message:', error);
@@ -612,7 +609,7 @@ export class Client implements OnInit, OnDestroy {
       return false;
     }
 
-    if(this.socket.readyState === this.socket.CLOSED){
+    if(this.socket.readyState === this.socket.CLOSED) {
       return false;
     }
 

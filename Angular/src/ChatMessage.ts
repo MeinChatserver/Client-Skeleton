@@ -8,9 +8,9 @@ export enum ChatMessageType {
 
 export class ChatMessage {
   user: User | null | '-' = null;
-  users?: User[] | null = null;
-  type: ChatMessageType = ChatMessageType.PUBLIC;
-  message: string | null = null;
+  users?: User[] | null   = null;
+  type: ChatMessageType   = ChatMessageType.PUBLIC;
+  message: string | null  = null;
   timestamp?: Date;
 
   constructor(init?: Partial<ChatMessage>) {
@@ -18,11 +18,11 @@ export class ChatMessage {
   }
 
   getUsername(): string {
-    if (this.user === '-') {
+    if(this.user === '-') {
       return 'System';
     }
 
-    if (this.user) {
+    if(this.user) {
       return `<span data-action="profile:${this.user.username}">${this.user.username}</span>`;
     }
 

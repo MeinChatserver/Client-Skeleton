@@ -2,59 +2,62 @@ import {computed, Component, OnInit, Input, CUSTOM_ELEMENTS_SCHEMA} from '@angul
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Client } from './Client';
-import { Select, Textfield, CheckBox, Button, List, Label, Panel } from './Components';
+import { Select, Textfield, CheckBox, Button, List, Label, Panel, Link } from './Components';
 import {Category, ListItem} from './Models';
 import {CategoryChange, ChatroomInfo} from './Models/Network';
+import {LinkTarget} from './Components/Link';
 
 @Component({
   selector: 'ui-login',
   standalone: true,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, Select, Textfield, CheckBox, Button, List, Label, Panel],
+  imports: [CommonModule, FormsModule, Select, Textfield, CheckBox, Button, List, Label, Panel, Link],
   template: `
-    <ui-form>
-        @if(client.isEmbedded) {
+    <form>
+      <ui-form>
+          @if(client.isEmbedded) {
+              <ui-label name="category" text="Kategorie" [dotted]="true" />
+              <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" valueKey="id" labelKey="name"></ui-select>
+
+              <ui-label name="username" text="Benutzername" [dotted]="true" />
+              <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
+              <ui-label name="password" text="Passwort" [dotted]="true" />
+              <ui-input name="password" [(ngModel)]="password" [password]="true" (keydown.enter)="focusNext('ui-button', $event)" />
+              <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
+              <ui-input name="chatroom" [(ngModel)]="chatroom" />
+
+              <div id="remember_container">
+                <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
+              </div>
+
+               <ui-button (click)="onLoginClick()" [disabled]="!canLogin()" text="{{ getButtonText() }}" />
+          } @else {
+            <h1 name="logo">
+              <i class="bi bi-cloud-fill"></i>&nbsp;<span>Mein Chatserver</span>
+            </h1>
+
+            <ui-container>
+              <ui-label name="username" text="Benutzername" [dotted]="true" />
+              <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
+              <ui-label name="password" text="Passwort" [dotted]="true" />
+              <ui-input name="password" [(ngModel)]="password" [password]="true" autocomplete="current-password" (keydown.enter)="focusNext('ui-button', $event)" />
+
+              <div id="remember_container">
+                <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
+              </div>
+
+              <div id="links">
+                <ui-link url="">Passwort vergessen?</ui-link> <ui-link url="https://demo.mein-chatserver.de/Register" [target]="LinkTarget.POPUP">Neu registrieren</ui-link>
+              </div>
+            </ui-container>
+
             <ui-label name="category" text="Kategorie" [dotted]="true" />
             <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" valueKey="id" labelKey="name"></ui-select>
-
-            <ui-label name="username" text="Benutzername" [dotted]="true" />
-            <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
-            <ui-label name="password" text="Passwort" [dotted]="true" />
-            <ui-input name="password" [(ngModel)]="password" [password]="true" (keydown.enter)="focusNext('ui-button', $event)" />
             <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
             <ui-input name="chatroom" [(ngModel)]="chatroom" />
-
-            <div id="remember_container">
-              <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
-            </div>
-
-             <ui-button (click)="onLoginClick()" [disabled]="!canLogin()" text="{{ getButtonText() }}" />
-        } @else {
-          <h1 name="logo">
-            <i class="bi bi-cloud-fill"></i>&nbsp;<span>Mein Chatserver</span>
-          </h1>
-
-          <ui-container>
-            <ui-label name="username" text="Benutzername" [dotted]="true" />
-            <ui-input name="username" [(ngModel)]="username" (keydown.enter)="focusNext('ui-input[name=password]', $event)" />
-            <ui-label name="password" text="Passwort" [dotted]="true" />
-            <ui-input name="password" [(ngModel)]="password" [password]="true" (keydown.enter)="focusNext('ui-button', $event)" />
-
-            <div id="remember_container">
-              <ui-check name="remember" [(ngModel)]="remember" /> <ui-label for="remember" text="Passwort merken" />
-            </div>
-
-            <div id="links">
-              <a href="#">Passwort vergessen?</a>&nbsp;<a href="#">Neu registrieren</a>
-            </div>
-          </ui-container>
-
-          <ui-label name="category" text="Kategorie" [dotted]="true" />
-          <ui-select name="category" [(ngModel)]="selectedCategory" [options]="categories" valueKey="id" labelKey="name"></ui-select>
-          <ui-label name="chatroom" text="Chatraum" [dotted]="true" />
-          <ui-input name="chatroom" [(ngModel)]="chatroom" />
-        }
-    </ui-form>
+          }
+      </ui-form>
+    </form>
     <aside>
       @if(this.client.connectionStatus === 'connecting') {
         <ui-panel class="connecting">
@@ -284,4 +287,6 @@ export class Login implements OnInit {
       }
     }
   }
+
+  protected readonly LinkTarget = LinkTarget;
 }

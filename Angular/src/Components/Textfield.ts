@@ -18,6 +18,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
     <input #inputRef [type]="password ? 'password' : 'text'"
       [value]="value"
       [placeholder]="placeholder"
+      [autocomplete]="autocomplete"
       (change)="onChange($event)"
       (keydown.enter)="onEnter()"
       [disabled]="disabled" />`,
@@ -33,6 +34,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
 })
 export class Textfield implements ControlValueAccessor {
   @ViewChild('inputRef') inputRef?: ElementRef<HTMLInputElement>;
+  @Input() autocomplete: string = 'off';
   @Input() placeholder: string = '';
   @Input() password: boolean = false;
 

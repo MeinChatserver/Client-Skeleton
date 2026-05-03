@@ -24,17 +24,13 @@ export class ChatroomFrame extends Frame {
     injector: EnvironmentInjector,
     protected client: Client
   ) {
-    super(
-      {
-        ...config,
-        width: config.width || 800,
-        height: config.height || 600,
-        resizable: true,
-        scrollbars: false
-      },
-      appRef,
-      injector
-    );
+    super({
+      ...config,
+      width:      config.width || 800,
+      height:     config.height || 600,
+      resizable:  true,
+      scrollbars: false
+    }, appRef, injector);
 
     this.roomName = config.roomName || 'Chat';
 
@@ -44,19 +40,19 @@ export class ChatroomFrame extends Frame {
   protected override renderContent(): void {
     this.applyStyle();
 
-    if (this.frameDocument && !this.frameDocument.getElementById('chatroom-styles')) {
+    if(this.frameDocument && !this.frameDocument.getElementById('chatroom-styles')) {
       const style = this.frameDocument.createElement('style');
-      style.id = 'chatroom-styles';
-      style.textContent = CHATROOM_STYLES.replace(':host', 'body');
+      style.id                    = 'chatroom-styles';
+      style.textContent           = CHATROOM_STYLES.replace(':host', 'body');
       this.frameDocument.head.appendChild(style);
     }
 
     const ref = this.renderComponent(ChatroomComponent, {
-      client: this.client,
+      client:   this.client,
       roomName: this.roomName
     }) as ComponentRef<ChatroomComponent> | null;
 
-    if (!ref) {
+    if(!ref) {
       return;
     }
 
@@ -75,7 +71,7 @@ export class ChatroomFrame extends Frame {
   public addMessage(message: ChatMessage): void {
     this.messages.push(message);
 
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).addMessage(message);
     }
   }
@@ -83,7 +79,7 @@ export class ChatroomFrame extends Frame {
   public clearMessages(): void {
     this.messages = [];
 
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).clearMessages();
     }
 
@@ -95,31 +91,30 @@ export class ChatroomFrame extends Frame {
       this.users = [...users];
     }
 
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).setUsers(this.users);
     }
   }
 
   public addUser(user: User): void {
-    if (!this.users.some(u => u.id === user.id)) {
+    if(!this.users.some(u => u.id === user.id)) {
       this.users.push(user);
     }
 
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).addUser(user);
     }
   }
 
   public removeUser(user: User): void {
-    this.users = this.users.filter(u => u.id !== user.id);
+    this.users = this.users.filter(entry => entry.id !== user.id);
 
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).removeUser(user);
     }
   }
 
   public setStyle(style: any): void {
-    console.log('[ChatroomFrame] setStyle', this.config.id, style);
     this.style = style;
     this.applyStyle();
   }
@@ -129,87 +124,106 @@ export class ChatroomFrame extends Frame {
       return;
     }
 
-    const vars: string[] = [];
-    const bg     = this.style.background;
-    const output = this.style.output;
-    const ranks  = this.style.ranks;
+    const vars: string[]  = [];
+    const bg         = this.style.background;
+    const output     = this.style.output;
+    const ranks      = this.style.ranks;
 
-    if (bg?.color)            vars.push(`--room-background: ${bg.color};`);
-    if (bg?.image?.file)      vars.push(`--room-background-image: url(${bg.image.file});`);
-    if (output?.blue)         vars.push(`--room-blue: ${output.blue};`);
-    if (output?.red)          vars.push(`--room-red: ${output.red};`);
-    if (output?.green)        vars.push(`--room-green: ${output.green};`);
-    if (output?.default)      vars.push(`--room-foreground: ${output.default};`);
+    if(bg?.color) {
+      vars.push(`--room-background: ${bg.color};`);
+    }
 
-    if (ranks?.enabled) {
+    if(bg?.image?.file) {
+      vars.push(`--room-background-image: url('https://${this.client.getHostname()}${bg.image.file}');`);
+    }
+
+    if(output?.blue) {
+      vars.push(`--room-blue: ${output.blue};`);
+    }
+
+    if(output?.red) {
+      vars.push(`--room-red: ${output.red};`);
+    }
+
+    if(output?.green) {
+      vars.push(`--room-green: ${output.green};`);
+    }
+
+    if(output?.default) {
+      vars.push(`--room-foreground: ${output.default};`);
+    }
+
+    if(ranks?.enabled) {
       Object.entries(ranks).forEach(([key, value]) => {
-        if (key !== 'enabled' && typeof value === 'string') {
+        if(key !== 'enabled' && typeof value === 'string') {
           vars.push(`--room-rank-${key}: ${value};`);
         }
       });
     }
 
-    if (vars.length === 0) {
+    if(vars.length === 0) {
       return;
     }
 
-    let el = this.frameDocument.getElementById('chatroom-theme') as HTMLStyleElement | null;
+    let element = this.frameDocument.getElementById('chatroom-theme') as HTMLStyleElement | null;
 
-    if (!el) {
-      el = this.frameDocument.createElement('style');
-      el.id = 'chatroom-theme';
-      this.frameDocument.head.appendChild(el);
+    if(!element) {
+      element    = this.frameDocument.createElement('style');
+      element.id = 'chatroom-theme';
+      this.frameDocument.head.appendChild(element);
     }
 
-    el.textContent = `:root { ${vars.join(' ')} }`;
+    element.textContent = `:root { ${vars.join(' ')} }`;
   }
 
   public addFeature(type: string): void {
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).addFeature(type);
     }
   }
 
   public addUserFeature(type: string, userId: string): void {
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).addUserFeature(type, userId);
     }
   }
 
   public removeFeature(type: string): void {
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).removeFeature(type);
     }
   }
 
   public removeAllFeatures(): void {
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).removeAllFeatures();
     }
   }
 
   public hasFeature(type: string): boolean {
-    if (this.componentRef) {
+    if(this.componentRef) {
       return (this.componentRef.instance as ChatroomComponent).hasFeature(type);
     }
+
     return false;
   }
 
   public getSelectedUsers(): User[] {
-    if (this.componentRef) {
+    if(this.componentRef) {
       return (this.componentRef.instance as ChatroomComponent).getSelectedUsers();
     }
+
     return [];
   }
 
   public setConnected(connected: boolean): void {
-    if (this.componentRef) {
+    if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).setConnected(connected);
     }
   }
 
   public on(eventName: string, callback: Function): void {
-    if (!this.eventListeners.has(eventName)) {
+    if(!this.eventListeners.has(eventName)) {
       this.eventListeners.set(eventName, []);
     }
 
@@ -217,17 +231,17 @@ export class ChatroomFrame extends Frame {
   }
 
   public off(eventName: string, callback?: Function): void {
-    if (!callback) {
+    if(!callback) {
       this.eventListeners.delete(eventName);
       return;
     }
 
     const listeners = this.eventListeners.get(eventName);
 
-    if (listeners) {
+    if(listeners) {
       const index = listeners.indexOf(callback);
 
-      if (index > -1) {
+      if(index > -1) {
         listeners.splice(index, 1);
       }
     }
@@ -236,7 +250,7 @@ export class ChatroomFrame extends Frame {
   protected emit(eventName: string, data?: any): void {
     const listeners = this.eventListeners.get(eventName);
 
-    if (listeners) {
+    if(listeners) {
       listeners.forEach(callback => callback(data));
     }
   }
