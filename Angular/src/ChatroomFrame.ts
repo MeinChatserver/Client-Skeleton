@@ -141,8 +141,9 @@ export class ChatroomFrame extends Frame {
       vars.push(`--room-background: ${bg.getColor()};`);
     }
 
-    if(bg?.getImage()?.getFile()) {
-      vars.push(`--room-background-image: url('https://${this.client.getHostname()}${bg.getImage()?.getFile()}');`);
+    const imageFile = bg?.getImage()?.getFile() || null;
+    if(imageFile) {
+      vars.push(`--room-background-image: url('https://${this.client.getHostname()}${imageFile}');`);
     }
 
     if(output?.getBlue()) {
@@ -180,6 +181,44 @@ export class ChatroomFrame extends Frame {
     }
 
     element.textContent = `:root { ${vars.join(' ')} }`;
+
+    // Setze auch die Background-Position CSS-Regel
+    if(bg?.getImage()?.getPosition()) {
+      this.applyBackgroundPositionStyle(bg.getImage(), imageFile);
+    }
+  }
+
+  private applyBackgroundPositionStyle(image: any, imageUrl: string | null): void {
+    if(!this.frameDocument || !imageUrl) {
+      return;
+    }
+
+    const fullImageUrl = `https://${this.client.getHostname()}${imageUrl}`;
+    const position = String(image.getPosition());
+    const style = image.getPositionStyle(fullImageUrl);
+
+    let element = this.frameDocument.getElementById('chatroom-position-style') as HTMLStyleElement | null;
+
+    if(!element) {
+      element    = this.frameDocument.createElement('style');
+      element.id = 'chatroom-position-style';
+      this.frameDocument.head.appendChild(element);
+    }
+
+    // Höhere Spezifität: main ui-output[data-position="..."] statt nur [data-position="..."]
+    const cssProps: string[] = [];
+    Object.entries(style).forEach(([key, value]) => {
+      const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
+      cssProps.push(`${cssKey}: ${value};`);
+    });
+
+    element.textContent = `main ui-output[data-position="${position}"] { ${cssProps.join(' ')} }`;
+
+    // Setze auch das data-position Attribut auf dem ui-output Element
+    const uiOutput = this.frameDocument.querySelector('main ui-output') as HTMLElement | null;
+    if(uiOutput) {
+      uiOutput.setAttribute('data-position', position);
+    }
   }
 
   public addFeature(type: string): void {

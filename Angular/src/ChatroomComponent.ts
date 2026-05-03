@@ -43,6 +43,9 @@ export const CHATROOM_STYLES = `
     border-top: 1px solid #808080;
     border-left: 1px solid #808080;
     background-image: var(--room-background-image);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: cover;
   }
 
   main ui-output canvas {
