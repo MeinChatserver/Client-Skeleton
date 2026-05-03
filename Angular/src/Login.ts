@@ -1,17 +1,17 @@
-import {computed, Component, OnInit, Input, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {computed, Component, Input, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Client } from './Client';
+import {Client, ConnectionStatus} from './Client';
 import { Select, Textfield, CheckBox, Button, List, Label, Panel, Link } from './Components';
 import {Category, ListItem} from './Models';
 import {CategoryChange, ChatroomInfo} from './Models/Network';
 import {LinkTarget} from './Components/Link';
 
 @Component({
-  selector: 'ui-login',
+  selector:   'ui-login',
   standalone: true,
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, FormsModule, Select, Textfield, CheckBox, Button, List, Label, Panel, Link],
+  schemas:    [CUSTOM_ELEMENTS_SCHEMA],
+  imports:    [CommonModule, FormsModule, Select, Textfield, CheckBox, Button, List, Label, Panel, Link],
   template: `
     <form>
       <ui-form>
@@ -47,7 +47,7 @@ import {LinkTarget} from './Components/Link';
               </div>
 
               <div id="links">
-                <ui-link url="">Passwort vergessen?</ui-link> <ui-link url="https://demo.mein-chatserver.de/Register" [target]="LinkTarget.POPUP">Neu registrieren</ui-link>
+                <!--<ui-link url="">Passwort vergessen?</ui-link>--> <ui-link url="https://demo.mein-chatserver.de/Register" [target]="LinkTarget.POPUP">Neu registrieren</ui-link>
               </div>
             </ui-container>
 
@@ -59,7 +59,7 @@ import {LinkTarget} from './Components/Link';
       </ui-form>
     </form>
     <aside>
-      @if(this.client.connectionStatus === 'connecting') {
+      @if(this.client.connectionStatus === ConnectionStatus.CONNECTING) {
         <ui-panel class="connecting">
           <ui-label name="connecting" text="Verbinde" />
         </ui-panel>
@@ -194,28 +194,31 @@ import {LinkTarget} from './Components/Link';
     }
   `]
 })
-export class Login implements OnInit {
+export class Login {
   @Input() client!: Client;
-  username: string = '';
-  password: string = '';
-  chatroom: string = '';
-  remember: boolean = false;
-  private _selectedCategory: number | null = null;
-  get selectedCategory(): number | null { return this._selectedCategory; }
+  username: string                          = '';
+  password: string                          = '';
+  chatroom: string                          = '';
+  remember: boolean                         = false;
+  private _selectedCategory: number | null  = null;
+  categories: Category[]                    = [];
+
+  get selectedCategory(): number | null {
+    return this._selectedCategory;
+  }
+
   set selectedCategory(value: number | null) {
     this._selectedCategory = value;
+
     this.client.send(new CategoryChange(value));
   }
 
-  categories: Category[] = [];
   chatrooms = computed(() =>
     this.client.chatRooms().filter(room => room.getName() !== null).map((room): ListItem => ({
-      label: room.getName() ?? '',
-      number: room.getUserCount()
+      label:    room.getName() ?? '',
+      number:   room.getUserCount()
     }))
   );
-
-  ngOnInit() {}
 
   onChatroomSelect(type: string, item: ListItem): void {
     switch(type) {
@@ -244,15 +247,15 @@ export class Login implements OnInit {
   }
 
   canLogin(): boolean {
-    return this.client.connectionStatus !== 'connecting';
+    return this.client.connectionStatus !== ConnectionStatus.CONNECTING;
   }
 
   getButtonText(): string {
-    if(this.client.connectionStatus == 'connecting') {
+    if(this.client.connectionStatus === ConnectionStatus.CONNECTING) {
       return 'Verbinde...';
     }
 
-    if(this.client.connectionStatus !== 'connected') {
+    if(this.client.connectionStatus !== ConnectionStatus.CONNECTED) {
       return 'Nicht verbunden';
     }
 
@@ -262,24 +265,24 @@ export class Login implements OnInit {
   focusNext(selector: string, event: Event): void {
     event.preventDefault();
 
-    const target = event.target as HTMLElement;
-    const form = target.closest('ui-form')?.parentElement || document.body;
-    const next = form.querySelector<HTMLElement>(selector);
+    const target                 = event.target as HTMLElement;
+    const form      = target.closest('ui-form')?.parentElement || document.body;
+    const next  = form.querySelector<HTMLElement>(selector);
 
-    if (!next) {
+    if(!next) {
       console.warn(`No element found for selector: ${selector}`, form);
       return;
     }
 
-    if (next.tagName === 'UI-BUTTON' || next.tagName === 'BUTTON') {
+    if(next.tagName === 'UI-BUTTON' || next.tagName === 'BUTTON') {
       next.dispatchEvent(new MouseEvent('click', {
-        bubbles: true,
+        bubbles:    true,
         cancelable: true
       }));
     } else {
       const innerInput = next.querySelector('input, textarea, select') as HTMLInputElement;
 
-      if (innerInput) {
+      if(innerInput) {
         innerInput.focus();
         innerInput.select?.();
       } else {
@@ -289,4 +292,5 @@ export class Login implements OnInit {
   }
 
   protected readonly LinkTarget = LinkTarget;
+  protected readonly ConnectionStatus = ConnectionStatus;
 }

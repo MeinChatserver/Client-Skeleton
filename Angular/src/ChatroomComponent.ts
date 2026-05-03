@@ -7,7 +7,7 @@ import {
 import { CommonModule } from '@angular/common';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { Client } from './Client';
-import {List, Select, Textfield} from './Components';
+import {List, Select, MessageInput} from './Components';
 import { ListItem, User } from './Models';
 import {ProfileOpen} from './Models/Network/ProfileOpen';
 import { FeatureService, FeatureType, ListBurnFeature, ListGlowFeature } from './Features';
@@ -90,11 +90,11 @@ export const CHATROOM_STYLES = `
     color: var(--room-red);
   }
 
-  main ui-input {
+  main ui-message-input {
     flex: 0;
   }
 
-  main ui-input input {
+  main ui-message-input input {
     width: 100%;
     height: 100%;
     font-size: 90%;
@@ -170,14 +170,14 @@ export const CHATROOM_STYLES = `
   }
 
   aside ui-select {
-    font-size: 16px;
-    margin: 1px;
+    font-size: 18px;
+    margin: 2px;
     background-color: var(--room-background);
     color: var(--room-foreground);
   }
 
   aside ui-select select {
-    padding: 4px;
+    padding: 5px;
   }
 
   aside .connecting {
@@ -191,7 +191,7 @@ export const CHATROOM_STYLES = `
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, List, Select, Textfield, FormsModule],
+  imports: [CommonModule, List, Select, MessageInput, FormsModule],
   template: `
     <ui-loading class="hidden"></ui-loading>
     <main>
@@ -203,7 +203,7 @@ export const CHATROOM_STYLES = `
         </ui-messages>
         <canvas #featureCanvas style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></canvas>
       </ui-output>
-      <ui-input #messageInput placeholder="Gebe eine Nachricht ein..." (keydown.enter)="onSendMessage()"></ui-input>
+      <ui-message-input #messageInput placeholder="Gebe eine Nachricht ein..." (keydown.enter)="onSendMessage()"></ui-message-input>
     </main>
     <aside>
       <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
@@ -518,7 +518,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
     if (value) {
       this.sendMessage.emit(value);
-      this.messageInput.setValue('');
+      (this.messageInput as any).sendMessage();
     }
   }
 

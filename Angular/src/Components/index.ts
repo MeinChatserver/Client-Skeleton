@@ -8,3 +8,4 @@ export { List } from './List';
 export { Panel } from './Panel';
 export { Select } from './Select';
 export { Textfield } from './Textfield';
+export { MessageInput } from './MessageInput';

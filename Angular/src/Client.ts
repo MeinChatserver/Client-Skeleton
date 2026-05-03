@@ -37,6 +37,14 @@ import {
 import { WindowManager } from './WindowManager';
 import {ChatMessage, ChatMessageType} from './ChatMessage';
 
+export enum ConnectionStatus {
+  CONNECTING = 'connecting',
+  CONNECTED  = 'connected',
+  DISCONNECTED = 'disconnected',
+  ERROR = 'error',
+  FAILED = 'failed'
+}
+
 @Component({
   selector: 'body',
   standalone: true,
@@ -132,7 +140,7 @@ export class Client implements OnInit, OnDestroy {
   pingInterval: number | null           = null;
   meta: MetaInfo                        = new MetaInfo();
   socket: WebSocket | null              = null;
-  connectionStatus: string              = 'disconnected';
+  connectionStatus: ConnectionStatus    = ConnectionStatus.DISCONNECTED;
   private reconnectAttempts: number     = 0;
   private maxReconnectAttempts: number  = 5;
   chatRooms         = signal<Room[]>([]);
@@ -263,20 +271,20 @@ export class Client implements OnInit, OnDestroy {
 
     try {
       this.socket				    = new WebSocket(`wss://${this.getHostname()}:${this.getPort()}/`);
-      this.connectionStatus = 'connecting';
+      this.connectionStatus = ConnectionStatus.CONNECTING;
       this.socket.onopen    = this.onOpen.bind(this);
       this.socket.onclose   = this.onClose.bind(this);
       this.socket.onerror   = this.onError.bind(this);
       this.socket.onmessage = this.onReceive.bind(this);
     } catch(error) {
       console.error('Failed to create WebSocket:', error);
-      this.connectionStatus = 'error';
+      this.connectionStatus = ConnectionStatus.ERROR;
     }
   }
 
   private onOpen() {
     console.log('WebSocket connected');
-    this.connectionStatus   = 'connected';
+    this.connectionStatus   = ConnectionStatus.CONNECTED;
     this.reconnectAttempts  = 0;
 
     if(this.pingInterval) {
@@ -306,7 +314,7 @@ export class Client implements OnInit, OnDestroy {
       clearInterval(this.pingInterval);
     }
 
-    this.connectionStatus = 'disconnected';
+    this.connectionStatus = ConnectionStatus.DISCONNECTED;
     this.disconnect();
     this.attemptReconnect();
 
@@ -315,7 +323,7 @@ export class Client implements OnInit, OnDestroy {
 
   private onError(error: any) {
     console.error('WebSocket error:', error);
-    this.connectionStatus = 'error';
+    this.connectionStatus = ConnectionStatus.ERROR;
   }
 
   private onReceive(event: MessageEvent): void {
@@ -640,7 +648,7 @@ export class Client implements OnInit, OnDestroy {
       }, delay);
     } else {
       console.error('Max reconnection attempts reached');
-      this.connectionStatus = 'failed';
+      this.connectionStatus = ConnectionStatus.FAILED;
     }
   }
 
