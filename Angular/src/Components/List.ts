@@ -150,7 +150,7 @@ export class List {
   }
 
   getRankColor(rank?: number): string {
-    if (!rank) return 'inherit';
-    return `var(--room-rank-${rank}, inherit)`;
+    if (rank == null) return 'inherit';
+    return `var(--rank_${rank})`;
   }
 }

@@ -228,7 +228,7 @@ export class RankColors {
   }
 
   isEnabled(): boolean {
-    return this.enabled;
+    return this.enabled || this.colors.size > 0;
   }
 
   getColor(rankId: string | number): string | null {

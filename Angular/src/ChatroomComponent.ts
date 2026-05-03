@@ -118,12 +118,12 @@ export const CHATROOM_STYLES = `
     overflow-x: hidden;
     overflow-y: scroll;
     background: var(--room-background) !important;
-    color: var(--room-foreground) !important;
+    color: var(--room-foreground);
     border-color: transparent !important;
   }
 
   aside ui-list .list-item {
-    color: var(--room-foreground) !important;
+    color: var(--room-foreground);
     background-color: var(--room-background) !important;
   }
 
@@ -256,7 +256,6 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private resizeObserver: ResizeObserver | null = null;
 
   userItems = computed((): ListItem[] =>
-    // number = age?
     this.users().map(user => ({ id: user.id, label: user.username, rank: user.rank }))
   );
 

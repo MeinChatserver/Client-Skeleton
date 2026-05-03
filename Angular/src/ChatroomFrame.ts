@@ -172,7 +172,7 @@ export class ChatroomFrame extends Frame {
 
     if(ranks?.isEnabled()) {
       ranks.getAllColors().forEach((color, rankId) => {
-        vars.push(`--room-rank-${rankId}: ${color};`);
+        vars.push(`--rank_${rankId}: ${color};`);
       });
     }
 
