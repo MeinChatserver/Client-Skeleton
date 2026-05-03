@@ -73,8 +73,8 @@ export class Calendar implements ControlValueAccessor {
   }
 
   onChange(event: Event): void {
-    const target = event.target as HTMLInputElement;
-    this.value = target.value;
+    this.value = (event.target as HTMLInputElement).value;
+
     this.onChangeFn(this.value);
     this.onTouchedFn();
   }

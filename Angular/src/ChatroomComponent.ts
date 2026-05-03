@@ -11,7 +11,6 @@ import {List, Select, Textfield} from './Components';
 import { ListItem, User } from './Models';
 import {ProfileOpen} from './Models/Network/ProfileOpen';
 import { FeatureService, FeatureType, ListBurnFeature, ListGlowFeature } from './Features';
-import {CategoryChange} from './Models/Network';
 import {FormsModule} from '@angular/forms';
 import {ChatroomFrame} from './ChatroomFrame';
 
