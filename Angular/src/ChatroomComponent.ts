@@ -551,18 +551,20 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   }
 
   getMessageContent(message: ChatMessage): string {
-    switch (message.type) {
+    switch(message.type) {
       case ChatMessageType.ACTION:
         return message.message ?? '';
       case ChatMessageType.PUBLIC:
         return `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
       case ChatMessageType.PRIVATE: {
         let target = '';
-        if (message.user && message.users) {
-          target = ' an ' + message.users.map(entry =>
-            `<span data-action="profile:${entry.username}">${entry.username}</span>`
+
+        if(message.users) {
+          target = ' an ' + message.users.map(user =>
+            `<span data-action="profile:${user}">${user}</span>`
           ).join(', ');
         }
+
         return `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
       }
     }

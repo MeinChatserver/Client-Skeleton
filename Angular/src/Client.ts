@@ -327,7 +327,7 @@ export class Client implements OnInit, OnDestroy {
       let roomName      = null;
       var chatMessage: ChatMessage;
 
-      switch (packet.getOperation()) {
+      switch(packet.getOperation()) {
         case 'CONFIGURATION':
           const config = packet as Configuration;
 
