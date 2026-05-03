@@ -226,6 +226,8 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private featureService = inject(FeatureService);
   private userFeatureServices: Map<string, FeatureService> = new Map();
   private elementRef = inject(ElementRef);
+  private canvasWasInitialized = false;
+  private pendingFeatures: string[] = [];
 
   private _selectedChatroom: string | null = null;
 
@@ -279,6 +281,12 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     }
 
     this.initializeCanvasIfNeeded();
+
+    if (!this.canvasWasInitialized) {
+      setTimeout(() => {
+        this.initializeCanvasIfNeeded();
+      }, 100);
+    }
   }
 
   ngOnDestroy(): void {
@@ -287,6 +295,14 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       this.resizeObserver = null;
     }
     this.featureService.cleanup();
+  }
+
+  resetCanvasInitialized(): void {
+    if (this.featureCanvas?.nativeElement) {
+      (this.featureCanvas.nativeElement as any).__initialized = false;
+    }
+    // Leere pending features vom vorherigen Raum
+    this.pendingFeatures = [];
   }
 
   private initializeCanvasIfNeeded(): void {
@@ -306,6 +322,12 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       return;
     }
 
+    if (this.canvasWasInitialized) {
+      this.featureService.stopAnimation();
+      this.featureService.removeAllFeatures();
+      context.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
     this.resizeCanvasToContainer(canvas);
 
     if (!this.resizeObserver) {
@@ -313,7 +335,24 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
       if (container) {
         this.resizeObserver = new ResizeObserver(() => {
+          const oldWidth = canvas.width;
+          const oldHeight = canvas.height;
           this.resizeCanvasToContainer(canvas);
+
+          const heightChanged = Math.abs(canvas.height - oldHeight) > 50;
+          const widthChanged = Math.abs(canvas.width - oldWidth) > 50;
+
+          if ((heightChanged || widthChanged) && canvas.width > 0 && canvas.height > 0) {
+            const ctx = canvas.getContext('2d');
+            if (ctx) {
+              this.featureService.stopAnimation();
+              this.featureService.removeAllFeatures();
+              this.featureService.initialize(canvas, ctx);
+              if (this.featureService.hasFeature('SNOW')) {
+                this.featureService.startAnimation();
+              }
+            }
+          }
         });
 
         this.resizeObserver.observe(container);
@@ -322,6 +361,18 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
     this.featureService.initialize(canvas, context);
     (canvas as any).__initialized = true;
+    this.canvasWasInitialized = true;
+
+    if (this.pendingFeatures.length > 0) {
+      this.pendingFeatures.forEach(featureType => {
+        this.featureService.addFeature(featureType as FeatureType);
+      });
+      this.pendingFeatures = [];
+    }
+
+    if (this.featureService.hasFeature('SNOW')) {
+      this.featureService.startAnimation();
+    }
   }
 
   private resizeCanvasToContainer(canvas: HTMLCanvasElement): void {
@@ -331,14 +382,34 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       return;
     }
 
-    const rect = container.getBoundingClientRect();
+    let width = Math.floor(container.getBoundingClientRect().width);
+    let height = Math.floor(container.getBoundingClientRect().height);
 
-    if (rect.width <= 0 || rect.height <= 0) {
-      return;
+    if (width <= 0) {
+      width = container.clientWidth;
+    }
+    if (height <= 0) {
+      height = container.clientHeight;
     }
 
-    canvas.width = Math.floor(rect.width);
-    canvas.height = Math.floor(rect.height);
+    if (width <= 0) {
+      width = container.offsetWidth;
+    }
+    if (height <= 0) {
+      height = container.offsetHeight;
+    }
+
+    if (width <= 0) {
+      width = 800;
+    }
+    if (height <= 0) {
+      height = 400;
+    }
+
+    if (width > 0 && height > 0) {
+      canvas.width = width;
+      canvas.height = height;
+    }
   }
 
   private getOrCreateUserFeatureService(userId: string): FeatureService | null {
@@ -457,9 +528,17 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
     if (Object.values(FeatureType).includes(featureType)) {
       if (!this.featureService.hasFeature(featureType)) {
+        if (!this.canvasWasInitialized) {
+          if (!this.pendingFeatures.includes(featureType)) {
+            this.pendingFeatures.push(featureType);
+          }
+          return;
+        }
+
         this.featureService.addFeature(featureType);
-        this.featureService.startAnimation();
       }
+
+      this.featureService.startAnimation();
     }
   }
 

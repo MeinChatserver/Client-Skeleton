@@ -27,12 +27,10 @@ export class FeatureService {
 
   addFeatureWithKey(type: FeatureType, key: string): void {
     if(!this.canvas || !this.context) {
-      console.warn('[FeatureService] Canvas not initialized');
       return;
     }
 
     if(this.features.has(key)) {
-      console.log(`[FeatureService] Feature with key ${key} already exists`);
       return;
     }
 
@@ -43,7 +41,6 @@ export class FeatureService {
         feature = new SnowFeature();
       break;
       default:
-        console.warn(`[FeatureService] Unknown feature type: ${type}`);
       return;
     }
 
