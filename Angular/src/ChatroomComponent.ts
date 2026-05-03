@@ -222,18 +222,24 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private userFeatureServices: Map<string, FeatureService> = new Map();
   private elementRef = inject(ElementRef);
 
-  private _selectedChatroom: number | null = null;
-  get selectedChatroom(): number | null { return this._selectedChatroom; }
-  set selectedChatroom(value: number | null) {
+  private _selectedChatroom: string | null = null;
+
+  get selectedChatroom(): string | null {
+    return this._selectedChatroom || this.frame.getRoomName();
+  }
+
+  set selectedChatroom(value: string | null) {
     this._selectedChatroom = value;
 
-    this.client.send({
-      operation: 'ROOM_MESSAGE',
-      data: {
-        room: this.frame.getRoomName(),
-        text: `/go ${value}`
-      }
-    });
+    if (value && value !== this.frame.getRoomName()) {
+      this.client.send({
+        operation: 'ROOM_MESSAGE',
+        data: {
+          room: this.frame.getRoomName(),
+          text: `/go ${value}`
+        }
+      });
+    }
   }
 
   messages = signal<ChatMessage[]>([]);
