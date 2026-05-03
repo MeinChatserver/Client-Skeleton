@@ -429,10 +429,17 @@ export class Client implements OnInit, OnDestroy {
           }
         break;
         case 'WINDOW_ROOM_UPDATE':
-          const updating                        = packet as WindowRoomUpdate;
-          const updatingFrame = this.windowManager.getChatroom(updating.getReference());
+          const updating      = packet as WindowRoomUpdate;
+          const reference     = updating.getReference();
+          const newName       = updating.getName();
+          const updatingFrame = this.windowManager.getChatroom(reference);
 
           if(updatingFrame !== null) {
+            if(newName && reference && newName !== reference) {
+              this.windowManager.renameFrame(reference, newName);
+              updatingFrame.updateRoomName(newName);
+            }
+
             updatingFrame.clearMessages();
 
             if(updating.getUsers()) {
@@ -444,6 +451,7 @@ export class Client implements OnInit, OnDestroy {
             }
 
             updatingFrame.focus();
+            this.send(new WindowInit(updatingFrame.getId()));
           }
         break;
         case 'ROOM_FEATURE':

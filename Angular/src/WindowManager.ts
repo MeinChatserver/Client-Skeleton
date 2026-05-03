@@ -110,6 +110,30 @@ export class WindowManager {
   }
 
   /*
+  * Benennt ein Fenster im WindowManager um (z.B. nach einem WINDOW_ROOM_UPDATE).
+  *
+  * @praram oldName string
+  * @praram newName string
+  * @return boolean
+  */
+  renameFrame(oldName: string, newName: string): boolean {
+    if(oldName === newName) {
+      return true;
+    }
+
+    const frame = this.frames.get(oldName);
+
+    if(!frame) {
+      return false;
+    }
+
+    this.frames.delete(oldName);
+    this.frames.set(newName, frame);
+    frame.setId(newName);
+    return true;
+  }
+
+  /*
   * Überprüft, ob ein Fenster im WindowManager existiert.
   *
   * @praram name string

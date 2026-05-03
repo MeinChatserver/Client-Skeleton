@@ -42,6 +42,10 @@ export class Frame {
     return this.config.id;
   }
 
+  setId(id: string) {
+    this.config.id = id;
+  }
+
   protected initialize(): void {
     this.frameWindow = window.open('', this.config.id, Object.entries({
       ...this.windowFeatures,

@@ -1,4 +1,5 @@
 import {RoomUpdate} from './RoomUpdate';
+import {Category} from '../Category';
 
 /**
  * Dieses Paket wird versendet, wenn ein Nutzer per Befehl den Chatraum wechselt ohne ein neues Chatfenster mit dem jeweiligen Raum zu eröffnen.
@@ -19,6 +20,29 @@ export class WindowRoomUpdate extends RoomUpdate {
 
     if(data.reference) {
       this.reference = data.reference;
+    }
+
+    // Variante mit verschachtelter Raum-Struktur (analog zu WINDOW_ROOM): Felder aus data.room übernehmen.
+    if(data.room) {
+      if(data.room.id && this.id === null) {
+        this.id = data.room.id;
+      }
+
+      if(data.room.name && this.name === null) {
+        this.name = data.room.name;
+      }
+
+      if(data.room.category && this.category === null) {
+        this.category = new Category(data.room.category);
+      }
+
+      if(data.room.style && this.style === null) {
+        this.style = data.room.style;
+      }
+
+      if(data.room.users && this.users === null) {
+        this.users = data.room.users;
+      }
     }
   }
 
