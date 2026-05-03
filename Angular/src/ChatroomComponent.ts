@@ -652,7 +652,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       case ChatMessageType.PRIVATE: {
         let target = '';
 
-        if(message.users) {
+        if(message.users && message.users.length >= 1) {
           target = ' an ' + message.users.map(user =>
             `<span data-action="profile:${user}">${user}</span>`
           ).join(', ');
