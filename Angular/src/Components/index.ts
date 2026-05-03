@@ -1,6 +1,8 @@
 export { Button } from './Button';
+export { Calendar } from './Calendar';
 export { CheckBox } from './CheckBox';
 export { Label } from './Label';
+export { Line } from './Line';
 export { Link } from './Link';
 export { List } from './List';
 export { Panel } from './Panel';

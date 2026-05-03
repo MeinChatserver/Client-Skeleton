@@ -1,6 +1,7 @@
 import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
 import { Button } from './Components';
+import { PopupRenderer } from './PopupRenderer';
 
 export interface PopupConfig extends FrameConfig {
   content?: any;
@@ -11,20 +12,23 @@ export class PopupFrame extends Frame {
   protected content: any;
   protected eventListeners: Map<string, Function[]> = new Map();
   protected okButtonRef: ComponentRef<Button> | null = null;
+  protected popupRenderer: PopupRenderer | null = null;
 
   constructor(
     config: PopupConfig,
     appRef: ApplicationRef,
     injector: EnvironmentInjector
   ) {
-    console.log('PopupFrame', config);
+    console.log('[PopupFrame] constructor:', config);
     super({
         ...config,
         width: config.width || 400,
         height: config.height || 100
       }, appRef, injector);
 
-    this.content = config.content || {};
+    // Content ist entweder config.content oder config selbst
+    this.content = config.content || config;
+    console.log('[PopupFrame] Set content:', this.content);
     this.renderContent();
   }
 
@@ -39,10 +43,125 @@ export class PopupFrame extends Frame {
       return;
     }
 
-    appRoot.innerHTML = this.buildContentFromJSON(this.content);
+    // Content kann entweder ein Array sein oder ein Objekt mit elements property
+    const elements = Array.isArray(this.content) ? this.content : this.content.elements;
+
+    if (elements && Array.isArray(elements)) {
+      this.renderWithComponents(appRoot, elements);
+    } else {
+      console.error('[PopupFrame] No elements found in content');
+    }
+  }
+
+  private renderWithComponents(appRoot: Element, elements: any[]): void {
+    console.log('[PopupFrame] renderWithComponents called with', elements.length, 'elements');
+    const wrapper = this.frameDocument!.createElement('div');
+    wrapper.className = 'mcs-popup-wrapper';
+
+    const body = this.frameDocument!.createElement('div');
+    body.className = 'mcs-popup-body';
+    wrapper.appendChild(body);
+
+    const footer = this.frameDocument!.createElement('div');
+    footer.className = 'mcs-popup-footer';
+    footer.id = 'ok-btn-container';
+    wrapper.appendChild(footer);
+
+    appRoot.appendChild(wrapper);
+
+    this.addPopupStyles(appRoot);
+
+    this.popupRenderer = new PopupRenderer(this.appRef, this.injector, this.frameDocument);
+    this.popupRenderer.renderElements(elements, body);
 
     this.renderOkButton();
-    this.setupEventListeners();
+  }
+
+  private addPopupStyles(container: Element): void {
+    const style = this.frameDocument!.createElement('style');
+    style.textContent = `
+      * {
+        box-sizing: border-box !important;
+      }
+
+      body {
+        margin: 0 !important;
+        padding: 0 !important;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+      }
+
+      .mcs-popup-wrapper {
+        display: flex !important;
+        flex-direction: column !important;
+        height: 100vh !important;
+        margin: 0 !important;
+        padding: 0 !important;
+      }
+
+      .mcs-popup-body {
+        flex: 1 !important;
+        padding: 20px !important;
+        overflow-y: auto !important;
+        background: white !important;
+      }
+
+      .mcs-popup-footer {
+        flex: 0 !important;
+        display: flex !important;
+        justify-content: flex-end !important;
+        align-items: center !important;
+        padding: 12px 20px !important;
+        border-top: 1px solid #e0e0e0 !important;
+        background: #f5f5f5 !important;
+        margin: 0 !important;
+        gap: 10px !important;
+      }
+
+      ui-button {
+        min-width: auto !important;
+      }
+
+      ui-button button {
+        padding: 8px 24px !important;
+        min-width: 80px !important;
+        height: auto !important;
+      }
+
+      .popup-element-wrapper {
+        margin-bottom: 15px !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .popup-input-label,
+      .popup-select-label,
+      .popup-calendar-label {
+        display: block !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        color: #222 !important;
+        margin-bottom: 6px !important;
+      }
+
+      .popup-input-wrapper,
+      .popup-select-wrapper,
+      .popup-calendar-wrapper {
+        width: 100% !important;
+      }
+
+      .popup-split-container {
+        display: grid !important;
+        width: 100% !important;
+        margin-bottom: 15px !important;
+      }
+
+      .popup-split-item {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 10px !important;
+      }
+    `;
+    this.frameDocument!.head.appendChild(style);
   }
 
   protected buildContentFromJSON(content: any): string {
@@ -178,9 +297,23 @@ export class PopupFrame extends Frame {
       return;
     }
 
-    const slot = this.frameDocument.getElementById('ok-btn');
+    let slot = this.frameDocument.getElementById('ok-btn');
+    let container = this.frameDocument.getElementById('ok-btn-container');
 
-    if (!slot) {
+    // If no slot exists, create one (for old-style popups)
+    if (!slot && !container) {
+      const footer = this.frameDocument.querySelector('.mcs-popup-footer');
+      if (footer) {
+        slot = this.frameDocument.createElement('div');
+        slot.id = 'ok-btn';
+        footer.appendChild(slot);
+      } else {
+        return;
+      }
+    }
+
+    const hostElement = slot || container;
+    if (!hostElement) {
       return;
     }
 
@@ -191,7 +324,7 @@ export class PopupFrame extends Frame {
 
     this.okButtonRef = createComponent(Button, {
       environmentInjector: this.injector,
-      hostElement: slot
+      hostElement: hostElement as HTMLElement
     });
     this.okButtonRef.instance.text = 'OK';
     this.okButtonRef.changeDetectorRef.detectChanges();
@@ -199,6 +332,11 @@ export class PopupFrame extends Frame {
   }
 
   protected override cleanup(): void {
+    if (this.popupRenderer) {
+      this.popupRenderer.cleanup();
+      this.popupRenderer = null;
+    }
+
     if (this.okButtonRef) {
       this.appRef.detachView(this.okButtonRef.hostView);
       this.okButtonRef.destroy();
