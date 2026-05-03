@@ -70,18 +70,23 @@ export const CHATROOM_STYLES = `
   }
 
   main ui-output ui-messages ui-text {
-    padding: 0 5px;
+    padding: 0px 5px;
   }
 
   main ui-output ui-messages ui-text[data-type="action"] {
     color: var(--room-blue);
   }
 
-  main ui-output ui-messages ui-text[data-type="public"] a.sender {
+  main ui-output ui-messages ui-text[data-type="public"] .sender {
     font-weight: bold;
   }
 
-  main ui-output ui-messages ui-text[data-type="private"] a.sender {
+  main ui-output ui-messages ui-text[data-type="private"] .sender {
+    font-weight: bold;
+    color: var(--room-red);
+  }
+
+  main ui-output ui-messages ui-text[data-type="private"] .sender {
     font-weight: bold;
     color: var(--room-red);
   }
@@ -550,7 +555,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       case ChatMessageType.ACTION:
         return message.message ?? '';
       case ChatMessageType.PUBLIC:
-        return `${message.getUsername()}: ${message.message}`;
+        return `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
       case ChatMessageType.PRIVATE: {
         let target = '';
         if (message.user && message.users) {
@@ -558,7 +563,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
             `<span data-action="profile:${entry.username}">${entry.username}</span>`
           ).join(', ');
         }
-        return `${message.getUsername()} (privat${target}): ${message.message}`;
+        return `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
       }
     }
   }
