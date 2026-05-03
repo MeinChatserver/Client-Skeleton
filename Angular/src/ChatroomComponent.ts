@@ -256,7 +256,8 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private resizeObserver: ResizeObserver | null = null;
 
   userItems = computed((): ListItem[] =>
-    this.users().map(user => ({ id: user.id, label: user.username, count: 0, rank: user.rank }))
+    // number = age?
+    this.users().map(user => ({ id: user.id, label: user.username, rank: user.rank }))
   );
 
   chatrooms = computed(() => {

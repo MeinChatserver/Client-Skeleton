@@ -19,8 +19,9 @@ import {ListItem} from '../Models';
         }
 
         <span class="label" [style.color]="getRankColor(item.rank)">{{ item.label }}</span>
-        @if(item.count) {
-          <small class="count">({{ item.count }})</small>
+
+        @if(item.number != null) {
+          <small class="count">({{ item.number }})</small>
         }
 
         @if (item.suffixIcon) {

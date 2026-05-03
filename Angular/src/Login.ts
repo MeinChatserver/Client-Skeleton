@@ -211,7 +211,7 @@ export class Login implements OnInit {
   chatrooms = computed(() =>
     this.client.chatRooms().filter(room => room.getName() !== null).map((room): ListItem => ({
       label: room.getName() ?? '',
-      count: room.getUserCount()
+      number: room.getUserCount()
     }))
   );
 
