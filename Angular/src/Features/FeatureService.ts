@@ -7,7 +7,7 @@ export enum FeatureType {
 }
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'any'
 })
 export class FeatureService {
   private features: Map<string, Feature>            = new Map();
@@ -65,6 +65,7 @@ export class FeatureService {
     }
 
     this.features.clear();
+    this.stopAnimation();
   }
 
   hasFeature(type: FeatureType | string): boolean {

@@ -301,8 +301,13 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     if (this.featureCanvas?.nativeElement) {
       (this.featureCanvas.nativeElement as any).__initialized = false;
     }
-    // Leere pending features vom vorherigen Raum
     this.pendingFeatures = [];
+    this.canvasWasInitialized = false;
+
+    // Force canvas re-initialization for room switch in same component
+    setTimeout(() => {
+      this.initializeCanvasIfNeeded();
+    }, 0);
   }
 
   private initializeCanvasIfNeeded(): void {
@@ -345,10 +350,13 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
           if ((heightChanged || widthChanged) && canvas.width > 0 && canvas.height > 0) {
             const ctx = canvas.getContext('2d');
             if (ctx) {
+              const hadSnow = this.featureService.hasFeature('SNOW');
               this.featureService.stopAnimation();
               this.featureService.removeAllFeatures();
               this.featureService.initialize(canvas, ctx);
-              if (this.featureService.hasFeature('SNOW')) {
+
+              if (hadSnow) {
+                this.featureService.addFeature('SNOW' as FeatureType);
                 this.featureService.startAnimation();
               }
             }
@@ -362,8 +370,10 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     this.featureService.initialize(canvas, context);
     (canvas as any).__initialized = true;
     this.canvasWasInitialized = true;
+    console.log('[ChatroomComponent] Canvas initialized, pending features:', this.pendingFeatures);
 
     if (this.pendingFeatures.length > 0) {
+      console.log('[ChatroomComponent] Adding pending features:', this.pendingFeatures);
       this.pendingFeatures.forEach(featureType => {
         this.featureService.addFeature(featureType as FeatureType);
       });
@@ -371,6 +381,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     }
 
     if (this.featureService.hasFeature('SNOW')) {
+      console.log('[ChatroomComponent] Starting SNOW animation');
       this.featureService.startAnimation();
     }
   }
@@ -538,7 +549,10 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
         this.featureService.addFeature(featureType);
       }
 
-      this.featureService.startAnimation();
+      const canvas = this.featureCanvas?.nativeElement;
+      if (canvas && canvas.height > 100) {
+        this.featureService.startAnimation();
+      }
     }
   }
 
