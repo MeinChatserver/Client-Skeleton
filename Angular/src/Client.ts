@@ -441,6 +441,8 @@ export class Client implements OnInit, OnDestroy {
             }
 
             updatingFrame.clearMessages();
+            updatingFrame.removeAllFeatures();
+            updatingFrame.resetCanvas();
 
             if(updating.getUsers()) {
               updatingFrame.setUsers(updating.getUsers());

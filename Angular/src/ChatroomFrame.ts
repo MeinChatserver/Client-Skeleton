@@ -94,6 +94,14 @@ export class ChatroomFrame extends Frame {
     this.emit('messages-cleared');
   }
 
+  public resetCanvas(): void {
+    if(this.componentRef) {
+      const component = this.componentRef.instance as ChatroomComponent;
+      // Markiere den Canvas als nicht initialisiert, damit er beim nächsten ngAfterViewChecked neu initialisiert wird
+      (component as any).resetCanvasInitialized?.();
+    }
+  }
+
   public setUsers(users: User[] | null): void {
     if(users !== null) {
       this.users = [...users];

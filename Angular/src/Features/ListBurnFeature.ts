@@ -1,303 +1,322 @@
 import { Feature } from './Feature';
 
 export class ListBurnFeature implements Feature {
-  private static readonly WIDTH_FACTOR = 3;
-  private static readonly HEIGHT_FACTOR = 5;
   private static readonly SHIFT_THRESHOLD = 160;
   private static readonly RANDOM_HEIGHT = 24;
-  private static readonly SPARK_HEIGHT = 4;
-  private static readonly IGNITE_VALUE = 1224;
-  private static readonly COOL_VALUE = 280;
+  // Narrow sparks so the cooling diffusion (which spreads ±1 column per
+  // pass) doesn't smear them into wide horizontal blobs.
+  private static readonly SPARK_WIDTH = 3;
+  private static readonly SPARK_HEIGHT = 2;
+  // Hot sparks (above 256 = WHITE in the palette) decay through YELLOW →
+  // RED → BLUE → black as they rise — that color trail is the flame tongue.
+  private static readonly IGNITE_VALUE = 1100;
+  // Dim base: keeps the bottom from being a uniform yellow stripe and
+  // makes the spark tongues stand out against a dark/red ground.
+  private static readonly COOL_VALUE = 70;
   private static readonly INTENSITY_THRESHOLDS = [4, 12, 20, 30];
-  private static COLORS_WARM: number[] = [];
-  private static COLORS_COLD: number[] = [];
+  // Full resolution (1:1 buffer/canvas pixels) — the previous LINE_HEIGHT=2
+  // downsampling chunked thin tongues into 2-pixel blobs.
+  private static readonly LINE_HEIGHT = 1;
+  private static readonly TICKS_PER_SECOND = 70;
+  private static readonly MIN_BUF_HEIGHT = 16;
+  // Cooling rate. Tuned so a spark rises ~10 rows before dying — enough
+  // to look like a tongue without flooding the container.
+  private static readonly COOL_DECAY = 7;
+  // Sparks stay in the bottom quarter so the rising tongues fill the
+  // middle of the container and the top fades to transparent.
+  private static readonly RANDOM_BAND_RATIO = 0.25;
+
+  private static COLORS_WARM: Int32Array = new Int32Array(0);
+  private static COLORS_COLD: Int32Array = new Int32Array(0);
+  private static colorsInitialized = false;
 
   private container: HTMLElement | null = null;
-  private running = false;
-  private animationFrameId: number | null = null;
-
-  private width = 200;
-  private height = 100;
-  private lineHeight = 2;
-  private scale = 100;
-  private widthNew = Math.ceil(200 / 2);
-  private heightNew = Math.ceil((100 * 100) / (2 * 100));
-
-  private canvas: HTMLCanvasElement | null = null;
-  private context: CanvasRenderingContext2D | null = null;
+  private overlayCanvas: HTMLCanvasElement | null = null;
+  private overlayContext: CanvasRenderingContext2D | null = null;
   private image: ImageData | null = null;
-  private colorMap: number[] = [];
-  private morphTargets: number[] = [];
+
+  private bufWidth = 0;
+  private bufHeight = 0;
+  private viewWidth = 0;
+  private viewHeight = 0;
+  private randomBand = 0;
+
+  private morphTargets: Int32Array = new Int32Array(0);
+  private colorMap: Int32Array = new Int32Array(0);
+
+  private touchedChildren: HTMLElement[] = [];
+  private restoreContainerPosition: string | null = null;
+  private restoreContainerOverflow: string | null = null;
+
   private shift = 0;
-  private lightness: number[] = [];
+  private running = false;
+  private lastTickTime = 0;
 
   constructor() {
-    this.initializeColors();
+    if (!ListBurnFeature.colorsInitialized) {
+      ListBurnFeature.initializeColors();
+      ListBurnFeature.colorsInitialized = true;
+    }
   }
 
-  onInit(canvas: HTMLCanvasElement, context: CanvasRenderingContext2D | null, container?: HTMLElement): void {
+  onInit(_canvas: HTMLCanvasElement, _context: CanvasRenderingContext2D | null, container?: HTMLElement): void {
     this.container = container || null;
-
     if (!this.container) return;
 
-    // Size based on container dimensions
     const rect = this.container.getBoundingClientRect();
-    this.width = Math.max(1, Math.floor(rect.width));
-    this.height = Math.max(1, Math.floor(rect.height));
+    this.bufWidth = Math.max(2, Math.floor(rect.width));
+    this.bufHeight = Math.max(ListBurnFeature.MIN_BUF_HEIGHT, Math.floor(rect.height));
 
-    // Fallback to reasonable defaults if container not yet laid out
-    if (this.width <= 0 || this.height <= 0) {
-      this.width = 200;
-      this.height = 30;
+    this.viewWidth = Math.max(1, Math.ceil(this.bufWidth / ListBurnFeature.LINE_HEIGHT));
+    this.viewHeight = Math.max(1, Math.ceil(this.bufHeight / ListBurnFeature.LINE_HEIGHT));
+
+    this.randomBand = Math.max(
+      ListBurnFeature.SPARK_HEIGHT,
+      Math.floor(this.bufHeight * ListBurnFeature.RANDOM_BAND_RATIO)
+    );
+
+    this.morphTargets = new Int32Array(this.bufWidth * this.bufHeight);
+    this.colorMap = new Int32Array(this.viewWidth * this.viewHeight);
+
+    const computed = window.getComputedStyle(this.container);
+    if (computed.position === 'static') {
+      this.restoreContainerPosition = this.container.style.position;
+      this.container.style.position = 'relative';
+    }
+    if (computed.overflow === 'visible') {
+      this.restoreContainerOverflow = this.container.style.overflow;
+      this.container.style.overflow = 'hidden';
     }
 
-    this.widthNew = Math.ceil(this.width / 2);
-    this.heightNew = Math.ceil((this.height * 100) / (2 * 100));
+    this.overlayCanvas = document.createElement('canvas');
+    this.overlayCanvas.width = this.viewWidth;
+    this.overlayCanvas.height = this.viewHeight;
+    const style = this.overlayCanvas.style;
+    style.position = 'absolute';
+    style.left = '0';
+    style.top = '0';
+    style.width = '100%';
+    style.height = '100%';
+    style.pointerEvents = 'none';
+    style.zIndex = '0';
+    style.imageRendering = 'pixelated';
 
-    console.log(`[ListBurnFeature] onInit: container ${this.width}x${this.height}, canvas ${this.widthNew}x${this.heightNew}`);
+    this.overlayContext = this.overlayCanvas.getContext('2d');
+    if (this.overlayContext) {
+      this.overlayContext.imageSmoothingEnabled = false;
+      this.image = this.overlayContext.createImageData(this.viewWidth, this.viewHeight);
+    }
 
-    this.canvas = document.createElement('canvas');
-    this.canvas.width = this.widthNew;
-    this.canvas.height = this.heightNew;
-    this.context = this.canvas.getContext('2d');
+    for (const child of Array.from(this.container.children) as HTMLElement[]) {
+      if (window.getComputedStyle(child).position === 'static') {
+        child.style.position = 'relative';
+      }
+      if (!child.style.zIndex) {
+        child.style.zIndex = '1';
+      }
+      this.touchedChildren.push(child);
+    }
 
-    if (!this.context) return;
-
-    this.image = this.context.createImageData(this.widthNew, this.heightNew);
-    this.lightness = new Array(this.heightNew * this.widthNew).fill(0);
-    this.morphTargets = new Array(this.height * this.width).fill(0);
-    this.colorMap = new Array(this.heightNew * this.widthNew).fill(0);
-
-    this.changeStyle();
+    this.container.insertBefore(this.overlayCanvas, this.container.firstChild);
+    this.container.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';
   }
 
   onStart(): void {
     this.running = true;
+    this.lastTickTime = performance.now();
   }
 
   onDestroy(): void {
     this.running = false;
-    if (this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
+
+    if (this.overlayCanvas?.parentElement) {
+      this.overlayCanvas.parentElement.removeChild(this.overlayCanvas);
     }
+    this.overlayCanvas = null;
+    this.overlayContext = null;
+    this.image = null;
+
     if (this.container) {
-      this.container.style.backgroundImage = '';
       this.container.style.textShadow = '';
-    }
-  }
-
-  onPaint(context: CanvasRenderingContext2D, timestamp: number): void {
-    if (!this.running || !this.container) {
-      return;
-    }
-
-    this.recalculate();
-    if (this.canvas) {
-      const dataUrl = this.canvas.toDataURL('image/png');
-      this.container.style.backgroundImage = `url(${dataUrl})`;
-
-      // Debug: Log sample colors
-      if (timestamp % 30 === 0) {
-        console.log('[ListBurnFeature] Sample morphTargets:', this.morphTargets.slice(this.height * this.width - 20, this.height * this.width));
-        console.log('[ListBurnFeature] Sample lightness:', this.lightness.slice(this.heightNew * this.widthNew - 10, this.heightNew * this.widthNew));
+      if (this.restoreContainerPosition !== null) {
+        this.container.style.position = this.restoreContainerPosition;
+      }
+      if (this.restoreContainerOverflow !== null) {
+        this.container.style.overflow = this.restoreContainerOverflow;
       }
     }
+
+    for (const child of this.touchedChildren) {
+      child.style.zIndex = '';
+    }
+    this.touchedChildren = [];
   }
 
-  private changeStyle(): void {
-    if (this.container) {
-      this.container.style.textShadow = '-1px 0 black, 0 1px black, 1px 0 black, 0 -1px black';
-      this.container.style.backgroundSize = '100% 100%';
-      this.container.style.backgroundPosition = '0 0';
-      this.container.style.backgroundRepeat = 'no-repeat';
-    }
-  }
+  onPaint(_context: CanvasRenderingContext2D, _timestamp: number): void {
+    if (!this.running || !this.overlayContext || !this.image) return;
 
-  private repaint(): void {
-    if (!this.running) {
-      return;
-    }
+    const now = performance.now();
+    const elapsed = now - this.lastTickTime;
+    let ticks = Math.floor((elapsed * ListBurnFeature.TICKS_PER_SECOND) / 1000);
+    if (ticks <= 0) return;
+    if (ticks > 20) ticks = 20;
+    this.lastTickTime = now;
 
-    this.recalculate();
-    this.animationFrameId = requestAnimationFrame(this.repaint.bind(this));
-
-    if (this.container && this.canvas) {
-      this.container.style.backgroundImage = `url(${this.canvas.toDataURL('image/png')})`;
+    while (ticks-- > 0) {
+      this.recalculate();
     }
+    this.convert();
+    this.overlayContext.putImageData(this.image, 0, 0);
   }
 
   private recalculate(): void {
-    this.createNewPixels();
+    this.fillBaseRow();
     this.addRandomSparks();
     this.coolFire();
-    this.updateDisplayPixels();
-    this.drawToCanvas();
   }
 
-  private createNewPixels(): void {
-    this.fillArray(this.morphTargets, this.width * (this.height - 1), this.width * this.height, ListBurnFeature.COOL_VALUE);
-  }
-
-  private fillArray(array: number[], start: number, end: number, value: number): void {
+  private fillBaseRow(): void {
+    const m = this.morphTargets;
+    const start = this.bufWidth * (this.bufHeight - 1);
+    const end = m.length;
     for (let i = start; i < end; i++) {
-      array[i] = value;
+      m[i] = ListBurnFeature.COOL_VALUE;
     }
   }
 
   private addRandomSparks(): void {
-    this.shift += this.width;
-
+    this.shift += this.bufWidth;
     while (this.shift > ListBurnFeature.SHIFT_THRESHOLD) {
       this.shift -= ListBurnFeature.SHIFT_THRESHOLD;
-      const x = Math.floor(Math.random() * this.width);
-      const y = Math.floor(Math.random() * ListBurnFeature.RANDOM_HEIGHT);
-      this.ignite(x - 7, this.height - 4 - y);
+      const x = Math.floor(Math.random() * this.bufWidth);
+      const y = Math.floor(Math.random() * this.randomBand);
+      this.ignite(x - ListBurnFeature.SPARK_WIDTH, this.bufHeight - ListBurnFeature.SPARK_HEIGHT - y);
     }
   }
 
   private ignite(x: number, y: number): void {
+    const m = this.morphTargets;
+    const w = this.bufWidth;
+    const h = this.bufHeight;
     for (let i = 0; i < ListBurnFeature.SPARK_WIDTH; i++) {
+      const px = x + i;
+      if (px < 0 || px >= w) continue;
       for (let j = 0; j < ListBurnFeature.SPARK_HEIGHT; j++) {
-        const idx = (y + j) * this.width + i + x;
-        if (idx >= 0 && idx < this.morphTargets.length) {
-          this.morphTargets[idx] = ListBurnFeature.IGNITE_VALUE;
-        }
+        const py = y + j;
+        if (py < 0 || py >= h) continue;
+        m[py * w + px] = ListBurnFeature.IGNITE_VALUE;
       }
     }
   }
 
   private coolFire(): void {
-    const endIndex = this.morphTargets.length - this.width - 1;
-
-    for (let i = 0; i < endIndex; i++) {
-      const newVal =
-        ((this.morphTargets[i] +
-          this.morphTargets[i + this.width] +
-          this.morphTargets[i + this.width - 1] +
-          this.morphTargets[i + this.width + 1] +
-          2) >>
-          2) -
-        3;
-      this.morphTargets[i] = Math.max(0, newVal);
+    const m = this.morphTargets;
+    const w = this.bufWidth;
+    const end = m.length - w - 1;
+    for (let i = 0; i < end; i++) {
+      const sum = m[i] + m[i + w] + m[i + w - 1] + m[i + w + 1];
+      const v = ((sum + 2) >> 2) - ListBurnFeature.COOL_DECAY;
+      m[i] = v < 0 ? 0 : v;
     }
   }
 
-  private updateDisplayPixels(): void {
-    let index = 0;
-    const canvasRowLength = this.width * this.lineHeight;
+  private convert(): void {
+    const m = this.morphTargets;
+    const cm = this.colorMap;
+    const warm = ListBurnFeature.COLORS_WARM;
+    const cold = ListBurnFeature.COLORS_COLD;
+    const thresholds = ListBurnFeature.INTENSITY_THRESHOLDS;
+    const lineHeight = ListBurnFeature.LINE_HEIGHT;
+    const stride = this.bufWidth * lineHeight;
+    const mLen = m.length;
 
-    for (let y = 0; y < this.heightNew; y++) {
-      const baseIndex = y * canvasRowLength;
+    let prevShift = 0;
 
-      for (let x = 0; x < this.widthNew; x++) {
-        let color;
-        const pixelIndex = baseIndex + x * this.lineHeight;
-        const intensity = this.morphTargets[pixelIndex] || 0;
+    for (let y = 0; y < this.viewHeight; y++) {
+      const base = y * stride;
+      for (let x = 0; x < this.viewWidth; x++) {
+        const pi = base + x * lineHeight;
+        const intensity = pi < mLen ? m[pi] : 0;
+        let color: number;
 
         if (intensity > 0) {
-          color = ListBurnFeature.COLORS_WARM[intensity] || 0;
+          color = warm[intensity];
         } else {
           let maxShift = 0;
-
-          for (let targetIndex = 1; targetIndex <= 5; targetIndex++) {
-            const shiftedIndex = pixelIndex + canvasRowLength * targetIndex;
-
-            if (shiftedIndex < this.morphTargets.length) {
-              const morphTarget = this.morphTargets[shiftedIndex] || 0;
+          for (let row = 1; row <= 5; row++) {
+            const sampleIdx = pi + stride * row;
+            if (sampleIdx < mLen) {
+              const v = m[sampleIdx];
               let shiftAmount = 0;
-
-              for (let j = ListBurnFeature.INTENSITY_THRESHOLDS.length - 1; j >= 0; j--) {
-                if (morphTarget >= ListBurnFeature.INTENSITY_THRESHOLDS[j]) {
-                  shiftAmount = j + 1;
+              for (let t = thresholds.length - 1; t >= 0; t--) {
+                if (v >= thresholds[t]) {
+                  shiftAmount = t + 1;
                   break;
                 }
               }
-
-              const j = shiftAmount - targetIndex + 1;
-
-              if (j > maxShift) {
-                maxShift = j;
-              }
+              const delta = shiftAmount - row + 1;
+              if (delta > maxShift) maxShift = delta;
             }
           }
-
-          const targetIndex = ((index + maxShift + 1) >> 2) % ListBurnFeature.COLORS_COLD.length;
-          index = maxShift;
-          color = ListBurnFeature.COLORS_COLD[targetIndex] || 0;
+          const idx = (prevShift + maxShift + 1) >> 2;
+          prevShift = maxShift;
+          color = idx === 0 ? 0 : cold[idx];
         }
-
-        this.lightness[y * this.widthNew + x] = color;
+        cm[y * this.viewWidth + x] = color;
       }
     }
 
-    if (!this.image) return;
-
-    const imageData = this.image.data;
-
-    for (let i = 0; i < this.lightness.length; i++) {
-      const color = this.lightness[i];
-      const offset = i * 4;
-
-      imageData[offset] = (color >> 16) & 0xff;
-      imageData[offset + 1] = (color >> 8) & 0xff;
-      imageData[offset + 2] = color & 0xff;
-      imageData[offset + 3] = (color >> 24) & 0xff;
-    }
-
-    this.context!.putImageData(this.image, 0, 0);
-  }
-
-  private drawToCanvas(): void {
-    if (!this.context || !this.canvas || !this.image) return;
-
-    this.context.putImageData(this.image, 0, 0);
-  }
-
-  private static fillWithColor(
-    pixels: number[],
-    min: number,
-    max: number,
-    fromRed: number,
-    fromGreen: number,
-    fromBlue: number,
-    fromAlpha: number,
-    toRed: number,
-    toGreen: number,
-    toBlue: number,
-    toAlpha: number
-  ): void {
-    const segmentLength = max - min;
-
-    for (let index = 0; index < segmentLength; index++) {
-      const r = (fromRed * (segmentLength - index) + toRed * index) / segmentLength;
-      const g = (fromGreen * (segmentLength - index) + toGreen * index) / segmentLength;
-      const b = (fromBlue * (segmentLength - index) + toBlue * index) / segmentLength;
-      const a = (fromAlpha * (segmentLength - index) + toAlpha * index) / segmentLength;
-
-      pixels[min + index] = ListBurnFeature.getColor(r, g, b, a);
+    const data = this.image!.data;
+    for (let i = 0; i < cm.length; i++) {
+      const c = cm[i];
+      const o = i * 4;
+      data[o] = (c >> 16) & 0xff;
+      data[o + 1] = (c >> 8) & 0xff;
+      data[o + 2] = c & 0xff;
+      data[o + 3] = (c >>> 24) & 0xff;
     }
   }
 
-  private static getColor(red: number, green: number, blue: number, alpha: number): number {
-    red = Math.max(0, Math.min(255, red));
-    green = Math.max(0, Math.min(255, green));
-    blue = Math.max(0, Math.min(255, blue));
-    alpha = Math.max(0, Math.min(255, alpha));
+  private static initializeColors(): void {
+    ListBurnFeature.COLORS_WARM = new Int32Array(1225);
+    ListBurnFeature.COLORS_COLD = new Int32Array(5);
 
-    return (alpha << 24) | (red << 16) | (green << 8) | blue;
-  }
-
-  private initializeColors(): void {
-    ListBurnFeature.COLORS_WARM = new Array(1225).fill(0);
-    ListBurnFeature.COLORS_COLD = new Array(256).fill(0);
-
-    // Exact copy from Java original: BLACK -> BLUE -> RED -> YELLOW -> WHITE
     ListBurnFeature.fillWithColor(ListBurnFeature.COLORS_COLD, 0, 5, 0, 0, 0, 0, 0, 0, 0, 212);
     ListBurnFeature.fillWithColor(ListBurnFeature.COLORS_WARM, 0, 32, 0, 0, 0, 255, 0, 0, 255, 255);
     ListBurnFeature.fillWithColor(ListBurnFeature.COLORS_WARM, 32, 96, 0, 0, 255, 255, 255, 0, 0, 255);
     ListBurnFeature.fillWithColor(ListBurnFeature.COLORS_WARM, 96, 160, 255, 0, 0, 255, 255, 255, 0, 255);
     ListBurnFeature.fillWithColor(ListBurnFeature.COLORS_WARM, 160, 256, 255, 255, 0, 255, 255, 255, 255, 255);
     ListBurnFeature.fillWithColor(ListBurnFeature.COLORS_WARM, 256, 1225, 255, 255, 255, 255, 255, 255, 255, 255);
+  }
+
+  private static fillWithColor(
+    pixels: Int32Array,
+    min: number,
+    max: number,
+    fromR: number, fromG: number, fromB: number, fromA: number,
+    toR: number, toG: number, toB: number, toA: number
+  ): void {
+    const len = max - min;
+    for (let i = 0; i < len; i++) {
+      const r = (fromR * (len - i) + toR * i) / len;
+      const g = (fromG * (len - i) + toG * i) / len;
+      const b = (fromB * (len - i) + toB * i) / len;
+      const a = (fromA * (len - i) + toA * i) / len;
+      pixels[min + i] = ListBurnFeature.encodeColor(r, g, b, a);
+    }
+  }
+
+  private static encodeColor(r: number, g: number, b: number, a: number): number {
+    const cr = ListBurnFeature.clamp255(r);
+    const cg = ListBurnFeature.clamp255(g);
+    const cb = ListBurnFeature.clamp255(b);
+    const ca = ListBurnFeature.clamp255(a);
+    return (ca << 24) | (cr << 16) | (cg << 8) | cb;
+  }
+
+  private static clamp255(v: number): number {
+    const i = v | 0;
+    return i < 0 ? 0 : i > 255 ? 255 : i;
   }
 
   setContainer(container: HTMLElement): void {
