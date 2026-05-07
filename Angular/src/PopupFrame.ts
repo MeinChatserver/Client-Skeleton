@@ -20,12 +20,14 @@ export class PopupFrame extends Frame {
     appRef: ApplicationRef,
     injector: EnvironmentInjector
   ) {
-    console.log('[PopupFrame] constructor:', config);
-    super({
-        ...config,
-        width: config.width || 400,
-        height: config.height || 100
-      }, appRef, injector);
+    console.log('[PopupFrame] constructor input:', config);
+    const frameConfig = {
+      ...config,
+      width: config.width || 400,
+      height: config.height || 100
+    };
+    console.log('[PopupFrame] frameConfig to pass:', frameConfig);
+    super(frameConfig, appRef, injector);
 
     // Content ist entweder config.content oder config selbst
     this.content = config.content || config;

@@ -16,8 +16,19 @@ export class Popup extends Packet {
   constructor(data: any) {
     super('POPUP', data);
 
-    if(data.width || data.height) {
-      this.size = new Size(data.width, data.height);
+    let width: number | null = null;
+    let height: number | null = null;
+
+    if(data.size) {
+      width = data.size.width ?? null;
+      height = data.size.height ?? null;
+    } else {
+      width = data.width ?? null;
+      height = data.height ?? null;
+    }
+
+    if(width !== null || height !== null) {
+      this.size = new Size(width, height);
     }
 
     if(data.name) {

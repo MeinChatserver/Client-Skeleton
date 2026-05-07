@@ -56,6 +56,7 @@ export class WindowManager {
       config.content = popup.getElements();
     }
 
+    console.log('[WindowManager] Creating popup with config:', config);
     const frame = new PopupFrame(config, this.appRef, this.injector);
     this.addFrame(frame.getId(), frame);
     return frame;

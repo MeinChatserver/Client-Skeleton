@@ -47,13 +47,31 @@ export class Frame {
   }
 
   protected initialize(): void {
-    this.frameWindow = window.open('', this.config.id, Object.entries({
+    const width = this.config.width || 400;
+    const height = this.config.height || 100;
+
+    console.log('[Frame] Initialize with config:', { width, height, id: this.config.id });
+
+    const features: any = {
       ...this.windowFeatures,
-      width: this.config.width || 400,
-      height: this.config.height || 100,
-      left: this.config.left || null,
-      top: this.config.top || null,
-    }).map(([ key, value ]) => key + '=' + (typeof(value) === 'boolean' ? (value ? 'yes' : 'no') : value)).join(','));
+      width: width,
+      height: height,
+    };
+
+    if (this.config.left !== undefined && this.config.left !== null) {
+      features.left = this.config.left;
+    }
+
+    if (this.config.top !== undefined && this.config.top !== null) {
+      features.top = this.config.top;
+    }
+
+    const featuresString = Object.entries(features)
+      .map(([ key, value ]) => key + '=' + (typeof(value) === 'boolean' ? (value ? 'yes' : 'no') : value))
+      .join(',');
+
+    console.log('[Frame] Features string:', featuresString);
+    this.frameWindow = window.open('', this.config.id, featuresString);
 
     if(!this.frameWindow) {
       console.error('PopupFrame wurde blockiert oder konnte nicht geöffnet werden');
@@ -91,11 +109,11 @@ export class Frame {
             padding: 0;
             box-sizing: border-box;
           }
-          body {
+          html, body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
             background: #ffffff;
             width: 100%;
-            height: 100vh;
+            height: 100%;
           }
         </style>
       </head>
