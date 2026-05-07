@@ -1,4 +1,5 @@
 import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, Type } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Button, Calendar, Label, Line, Select, Textfield } from './Components';
 
 export class PopupRenderer {
@@ -7,7 +8,8 @@ export class PopupRenderer {
   constructor(
     private appRef: ApplicationRef,
     private injector: EnvironmentInjector,
-    private frameDocument: Document | null
+    private frameDocument: Document | null,
+    private sanitizer: DomSanitizer
   ) {}
 
   renderElements(elements: any[], container: HTMLElement): void {
@@ -54,6 +56,9 @@ export class PopupRenderer {
           break;
         case 'split':
           this.renderSplit(element, container);
+          break;
+        case 'content':
+          this.renderContent(element, container);
           break;
         default:
           console.log('[PopupRenderer] Unknown element type:', element.type);
@@ -244,6 +249,16 @@ export class PopupRenderer {
         this.renderElement(child, splitItem);
       });
     });
+  }
+
+  private renderContent(element: any, container: HTMLElement): void {
+    const wrapper = this.frameDocument!.createElement('div');
+    wrapper.className = 'popup-content-wrapper';
+
+    const sanitized = this.sanitizer.sanitize(1, element.content ?? '');
+    wrapper.innerHTML = sanitized || '';
+
+    container.appendChild(wrapper);
   }
 
   getValues(): Map<string, any> {

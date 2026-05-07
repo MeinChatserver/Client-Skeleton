@@ -1,4 +1,5 @@
 import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector } from '@angular/core';
+import { DomSanitizer } from '@angular/platform-browser';
 import { Frame, FrameConfig } from './Frame';
 import { Button } from './Components';
 import { PopupRenderer } from './PopupRenderer';
@@ -71,7 +72,8 @@ export class PopupFrame extends Frame {
 
     this.addPopupStyles(appRoot);
 
-    this.popupRenderer = new PopupRenderer(this.appRef, this.injector, this.frameDocument);
+    const sanitizer = this.injector.get(DomSanitizer);
+    this.popupRenderer = new PopupRenderer(this.appRef, this.injector, this.frameDocument, sanitizer);
     this.popupRenderer.renderElements(elements, body);
 
     this.renderOkButton();
@@ -159,6 +161,36 @@ export class PopupFrame extends Frame {
         display: flex !important;
         flex-direction: column !important;
         gap: 10px !important;
+      }
+
+      .popup-content-wrapper {
+        padding: 10px 0 !important;
+        color: #333 !important;
+        line-height: 1.5 !important;
+        font-size: 14px !important;
+      }
+
+      .popup-content-wrapper p {
+        margin: 0 0 10px 0 !important;
+      }
+
+      .popup-content-wrapper p:last-child {
+        margin-bottom: 0 !important;
+      }
+
+      .popup-content-wrapper h1,
+      .popup-content-wrapper h2,
+      .popup-content-wrapper h3,
+      .popup-content-wrapper h4,
+      .popup-content-wrapper h5,
+      .popup-content-wrapper h6 {
+        margin: 10px 0 !important;
+      }
+
+      .popup-content-wrapper ul,
+      .popup-content-wrapper ol {
+        margin: 10px 0 !important;
+        padding-left: 20px !important;
       }
     `;
     this.frameDocument!.head.appendChild(style);
