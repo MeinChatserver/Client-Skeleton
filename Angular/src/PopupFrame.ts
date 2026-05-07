@@ -192,6 +192,218 @@ export class PopupFrame extends Frame {
         margin: 10px 0 !important;
         padding-left: 20px !important;
       }
+
+      .popup-textarea-label {
+        display: block !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        color: #222 !important;
+        margin-bottom: 6px !important;
+      }
+
+      .popup-textarea-wrapper {
+        width: 100% !important;
+        margin-bottom: 15px !important;
+      }
+
+      .popup-textarea-wrapper textarea {
+        width: 100% !important;
+        padding: 8px 12px !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px !important;
+        font-family: monospace !important;
+        font-size: 12px !important;
+        resize: vertical !important;
+      }
+
+      .popup-checkbox-wrapper,
+      .popup-radio-item {
+        display: flex !important;
+        align-items: center !important;
+        margin-bottom: 8px !important;
+      }
+
+      .popup-checkbox-wrapper input[type="checkbox"],
+      .popup-radio-item input[type="radio"] {
+        margin-right: 8px !important;
+        cursor: pointer !important;
+      }
+
+      .popup-checkbox-label,
+      .popup-radio-item label {
+        cursor: pointer !important;
+        user-select: none !important;
+      }
+
+      .popup-radio-group-label {
+        display: block !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        color: #222 !important;
+        margin-bottom: 10px !important;
+      }
+
+      .popup-radio-options {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+      }
+
+      .popup-slider-label {
+        display: block !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        color: #222 !important;
+        margin-bottom: 6px !important;
+      }
+
+      .popup-slider-wrapper {
+        display: flex !important;
+        align-items: center !important;
+        gap: 10px !important;
+        margin-bottom: 15px !important;
+      }
+
+      .popup-slider-input {
+        flex: 1 !important;
+        cursor: pointer !important;
+      }
+
+      .popup-slider-value {
+        min-width: 50px !important;
+        text-align: right !important;
+        font-weight: 500 !important;
+      }
+
+      .popup-tabs-wrapper {
+        margin-bottom: 15px !important;
+        border: 1px solid #ddd !important;
+        border-radius: 4px !important;
+        overflow: hidden !important;
+      }
+
+      .popup-tabs-list {
+        display: flex !important;
+        border-bottom: 2px solid #ddd !important;
+        background: #f9f9f9 !important;
+      }
+
+      .popup-tab-button {
+        flex: 1 !important;
+        padding: 12px !important;
+        border: none !important;
+        background: transparent !important;
+        cursor: pointer !important;
+        font-size: 14px !important;
+        font-weight: 500 !important;
+        color: #666 !important;
+        border-bottom: 3px solid transparent !important;
+        transition: all 0.2s !important;
+      }
+
+      .popup-tab-button:hover {
+        color: #333 !important;
+      }
+
+      .popup-tab-button.active {
+        color: #0066cc !important;
+        border-bottom-color: #0066cc !important;
+      }
+
+      .popup-tabs-content {
+        position: relative !important;
+      }
+
+      .popup-tab-panel {
+        display: none !important;
+        padding: 15px !important;
+      }
+
+      .popup-tab-panel.active {
+        display: block !important;
+      }
+
+      .popup-grid-wrapper {
+        display: grid !important;
+        margin-bottom: 15px !important;
+      }
+
+      .popup-grid-item {
+        display: flex !important;
+        flex-direction: column !important;
+      }
+
+      .popup-checkbox-options {
+        display: flex !important;
+        flex-direction: column !important;
+        gap: 8px !important;
+        margin-bottom: 15px !important;
+      }
+
+      .popup-checkbox-item {
+        display: flex !important;
+        align-items: center !important;
+      }
+
+      .popup-checkbox-item input[type="checkbox"] {
+        margin-right: 8px !important;
+        cursor: pointer !important;
+      }
+
+      .popup-checkbox-item label {
+        cursor: pointer !important;
+        user-select: none !important;
+      }
+
+      .popup-link-wrapper {
+        margin-bottom: 15px !important;
+      }
+
+      .popup-link {
+        color: #0066cc !important;
+        text-decoration: none !important;
+        cursor: pointer !important;
+        font-weight: 500 !important;
+      }
+
+      .popup-link:hover {
+        text-decoration: underline !important;
+      }
+
+      .popup-clock-label {
+        display: block !important;
+        font-weight: 600 !important;
+        font-size: 14px !important;
+        color: #222 !important;
+        margin-bottom: 6px !important;
+      }
+
+      .popup-clock-wrapper {
+        width: 100% !important;
+        margin-bottom: 15px !important;
+      }
+
+      .popup-clock-wrapper input[type="time"] {
+        width: 100% !important;
+        padding: 8px 12px !important;
+        border: 1px solid #ccc !important;
+        border-radius: 4px !important;
+        font-size: 14px !important;
+      }
+
+      .popup-button-wrapper {
+        margin-bottom: 15px !important;
+      }
+
+      .popup-button-wrapper ui-button {
+        width: 100% !important;
+      }
+
+      .popup-button-wrapper ui-button button {
+        width: 100% !important;
+        padding: 10px 20px !important;
+        height: auto !important;
+      }
     `;
     this.frameDocument!.head.appendChild(style);
   }
