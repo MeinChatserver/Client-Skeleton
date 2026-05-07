@@ -59,6 +59,10 @@ import {LinkTarget} from './Components/Link';
       </ui-form>
     </form>
     <aside>
+      @if(client.isEmbedded) {
+        <label><span>Räume</span></label>
+      }
+
       @if(this.client.connectionStatus === ConnectionStatus.CONNECTING) {
         <ui-panel class="connecting">
           <ui-label name="connecting" text="Verbinde" />
@@ -75,6 +79,10 @@ import {LinkTarget} from './Components/Link';
   `,
   styles: [`
     :host {
+      display: flex;
+    }
+
+    form {
       display: flex;
     }
 

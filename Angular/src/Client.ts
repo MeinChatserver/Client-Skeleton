@@ -106,14 +106,55 @@ export enum ConnectionStatus {
         "button button";
     }
 
-
     :host.embedded ::ng-deep ui-label[name="username"],
     :host.embedded ::ng-deep ui-label[name="password"] {
       text-align: left !important;
     }
 
+    /* Fake-Tab */
+    :host.embedded ::ng-deep aside {
+      display: flex;
+      flex-direction: column;
+      padding: 10px;
+      min-width: 250px;
+    }
+
+    :host.embedded ::ng-deep aside > label {
+      position: relative;
+      display: inline-block;
+      flex: 0 0 auto;
+      width: fit-content;
+      padding: 2px 15px 0 15px;
+      color: var(--login-foreground-list, #000000);
+      font-size: 85%;
+      overflow: hidden;
+      margin-bottom: -2px;
+      z-index: 10000;
+      clip-path: polygon( 8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
+    }
+
+    :host.embedded ::ng-deep aside > label::before,
+    :host.embedded ::ng-deep aside > label::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      z-index: -1;
+    }
+
+    :host.embedded ::ng-deep aside > label::before {
+      background: #808080;
+      border-top: 2px solid #444444;
+      clip-path: polygon(8px 0, calc(100% - 8px) 0, 100% 100%, 0 100%);
+    }
+
+    :host.embedded ::ng-deep aside > label::after {
+      inset: 2px 2px 0 2px;
+      background-color: var(--login-background-list, #FFFFFF);
+      clip-path: polygon( 7px 0, calc(100% - 7px) 0, 100% 100%, 0 100%);
+    }
 
     ui-login ::ng-deep ui-list {
+      flex: 1;
       color: var(--login-foreground-list, #000000);
       background-color: var(--login-background-list, #FFFFFF);
     }
