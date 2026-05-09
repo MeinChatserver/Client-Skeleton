@@ -12,7 +12,7 @@ export class Handshake extends Packet {
   protected client: string | null = null;
   protected version: string | null = null;
   protected location: string | null = null;
-  protected userAgent: string | null = null;
+  protected useragent: string | null = null;
 
   constructor(data: any = null) {
     super('HANDSHAKE', data);
@@ -30,7 +30,7 @@ export class Handshake extends Packet {
     this.location = location;
   }
 
-  setUserAgent(userAgent: string) {
-    this.userAgent = userAgent;
+  setUserAgent(agent: string) {
+    this.useragent = agent;
   }
 }
