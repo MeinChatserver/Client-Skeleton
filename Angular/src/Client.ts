@@ -1,6 +1,5 @@
 import {
   signal,
-  Signal,
   Component,
   OnInit,
   OnDestroy,
@@ -154,7 +153,8 @@ export enum ConnectionStatus {
       clip-path: polygon( 7px 0, calc(100% - 7px) 0, 100% 100%, 0 100%);
     }
 
-    ui-login ::ng-deep ui-list {
+    ui-login ::ng-deep ui-list,
+    ui-login ::ng-deep ui-panel {
       flex: 1;
       color: var(--login-foreground-list, #000000);
       background-color: var(--login-background-list, #FFFFFF);
