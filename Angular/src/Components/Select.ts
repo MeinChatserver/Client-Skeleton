@@ -1,10 +1,26 @@
-import {Component, Input, forwardRef} from '@angular/core';
+import {Component, Input, forwardRef, ViewEncapsulation} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+
+export const SELECT_STYLES = `
+  ui-select {
+    margin: 1px;
+  }
+
+  ui-select select {
+    width: 100%;
+    font-size: 16px !important;
+  }
+
+  .frame ui-select select {
+    font-size: 14px !important;
+    padding: 6px 5px !important;
+  }`;
 
 @Component({
   selector: 'ui-select',
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
   imports: [CommonModule, FormsModule],
   providers: [
     {
@@ -22,14 +38,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
         {{ option[labelKey] }}
       </option>
     </select>`,
-  styles: [`:host {
-    margin: 1px;
-  }
-
-  select {
-    width: 100%;
-    font-size: 16px;
-  }`]
+  styles: [SELECT_STYLES]
 })
 export class Select implements ControlValueAccessor {
   @Input() options: any[] = [];

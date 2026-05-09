@@ -92,6 +92,8 @@ export const CHATROOM_STYLES = `
 
   main ui-message-input {
     flex: 0;
+    border: 0;
+    margin: 0;
   }
 
   main ui-message-input input {
@@ -104,9 +106,9 @@ export const CHATROOM_STYLES = `
   aside {
     position: relative;
     flex: 0 200px;
-    border-top: 1px solid #808080;
-    border-left: 1px solid #808080;
     display: flex;
+    margin: 0;
+    border: 0;
     flex-direction: column;
   }
 
@@ -119,7 +121,6 @@ export const CHATROOM_STYLES = `
     overflow-y: scroll;
     background: var(--room-background) !important;
     color: var(--room-foreground);
-    border-color: transparent !important;
   }
 
   aside ui-list .list-item {
@@ -171,7 +172,8 @@ export const CHATROOM_STYLES = `
 
   aside ui-select {
     font-size: 14px;
-    margin: 1px;
+    border: 0;
+    margin: 0;
     background-color: var(--room-background);
     color: var(--room-foreground);
   }

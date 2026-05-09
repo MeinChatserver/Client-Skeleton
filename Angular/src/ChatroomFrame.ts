@@ -1,6 +1,8 @@
 import { ApplicationRef, ComponentRef, EnvironmentInjector } from '@angular/core';
 import { Frame, FrameConfig } from './Frame';
 import { ChatroomComponent, CHATROOM_STYLES } from './ChatroomComponent';
+import { MESSAGE_INPUT_STYLES } from './Components/MessageInput';
+import { SELECT_STYLES } from './Components/Select';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { User, RoomStyle } from './Models';
@@ -44,6 +46,20 @@ export class ChatroomFrame extends Frame {
       const style = this.frameDocument.createElement('style');
       style.id                    = 'chatroom-styles';
       style.textContent           = CHATROOM_STYLES.replace(':host', 'body');
+      this.frameDocument.head.appendChild(style);
+    }
+
+    if(this.frameDocument && !this.frameDocument.getElementById('message-input-styles')) {
+      const style = this.frameDocument.createElement('style');
+      style.id                    = 'message-input-styles';
+      style.textContent           = MESSAGE_INPUT_STYLES;
+      this.frameDocument.head.appendChild(style);
+    }
+
+    if(this.frameDocument && !this.frameDocument.getElementById('select-styles')) {
+      const style = this.frameDocument.createElement('style');
+      style.id                    = 'select-styles';
+      style.textContent           = SELECT_STYLES;
       this.frameDocument.head.appendChild(style);
     }
 

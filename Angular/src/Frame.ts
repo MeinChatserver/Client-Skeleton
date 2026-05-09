@@ -123,7 +123,7 @@ export class Frame {
         <link rel="stylesheet" href="./Themes/Modern.css" />
         <link rel="stylesheet" href="./Themes/Comic.css" />
       </head>
-      <body></body>
+      <body class="frame"></body>
       </html>`);
     this.frameDocument.close();
 
@@ -148,6 +148,33 @@ export class Frame {
     parentStyles.forEach(styleElement => {
       const clonedStyle = styleElement.cloneNode(true) as HTMLElement;
       this.frameDocument!.head.appendChild(clonedStyle);
+    });
+
+    console.log(`[Frame ${this.config.id}] copyParentStyles - copied ${parentStyles.length} initial styles`);
+
+    // Beobachte neue Styles im Parent (z.B. Angular Component Styles mit ViewEncapsulation.None)
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        mutation.addedNodes.forEach((node) => {
+          if(!this.frameDocument) {
+            return;
+          }
+
+          if(node instanceof HTMLStyleElement) {
+            console.log(`[Frame ${this.config.id}] New <style> detected, content:`, node.textContent?.substring(0, 100));
+            const cloned = node.cloneNode(true) as HTMLElement;
+            this.frameDocument.head.appendChild(cloned);
+          } else if(node instanceof HTMLLinkElement && node.rel === 'stylesheet') {
+            console.log(`[Frame ${this.config.id}] New <link> detected:`, node.href);
+            const cloned = node.cloneNode(true) as HTMLElement;
+            this.frameDocument.head.appendChild(cloned);
+          }
+        });
+      });
+    });
+
+    observer.observe(document.head, {
+      childList: true
     });
   }
 

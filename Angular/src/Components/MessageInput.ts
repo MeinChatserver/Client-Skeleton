@@ -1,10 +1,22 @@
-import {Component, Input, Output, EventEmitter, ViewChild, ElementRef, forwardRef, CUSTOM_ELEMENTS_SCHEMA} from '@angular/core';
+import {Component, Input, Output, EventEmitter, ViewChild, ElementRef, forwardRef, CUSTOM_ELEMENTS_SCHEMA, ViewEncapsulation, OnInit, Renderer2, ChangeDetectorRef, NgZone} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+
+export const MESSAGE_INPUT_STYLES = `
+  ui-message-input {
+    margin: 1px;
+  }
+
+  ui-message-input input {
+    width: 100%;
+    font-size: 16px !important;
+    padding: 6px 5px !important;
+  }`;
 
 @Component({
   selector: 'ui-message-input',
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
   imports: [CommonModule, FormsModule],
   providers: [
@@ -23,18 +35,16 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
       (keydown)="onKeyDown($event)"
       (keydown.enter)="onEnter()"
       [disabled]="disabled" />`,
-  styles: [`
-    :host {
-      margin: 1px;
-    }
-
-    input {
-      width: 100%;
-      font-size: 16px;
-    }`]
+  styles: [MESSAGE_INPUT_STYLES]
 })
-export class MessageInput implements ControlValueAccessor {
+export class MessageInput implements ControlValueAccessor, OnInit {
   @ViewChild('inputRef') inputRef?: ElementRef<HTMLInputElement>;
+
+  constructor(
+    private renderer: Renderer2,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone
+  ) {}
   @Input() autocomplete: string               = 'off';
   @Input() placeholder: string                = '';
   @Input() password: boolean                  = false;
@@ -48,6 +58,10 @@ export class MessageInput implements ControlValueAccessor {
   private onTouchedFn                = () => {};
   private history: string[]                   = [];
   private historyIndex: number                = -1;
+
+  ngOnInit(): void {
+
+  }
 
   getValue(): string {
     return this.inputRef?.nativeElement.value ?? '';
