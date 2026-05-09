@@ -160,6 +160,11 @@ export enum ConnectionStatus {
       background-color: var(--login-background-list, #FFFFFF);
     }
 
+    :host.embedded ::ng-deep aside > ui-panel {
+      font-size: 13px;
+      text-align: center;
+    }
+
     :host ::ng-deep ui-form a {
       padding: 0 20px;
       color: var(--login-foreground-list, #000000);
