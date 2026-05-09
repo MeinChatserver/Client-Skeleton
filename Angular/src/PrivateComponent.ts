@@ -128,8 +128,12 @@ export class PrivateComponent implements AfterViewChecked {
   ngAfterViewChecked(): void {
     if(this.pendingScroll && this.messagesContainer) {
       const el = this.messagesContainer.nativeElement;
-      el.scrollTop = el.scrollHeight;
+      const win = el.ownerDocument.defaultView || window;
+
       this.pendingScroll = false;
+      win.requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
     }
   }
 

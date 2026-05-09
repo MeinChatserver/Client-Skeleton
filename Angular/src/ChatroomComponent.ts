@@ -255,6 +255,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private privateFrames: Map<string, PrivateFrame> = new Map();
   private featureService = inject(FeatureService);
   private userFeatureServices: Map<string, FeatureService> = new Map();
+  private activeUserFeatures: Set<string> = new Set();
   private elementRef = inject(ElementRef);
   private canvasWasInitialized = false;
   private pendingFeatures: string[] = [];
@@ -319,8 +320,13 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   ngAfterViewChecked(): void {
     if (this.pendingScroll && this.messagesContainer) {
       const el = this.messagesContainer.nativeElement;
-      el.scrollTop = el.scrollHeight;
+      const win = el.ownerDocument.defaultView || window;
+
+      // Nach dem nächsten Browser-Layout scrollen, damit scrollHeight korrekt ist
       this.pendingScroll = false;
+      win.requestAnimationFrame(() => {
+        el.scrollTop = el.scrollHeight;
+      });
     }
 
     this.initializeCanvasIfNeeded();
@@ -635,6 +641,12 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       return;
     }
 
+    // Verhindere doppelte Features für denselben User
+    const featureKey = `${user.username}:${featureType}`;
+    if (this.activeUserFeatures.has(featureKey)) {
+      return;
+    }
+
     const doc = this.elementRef.nativeElement.ownerDocument;
     const userListContainer = doc.querySelector('aside ui-list');
 
@@ -666,12 +678,14 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       burnFeature.onInit(dummyCanvas, null as any, listItem);
       burnFeature.onStart();
       this.startUserFeatureAnimation(user.username, burnFeature, listItem);
+      this.activeUserFeatures.add(featureKey);
     } else if (featureType === 'GLOW') {
       const glowFeature = new ListGlowFeature();
       const dummyCanvas = doc.createElement('canvas');
       glowFeature.onInit(dummyCanvas, null as any, listItem);
       glowFeature.onStart();
       this.startUserFeatureAnimation(user.username, glowFeature, listItem);
+      this.activeUserFeatures.add(featureKey);
     }
   }
 
@@ -687,6 +701,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   removeAllFeatures(): void {
     this.featureService.removeAllFeatures();
     this.featureService.stopAnimation();
+    this.activeUserFeatures.clear();
   }
 
   hasFeature(type: string): boolean {
@@ -731,7 +746,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
           ).join(', ');
         }
 
-        return `<span class="sender" data-action="profile:${message.getUsername()}">${message.getUsername()} (privat${target}):</span> ${message.message}`;
+        return `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
       }
     }
   }
