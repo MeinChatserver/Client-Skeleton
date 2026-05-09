@@ -1,3 +1,8 @@
+> [!CAUTION]
+> This Client is **deprecated** and will no longer maintained.
+> 
+> Please use the [Angular](https://github.com/MeinChatserver/Client-Skeleton/tree/main/Angular) version.
+
 # Client
 
 # Screenshot
