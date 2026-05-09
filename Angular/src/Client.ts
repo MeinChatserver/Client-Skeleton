@@ -272,7 +272,8 @@ export class Client implements OnInit, OnDestroy {
   }
 
   private updateConfigurations(name: string, value: string | null) {
-    const style = document.documentElement.style;
+    const doc = document.documentElement;
+    const style = doc.style;
 
     switch(name) {
       case 'port':
@@ -297,6 +298,28 @@ export class Client implements OnInit, OnDestroy {
       break;
       case 'foregroundList':
         style.setProperty('--login-foreground-list', value);
+      break;
+      case 'theme':
+        if(value) {
+          document.documentElement.dataset['theme'] = value;
+          console.log('[Theme] Set to LOGIN:', value);
+
+          // Auch auf alle offenen Frames setzen
+          const frames = this.windowManager.getAllChatrooms();
+          console.log('[Theme] Found frames:', frames.length);
+
+          frames.forEach((frame) => {
+            const frameDoc = frame.getDocument();
+            console.log('[Theme] Frame', frame.getId(), 'document:', !!frameDoc);
+
+            if(frameDoc?.documentElement) {
+              frameDoc.documentElement.dataset['theme'] = value;
+              console.log('[Theme] Applied to frame html:', frame.getId(), 'value:', frameDoc.documentElement.dataset['theme']);
+            } else {
+              console.warn('[Theme] Frame', frame.getId(), 'has no documentElement');
+            }
+          });
+        }
       break;
       default:
         console.warn('Unsupported Parameter:', name, value);
@@ -429,6 +452,11 @@ export class Client implements OnInit, OnDestroy {
               this.updateConfigurations('backgroundImage', style.getBackgroundImage());
               this.updateConfigurations('foreground', style.getForeground());
               this.updateConfigurations('foregroundList', style.getForegroundList());
+              const themeValue = style.getTheme();
+              console.log('[CONFIGURATION] Theme received:', themeValue);
+              if(themeValue) {
+                this.updateConfigurations('theme', themeValue);
+              }
             }
 
             this.cdr.detectChanges();

@@ -91,9 +91,12 @@ export class Frame {
       return;
     }
 
+    const parentTheme = document.documentElement.dataset['theme'] || '';
+    const themeAttribute = parentTheme ? ` data-theme="${parentTheme}"` : '';
+
     this.frameDocument.open();
     this.frameDocument.write(`<!DOCTYPE html>
-      <html lang="de">
+      <html lang="en"${themeAttribute}>
       <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1, shrink-to-fit=no" />
@@ -116,6 +119,9 @@ export class Frame {
             height: 100%;
           }
         </style>
+        <link rel="stylesheet" href="./Themes/Gradient.css" />
+        <link rel="stylesheet" href="./Themes/Modern.css" />
+        <link rel="stylesheet" href="./Themes/Comic.css" />
       </head>
       <body></body>
       </html>`);
@@ -123,6 +129,7 @@ export class Frame {
 
     this.isDocumentInitialized = true;
     this.copyParentStyles();
+    this.setupThemeWatcher();
   }
 
   protected copyParentStyles(): void {
@@ -141,6 +148,27 @@ export class Frame {
     parentStyles.forEach(styleElement => {
       const clonedStyle = styleElement.cloneNode(true) as HTMLElement;
       this.frameDocument!.head.appendChild(clonedStyle);
+    });
+  }
+
+  protected setupThemeWatcher(): void {
+    if(!this.frameDocument?.documentElement) {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      const parentTheme = document.documentElement.dataset['theme'];
+      const frameHtml = this.frameDocument?.documentElement;
+
+      if(frameHtml && parentTheme !== frameHtml.dataset['theme']) {
+        console.log(`[Frame ${this.config.id}] Theme changed from "${frameHtml.dataset['theme']}" to "${parentTheme}"`);
+        frameHtml.dataset['theme'] = parentTheme || '';
+      }
+    });
+
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ['data-theme']
     });
   }
 
