@@ -1,5 +1,10 @@
 # Java Client
 
+> [!CAUTION]
+> This Client is **deprecated** and will no longer maintained.
+> 
+> Please use the [Angular](https://github.com/MeinChatserver/Client-Skeleton/tree/main/Angular) version.
+
 ### DEV-Environment
 We had using `Eclipse IDE` and `Java JDK 24` for development.
 
