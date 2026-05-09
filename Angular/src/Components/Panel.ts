@@ -24,18 +24,16 @@ import { CommonModule } from '@angular/common';
 
     :host::before {
       content: "";
-      position: sticky;
-      display: block;
+      position: absolute;
       top: 0;
       left: 0;
       right: 0;
-      bottom: 0;
       z-index: 1;
       width: 100%;
+      height: 1px;
       pointer-events: none;
       border-top: 1px solid #000000;
       border-left: 1px solid #000000;
-      overflow: hidden;
     }
   `]
 })

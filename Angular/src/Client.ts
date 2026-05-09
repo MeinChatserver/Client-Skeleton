@@ -1,5 +1,6 @@
 import {
   signal,
+  Signal,
   Component,
   OnInit,
   OnDestroy,
@@ -181,9 +182,11 @@ export class Client implements OnInit, OnDestroy {
   pingInterval: number | null           = null;
   meta: MetaInfo                        = new MetaInfo();
   socket: WebSocket | null              = null;
-  connectionStatus: ConnectionStatus    = ConnectionStatus.DISCONNECTED;
+  connectionStatus = signal<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
+  reconnectCountdown = signal<number>(0);
   private reconnectAttempts: number     = 0;
   private maxReconnectAttempts: number  = 5;
+  private reconnectCountdownInterval: number | null = null;
   chatRooms         = signal<Room[]>([]);
 
   constructor(
@@ -312,21 +315,27 @@ export class Client implements OnInit, OnDestroy {
 
     try {
       this.socket				    = new WebSocket(`wss://${this.getHostname()}:${this.getPort()}/`);
-      this.connectionStatus = ConnectionStatus.CONNECTING;
+      this.connectionStatus.set(ConnectionStatus.CONNECTING);
       this.socket.onopen    = this.onOpen.bind(this);
       this.socket.onclose   = this.onClose.bind(this);
       this.socket.onerror   = this.onError.bind(this);
       this.socket.onmessage = this.onReceive.bind(this);
     } catch(error) {
       console.error('Failed to create WebSocket:', error);
-      this.connectionStatus = ConnectionStatus.ERROR;
+      this.connectionStatus.set(ConnectionStatus.ERROR);
     }
   }
 
   private onOpen() {
     console.log('WebSocket connected');
-    this.connectionStatus   = ConnectionStatus.CONNECTED;
+    this.connectionStatus.set(ConnectionStatus.CONNECTED);
     this.reconnectAttempts  = 0;
+    this.reconnectCountdown.set(0);
+
+    if(this.reconnectCountdownInterval) {
+      clearInterval(this.reconnectCountdownInterval);
+      this.reconnectCountdownInterval = null;
+    }
 
     if(this.pingInterval) {
       clearInterval(this.pingInterval);
@@ -355,7 +364,7 @@ export class Client implements OnInit, OnDestroy {
       clearInterval(this.pingInterval);
     }
 
-    this.connectionStatus = ConnectionStatus.DISCONNECTED;
+    this.connectionStatus.set(ConnectionStatus.DISCONNECTED);
     this.disconnect();
     this.attemptReconnect();
 
@@ -364,7 +373,7 @@ export class Client implements OnInit, OnDestroy {
 
   private onError(error: any) {
     console.error('WebSocket error:', error);
-    this.connectionStatus = ConnectionStatus.ERROR;
+    this.connectionStatus.set(ConnectionStatus.ERROR);
   }
 
   private onReceive(event: MessageEvent): void {
@@ -655,6 +664,12 @@ export class Client implements OnInit, OnDestroy {
       this.windowManager.closeAll();
     }
 
+    /* Clear reconnect countdown interval */
+    if(this.reconnectCountdownInterval) {
+      clearInterval(this.reconnectCountdownInterval);
+      this.reconnectCountdownInterval = null;
+    }
+
     /* Close the Socket */
     if(this.socket !== null) {
       if(this.socket.readyState === WebSocket.OPEN) {
@@ -681,15 +696,31 @@ export class Client implements OnInit, OnDestroy {
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
+      const delaySeconds = Math.ceil(delay / 1000);
 
       console.log(`Attempting to reconnect in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
-      setTimeout(() => {
-        this.connect();
-      }, delay);
+      this.reconnectCountdown.set(delaySeconds);
+
+      if(this.reconnectCountdownInterval) {
+        clearInterval(this.reconnectCountdownInterval);
+      }
+
+      this.reconnectCountdownInterval = window.setInterval(() => {
+        const current = this.reconnectCountdown();
+        if(current > 1) {
+          this.reconnectCountdown.set(current - 1);
+        } else {
+          if(this.reconnectCountdownInterval) {
+            clearInterval(this.reconnectCountdownInterval);
+          }
+          this.connect();
+        }
+      }, 1000);
     } else {
       console.error('Max reconnection attempts reached');
-      this.connectionStatus = ConnectionStatus.FAILED;
+      this.connectionStatus.set(ConnectionStatus.FAILED);
+      this.reconnectCountdown.set(0);
     }
   }
 

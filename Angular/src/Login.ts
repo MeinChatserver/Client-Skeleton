@@ -63,12 +63,20 @@ import {LinkTarget} from './Components/Link';
         <label><span>Räume</span></label>
       }
 
-      @if(this.client.connectionStatus === ConnectionStatus.CONNECTING) {
+      @if(this.client.connectionStatus() === ConnectionStatus.CONNECTING) {
         <ui-panel class="connecting">
           <ui-label name="connecting" text="Verbinde" />
         </ui-panel>
-      } @else {
+      } @else if(this.client.connectionStatus() === ConnectionStatus.CONNECTED) {
         <ui-list [items]="chatrooms()" (itemClick)="onChatroomSelect('left', $event)" (itemRightClick)="onChatroomSelect('right', $event)">></ui-list>
+      } @else if(this.client.connectionStatus() === ConnectionStatus.DISCONNECTED || this.client.connectionStatus() === ConnectionStatus.FAILED) {
+        <ui-panel class="reconnecting">
+          <ui-label name="reconnecting" [text]="getReconnectText()" />
+        </ui-panel>
+      } @else {
+        <ui-panel class="error">
+          <ui-label name="error" text="Verbindungsfehler" />
+        </ui-panel>
       }
     </aside>
     @if(!client.isEmbedded) {
@@ -181,9 +189,14 @@ import {LinkTarget} from './Components/Link';
       flex: 1;
       width: 100%;
       min-height: 0;
+      height: auto;
     }
 
-    aside .connecting {
+    aside .reconnecting, aside .error, aside .connecting {
+      display: flex;
+      flex: 1;
+      flex-direction: column;
+      place-content: center;
       text-align: center;
       color: #FFFFFF;
       text-shadow: -1px 0 black, 0 1px black, 1px 0 black, 0 -1px black;
@@ -255,19 +268,37 @@ export class Login {
   }
 
   canLogin(): boolean {
-    return this.client.connectionStatus !== ConnectionStatus.CONNECTING;
+    return this.client.connectionStatus() !== ConnectionStatus.CONNECTING;
   }
 
   getButtonText(): string {
-    if(this.client.connectionStatus === ConnectionStatus.CONNECTING) {
+    const status = this.client.connectionStatus();
+
+    if(status === ConnectionStatus.CONNECTING) {
       return 'Verbinde...';
     }
 
-    if(this.client.connectionStatus !== ConnectionStatus.CONNECTED) {
-      return 'Nicht verbunden';
+    if(status === ConnectionStatus.CONNECTED) {
+      return 'Einloggen';
     }
 
-    return 'Einloggen';
+    if(status === ConnectionStatus.DISCONNECTED) {
+      return 'Neu verbinden';
+    }
+
+    if(status === ConnectionStatus.FAILED) {
+      return 'Verbindung fehlgeschlagen';
+    }
+
+    return 'Nicht verbunden';
+  }
+
+  getReconnectText(): string {
+    const countdown = this.client.reconnectCountdown();
+    if(countdown > 0) {
+      return `Versuche erneut zu verbinden (${countdown}s)`;
+    }
+    return 'Versuche erneut zu verbinden...';
   }
 
   focusNext(selector: string, event: Event): void {
