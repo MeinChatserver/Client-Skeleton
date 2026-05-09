@@ -136,7 +136,10 @@ export class List {
         this.selectedItems = [...this.selectedItems, item];
       }
       this.selectionChange.emit([...this.selectedItems]);
-    } else if (!this.multiselect) {
+      return;
+    }
+
+    if (!this.multiselect) {
       this.selectedItem = item;
     }
 
@@ -150,7 +153,10 @@ export class List {
   }
 
   getRankColor(rank?: number): string {
-    if (rank == null) return 'inherit';
+    if(rank == null) {
+      return 'inherit';
+    }
+
     return `var(--rank_${rank})`;
   }
 }

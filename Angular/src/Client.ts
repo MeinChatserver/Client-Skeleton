@@ -511,13 +511,25 @@ export class Client implements OnInit, OnDestroy {
           let chatroom = this.windowManager.createChatroom(windowRoom, this);
 
           chatroom.on('sendMessage', (message: string) => {
-            this.send({
-              operation: 'ROOM_MESSAGE',
-              data: {
-                room: chatroom.getId(),
-                text: message
-              }
-            });
+            const selectedUsers = chatroom.getSelectedUsers();
+
+            if(selectedUsers && selectedUsers.length > 0) {
+              this.send({
+                operation: 'ROOM_MESSAGE',
+                data: {
+                  room: chatroom.getId(),
+                  text: `/p ${selectedUsers.map(u => u.username).join(',')}:${message}`
+                }
+              });
+            } else {
+              this.send({
+                operation: 'ROOM_MESSAGE',
+                data: {
+                  room: chatroom.getId(),
+                  text: message
+                }
+              });
+            }
           });
 
           if(windowRoom.getStyle()) {
