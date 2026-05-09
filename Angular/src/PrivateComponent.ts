@@ -34,7 +34,8 @@ export const PRIVATE_STYLES = `
   body main ui-output {
     flex: 1;
     overflow: hidden;
-    background: #FFFFFF;
+    background: var(--room-background, #FFFFFF);
+    color: var(--room-foreground, #000000);
     display: flex;
     flex-direction: column;
     position: relative;
@@ -57,7 +58,7 @@ export const PRIVATE_STYLES = `
 
   body main ui-output ui-messages ui-text[data-type="action"] {
     font-style: italic;
-    color: #888;
+    color: var(--room-blue, #888);
   }
 
   body main ui-output ui-messages ui-text[data-type="private"] .sender,

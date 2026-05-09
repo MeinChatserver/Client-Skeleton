@@ -146,6 +146,10 @@ export class ChatroomFrame extends Frame {
     }
   }
 
+  public getStyle(): RoomStyle | null {
+    return this.style;
+  }
+
   public setStyle(style: any): void {
     const newStyle = style instanceof RoomStyle ? style : (style ? new RoomStyle(style) : null);
 

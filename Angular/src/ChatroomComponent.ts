@@ -580,6 +580,10 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
     const privateFrame = this.client.windowManager.createPrivate(username, this.client);
 
+    if(this.frame) {
+      privateFrame.setStyle(this.frame.getStyle());
+    }
+
     privateFrame.on('sendMessage', (msg: string) => {
       this.client.send({
         operation: 'ROOM_MESSAGE',
@@ -727,7 +731,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
           ).join(', ');
         }
 
-        return `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
+        return `<span class="sender" data-action="profile:${message.getUsername()}">${message.getUsername()} (privat${target}):</span> ${message.message}`;
       }
     }
   }
