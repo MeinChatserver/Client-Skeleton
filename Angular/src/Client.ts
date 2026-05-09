@@ -187,7 +187,9 @@ export class Client implements OnInit, OnDestroy {
   private reconnectAttempts: number     = 0;
   private maxReconnectAttempts: number  = 5;
   private reconnectCountdownInterval: number | null = null;
-  chatRooms         = signal<Room[]>([]);
+  chatRooms = signal<Room[]>([]);
+  categories = signal<Category[]>([]);
+  private lastLoginData: { username: string; password: string; chatroom: string } | null = null;
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -341,6 +343,10 @@ export class Client implements OnInit, OnDestroy {
       clearInterval(this.pingInterval);
     }
 
+    this.windowManager.getAllChatrooms().forEach((frame) => {
+      frame.setConnected(true);
+    });
+
     const handshake = new Handshake();
     handshake.setClient(this.meta.getClient());
     handshake.setVersion(this.meta.getVersion());
@@ -357,6 +363,12 @@ export class Client implements OnInit, OnDestroy {
 
     handshake.setUserAgent(navigator.userAgent);
     this.send(handshake);
+
+    if(this.lastLoginData) {
+      setTimeout(() => {
+        this.relogin();
+      }, 500);
+    }
   }
 
   private onClose() {
@@ -365,6 +377,11 @@ export class Client implements OnInit, OnDestroy {
     }
 
     this.connectionStatus.set(ConnectionStatus.DISCONNECTED);
+
+    this.windowManager.getAllChatrooms().forEach((frame) => {
+      frame.setConnected(false);
+    });
+
     this.disconnect();
     this.attemptReconnect();
 
@@ -374,6 +391,10 @@ export class Client implements OnInit, OnDestroy {
   private onError(error: any) {
     console.error('WebSocket error:', error);
     this.connectionStatus.set(ConnectionStatus.ERROR);
+
+    this.windowManager.getAllChatrooms().forEach((frame) => {
+      frame.setConnected(false);
+    });
   }
 
   private onReceive(event: MessageEvent): void {
@@ -418,15 +439,20 @@ export class Client implements OnInit, OnDestroy {
         case 'ROOMS_CATEGORIES':
           const roomCategories = packet as RoomsCategories;
 
-          if(this.loginComponent && roomCategories.hasData()) {
-            this.loginComponent.categories = [
+          if(roomCategories.hasData()) {
+            const categories = [
               new Category({
                 id:   null,
                 name: 'Alle Chaträume'
               }),
               ...roomCategories.getCategories()
             ];
-            this.cdr.detectChanges();
+            this.categories.set(categories);
+
+            if(this.loginComponent) {
+              this.loginComponent.categories = categories;
+              this.cdr.detectChanges();
+            }
           }
         break;
         case 'PING':
@@ -739,5 +765,29 @@ export class Client implements OnInit, OnDestroy {
       console.warn('[SEND] RAW:', data);
       this.socket?.send(JSON.stringify(data));
     }
+  }
+
+  reconnect() {
+    this.reconnectAttempts = 0;
+    this.connect();
+  }
+
+  storeLoginData(username: string, password: string, chatroom: string): void {
+    this.lastLoginData = { username, password, chatroom };
+  }
+
+  private relogin(): void {
+    if(!this.lastLoginData) {
+      return;
+    }
+
+    this.send({
+      operation: 'LOGIN',
+      data: {
+        username: this.lastLoginData.username,
+        password: this.lastLoginData.password,
+        chatroom: this.lastLoginData.chatroom
+      }
+    });
   }
 }

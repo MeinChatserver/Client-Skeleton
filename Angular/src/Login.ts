@@ -222,7 +222,6 @@ export class Login {
   chatroom: string                          = '';
   remember: boolean                         = false;
   private _selectedCategory: number | null  = null;
-  categories: Category[]                    = [];
 
   get selectedCategory(): number | null {
     return this._selectedCategory;
@@ -241,6 +240,14 @@ export class Login {
     }))
   );
 
+  get categories(): Category[] {
+    return this.client.categories();
+  }
+
+  set categories(value: Category[]) {
+    this.client.categories.set(value);
+  }
+
   onChatroomSelect(type: string, item: ListItem): void {
     switch(type) {
       case 'left':
@@ -256,6 +263,8 @@ export class Login {
     if(!this.canLogin()) {
       return;
     }
+
+    this.client.storeLoginData(this.username, this.password, this.chatroom);
 
     this.client.send({
       operation: 'LOGIN',

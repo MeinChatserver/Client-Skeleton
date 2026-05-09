@@ -1,13 +1,13 @@
 import {
   Component, Input, Output, EventEmitter,
-  signal, computed, CUSTOM_ELEMENTS_SCHEMA,
+  signal, computed, effect, CUSTOM_ELEMENTS_SCHEMA,
   ViewEncapsulation, ViewChild, ElementRef,
   AfterViewChecked, OnDestroy, inject
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
-import { Client } from './Client';
-import {List, Select, MessageInput} from './Components';
+import { Client, ConnectionStatus } from './Client';
+import {List, Select, MessageInput, Button} from './Components';
 import { ListItem, User } from './Models';
 import {ProfileOpen} from './Models/Network/ProfileOpen';
 import { FeatureService, FeatureType, ListBurnFeature, ListGlowFeature } from './Features';
@@ -184,6 +184,23 @@ export const CHATROOM_STYLES = `
     text-align: center;
     padding: 10px;
   }
+
+  main ui-output .reconnect-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+  }
+
+  main ui-output .reconnect-content {
+    text-align: center;
+  }
 `;
 
 @Component({
@@ -191,7 +208,7 @@ export const CHATROOM_STYLES = `
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
-  imports: [CommonModule, List, Select, MessageInput, FormsModule],
+  imports: [CommonModule, List, Select, MessageInput, FormsModule, Button],
   template: `
     <ui-loading class="hidden"></ui-loading>
     <main>
@@ -202,12 +219,19 @@ export const CHATROOM_STYLES = `
           }
         </ui-messages>
         <canvas #featureCanvas style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></canvas>
+        @if(!isConnected()) {
+          <div class="reconnect-overlay">
+            <div class="reconnect-content">
+              <ui-button (click)="onReconnect()" text="Erneut Verbinden" />
+            </div>
+          </div>
+        }
       </ui-output>
-      <ui-message-input #messageInput placeholder="Gebe eine Nachricht ein..." (keydown.enter)="onSendMessage()"></ui-message-input>
+      <ui-message-input #messageInput [placeholder]="messagePlaceholder()" [disabled]="!isConnected()" (keydown.enter)="onSendMessage()"></ui-message-input>
     </main>
     <aside>
       <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
-      <ui-select name="chatrooms" [(ngModel)]="selectedChatroom" [options]="chatrooms()" valueKey="id" labelKey="name"></ui-select>
+      <ui-select name="chatrooms" [(ngModel)]="selectedChatroom" [options]="chatrooms()" valueKey="id" labelKey="name" [disabled]="!isConnected()"></ui-select>
     </aside>
   `,
   styles: []  // Styles werden von ChatroomFrame injiziert!
@@ -251,13 +275,26 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   messages = signal<ChatMessage[]>([]);
   users = signal<User[]>([]);
   selectedUsers = signal<User[]>([]);
-  isConnected = signal<boolean>(false);
+  isConnected = signal<boolean>(true);
   private pendingScroll = false;
   private resizeObserver: ResizeObserver | null = null;
+
+  constructor() {
+    effect(() => {
+      if(this.client) {
+        const status = this.client.connectionStatus();
+        this.isConnected.set(status === ConnectionStatus.CONNECTED);
+      }
+    });
+  }
 
   userItems = computed((): ListItem[] =>
     this.users().map(user => ({ id: user.id, label: user.username, rank: user.rank }))
   );
+
+  messagePlaceholder = computed(() => {
+    return this.isConnected() ? 'Gebe eine Nachricht ein...' : 'Verbindung verloren';
+  });
 
   chatrooms = computed(() => {
     if (!this.client) {
@@ -660,5 +697,9 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
         return `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
       }
     }
+  }
+
+  onReconnect(): void {
+    this.client.reconnect();
   }
 }

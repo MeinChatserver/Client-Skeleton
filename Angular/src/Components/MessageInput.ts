@@ -39,10 +39,10 @@ export class MessageInput implements ControlValueAccessor {
   @Input() placeholder: string                = '';
   @Input() password: boolean                  = false;
   @Input() maxHistorySize: number             = 50;
+  @Input() disabled: boolean                  = false;
   @Output() historyNavigate  = new EventEmitter<string>();
 
   value: any                                  = '';
-  disabled                            = false;
 
   private onChangeFn          = (value: any) => {};
   private onTouchedFn                = () => {};
