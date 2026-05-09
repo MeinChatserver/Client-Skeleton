@@ -11,6 +11,7 @@ import { Injectable, ApplicationRef, EnvironmentInjector } from '@angular/core';
 import { Frame } from './Frame';
 import { PopupFrame, PopupConfig } from './PopupFrame';
 import { ChatroomFrame } from './ChatroomFrame';
+import { PrivateFrame } from './PrivateFrame';
 import { Client } from './Client';
 import {Popup, WindowRoom } from './Models/Network';
 
@@ -182,6 +183,48 @@ export class WindowManager {
     }
 
     return frame as PopupFrame;
+  }
+
+  /*
+  * Erstellt ein neues Privatfenster und registriert dies zeitgleich im WindowManager.
+  *
+  * @praram username string  Username des Empfängers
+  * @praram client Client
+  * @return PrivateFrame
+  */
+  createPrivate(username: string, client: Client): PrivateFrame {
+    const id = 'private-' + username;
+    const config = {
+      id,
+      targetUsername: username,
+      title: `Privat mit ${username}`,
+      width: 500,
+      height: 400
+    };
+
+    const frame = new PrivateFrame(config, this.appRef, this.injector, client);
+    this.addFrame(id, frame);
+    return frame;
+  }
+
+  /*
+  * Holt ein gespeichertes Privatfenster aus dem WindowManager.
+  *
+  * @praram username string
+  * @return PrivateFrame | null
+  */
+  getPrivate(username: string | null): PrivateFrame | null {
+    if(!username) {
+      return null;
+    }
+
+    const frame = this.frames.get('private-' + username);
+
+    if(!(frame instanceof PrivateFrame)) {
+      return null;
+    }
+
+    return frame as PrivateFrame;
   }
 
   /*

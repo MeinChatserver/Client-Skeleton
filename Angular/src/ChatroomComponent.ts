@@ -2,7 +2,8 @@ import {
   Component, Input, Output, EventEmitter,
   signal, computed, effect, CUSTOM_ELEMENTS_SCHEMA,
   ViewEncapsulation, ViewChild, ElementRef,
-  AfterViewChecked, OnDestroy, inject
+  AfterViewChecked, OnDestroy, inject,
+  ApplicationRef, EnvironmentInjector
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
@@ -13,6 +14,7 @@ import {ProfileOpen} from './Models/Network/ProfileOpen';
 import { FeatureService, FeatureType, ListBurnFeature, ListGlowFeature } from './Features';
 import {FormsModule} from '@angular/forms';
 import {ChatroomFrame} from './ChatroomFrame';
+import {PrivateFrame} from './PrivateFrame';
 
 export const CHATROOM_STYLES = `
   :host {
@@ -232,7 +234,7 @@ export const CHATROOM_STYLES = `
       <ui-message-input #messageInput [placeholder]="messagePlaceholder()" [disabled]="!isConnected()" (keydown.enter)="onSendMessage()"></ui-message-input>
     </main>
     <aside>
-      <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
+      <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (itemRightClick)="onUserPrivate($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
       <ui-select name="chatrooms" [(ngModel)]="selectedChatroom" [options]="chatrooms()" valueKey="id" labelKey="name" [disabled]="!isConnected()"></ui-select>
     </aside>
   `,
@@ -248,6 +250,9 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   @ViewChild('messageInput') messageInput?: any;
   @ViewChild('featureCanvas') featureCanvas?: ElementRef<HTMLCanvasElement>;
 
+  private appRef = inject(ApplicationRef);
+  private injector = inject(EnvironmentInjector);
+  private privateFrames: Map<string, PrivateFrame> = new Map();
   private featureService = inject(FeatureService);
   private userFeatureServices: Map<string, FeatureService> = new Map();
   private elementRef = inject(ElementRef);
@@ -562,6 +567,30 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   onUserSelect(item: ListItem): void {
     this.client.send(new ProfileOpen(item.label));
+  }
+
+  onUserPrivate(item: ListItem): void {
+    const username = item.label;
+    const existing = this.client.windowManager.getPrivate(username);
+
+    if(existing && existing.isOpen()) {
+      existing.focus();
+      return;
+    }
+
+    const privateFrame = this.client.windowManager.createPrivate(username, this.client);
+
+    privateFrame.on('sendMessage', (msg: string) => {
+      this.client.send({
+        operation: 'ROOM_MESSAGE',
+        data: {
+          room: this.selectedChatroom,
+          text: `/p ${username}:${msg}`
+        }
+      });
+    });
+
+    this.privateFrames.set(username, privateFrame);
   }
 
   onUserSelectionChange(items: ListItem[]): void {

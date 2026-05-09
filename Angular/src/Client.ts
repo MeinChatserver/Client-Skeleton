@@ -640,6 +640,28 @@ export class Client implements OnInit, OnDestroy {
             timestamp:  new Date()
           });
 
+          /* Wenn ein PrivateFrame existiert, dorthin routen */
+          const sender = message.getSender();
+          const senderName = typeof sender === 'string' ? sender : (sender as any)?.username;
+          const recipients = message.getUsers() || [];
+
+          // Kandidaten: Sender (für Empfang) + Empfänger (für eigene Nachrichten)
+          const candidates = [senderName, ...recipients.map((u: any) => typeof u === 'string' ? u : u?.username)].filter(Boolean);
+
+          let privateFrame = null;
+          for(const name of candidates) {
+            const f = this.windowManager.getPrivate(name);
+            if(f && f.isOpen()) {
+              privateFrame = f;
+              break;
+            }
+          }
+
+          if(privateFrame) {
+            privateFrame.addMessage(chatMessage);
+            break;
+          }
+
           if(message.hasRoom() && !message.forAll()) {
             roomName = message.getRoom();
           }
