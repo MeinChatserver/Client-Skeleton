@@ -219,11 +219,22 @@ export class RankColors {
   constructor(data: any = null) {
     if (data) {
       this.enabled = data.enabled ?? false;
+
+      // Format 1: top-level keys (WINDOW_ROOM)
       Object.entries(data).forEach(([key, value]) => {
-        if (key !== 'enabled' && typeof value === 'string') {
+        if (key !== 'enabled' && key !== 'colors' && typeof value === 'string') {
           this.colors.set(key, value);
         }
       });
+
+      // Format 2: nested colors object (ROOM_UPDATE)
+      if (data.colors && typeof data.colors === 'object') {
+        Object.entries(data.colors).forEach(([key, value]) => {
+          if (typeof value === 'string') {
+            this.colors.set(key, value);
+          }
+        });
+      }
     }
   }
 

@@ -629,16 +629,16 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
     if (featureType === 'BURN') {
       const burnFeature = new ListBurnFeature();
-      const dummyCanvas = document.createElement('canvas');
+      const dummyCanvas = doc.createElement('canvas');
       burnFeature.onInit(dummyCanvas, null as any, listItem);
       burnFeature.onStart();
-      this.startUserFeatureAnimation(user.username, burnFeature);
+      this.startUserFeatureAnimation(user.username, burnFeature, listItem);
     } else if (featureType === 'GLOW') {
       const glowFeature = new ListGlowFeature();
-      const dummyCanvas = document.createElement('canvas');
+      const dummyCanvas = doc.createElement('canvas');
       glowFeature.onInit(dummyCanvas, null as any, listItem);
       glowFeature.onStart();
-      this.startUserFeatureAnimation(user.username, glowFeature);
+      this.startUserFeatureAnimation(user.username, glowFeature, listItem);
     }
   }
 
@@ -660,13 +660,15 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     return this.featureService.hasFeature(type.toUpperCase());
   }
 
-  private startUserFeatureAnimation(userId: string, feature: any): void {
+  private startUserFeatureAnimation(userId: string, feature: any, listItem?: HTMLElement): void {
+    const win = (listItem?.ownerDocument.defaultView) || window;
+
     const animate = (timestamp: number) => {
       feature.onPaint(null, timestamp);
-      requestAnimationFrame(animate);
+      win.requestAnimationFrame(animate);
     };
 
-    requestAnimationFrame(animate);
+    win.requestAnimationFrame(animate);
   }
 
   getSelectedUsers(): User[] {

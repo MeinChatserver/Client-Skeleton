@@ -147,7 +147,19 @@ export class ChatroomFrame extends Frame {
   }
 
   public setStyle(style: any): void {
-    this.style = style instanceof RoomStyle ? style : (style ? new RoomStyle(style) : null);
+    const newStyle = style instanceof RoomStyle ? style : (style ? new RoomStyle(style) : null);
+
+    // Merge: Wenn neue ranks leer sind, behalte alte
+    if(newStyle && this.style) {
+      const newRanks = newStyle.getRanks();
+      const oldRanks = this.style.getRanks();
+
+      if(oldRanks && (!newRanks || newRanks.getAllColors().size === 0)) {
+        newStyle.ranks = oldRanks;
+      }
+    }
+
+    this.style = newStyle;
     this.applyStyle();
   }
 

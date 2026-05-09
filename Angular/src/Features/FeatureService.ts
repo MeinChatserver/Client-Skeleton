@@ -76,12 +76,18 @@ export class FeatureService {
     return this.features.get(type as string);
   }
 
+  private getCanvasWindow(): Window {
+    return this.canvas?.ownerDocument.defaultView || window;
+  }
+
   startAnimation(): void {
     if(this.isRunning) {
       return;
     }
 
     this.isRunning = true;
+
+    const win = this.getCanvasWindow();
 
     const animate = (timestamp: number) => {
       if(!this.canvas || !this.context) {
@@ -95,18 +101,19 @@ export class FeatureService {
       }
 
       if(this.features.size > 0) {
-        this.animationFrameId = requestAnimationFrame(animate);
+        this.animationFrameId = win.requestAnimationFrame(animate);
       } else {
         this.isRunning = false;
       }
     };
 
-    this.animationFrameId = requestAnimationFrame(animate);
+    this.animationFrameId = win.requestAnimationFrame(animate);
   }
 
   stopAnimation(): void {
     if(this.animationFrameId !== null) {
-      cancelAnimationFrame(this.animationFrameId);
+      const win = this.getCanvasWindow();
+      win.cancelAnimationFrame(this.animationFrameId);
       this.animationFrameId = null;
     }
 
