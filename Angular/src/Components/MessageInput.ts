@@ -75,6 +75,28 @@ export class MessageInput implements ControlValueAccessor, OnInit {
     this.value = val;
   }
 
+  focus(): void {
+    const el = this.inputRef?.nativeElement;
+
+    if(!el) {
+      return;
+    }
+
+    el.focus();
+    el.setSelectionRange(el.value.length, el.value.length);
+  }
+
+  select(start: number, end: number): void {
+    const el = this.inputRef?.nativeElement;
+
+    if(!el) {
+      return;
+    }
+
+    el.focus();
+    el.setSelectionRange(start, end);
+  }
+
   onKeyDown(event: KeyboardEvent): void {
     if(event.key === 'ArrowUp') {
       event.preventDefault();

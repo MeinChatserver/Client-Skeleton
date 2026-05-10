@@ -583,6 +583,25 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
     event.stopPropagation();
 
+    if(command === '/input' || command.startsWith('/input ')) {
+      const text = command.slice('/input'.length).trimStart();
+
+      if(this.messageInput) {
+        this.messageInput.setValue(text);
+
+        const open  = text.indexOf('[');
+        const close = open !== -1 ? text.indexOf(']', open) : -1;
+
+        if(open !== -1 && close !== -1) {
+          this.messageInput.select(open, close + 1);
+        } else {
+          this.messageInput.focus();
+        }
+      }
+
+      return;
+    }
+
     this.client.send({
       operation: 'ROOM_MESSAGE',
       data: {

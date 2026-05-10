@@ -282,8 +282,7 @@ export class PopupRenderer {
     const wrapper = this.frameDocument!.createElement('div');
     wrapper.className = 'popup-content-wrapper';
 
-    const sanitized = this.sanitizer.sanitize(1, element.content ?? '');
-    wrapper.innerHTML = sanitized || '';
+    wrapper.innerHTML = element.content ?? '';
 
     container.appendChild(wrapper);
   }
@@ -511,8 +510,7 @@ export class PopupRenderer {
       tabPanel.id = `tab-${element.name}-${index}`;
 
       if (typeof tab === 'object' && tab.content) {
-        const sanitized = this.sanitizer.sanitize(1, tab.content);
-        tabPanel.innerHTML = sanitized || '';
+        tabPanel.innerHTML = tab.content;
       }
 
       if (typeof tab === 'object' && tab.elements && Array.isArray(tab.elements)) {
