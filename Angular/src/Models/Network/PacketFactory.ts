@@ -13,6 +13,7 @@ import {RoomUserAdd} from './RoomUserAdd';
 import {RoomUserRemove} from './RoomUserRemove';
 import {MessagePrivate} from './MessagePrivate';
 import {MessageAction} from './MessageAction';
+import {MessageGame} from './MessageGame';
 import {MessagePublic} from './MessagePublic';
 import {WindowRoomClose} from './WindowRoomClose';
 import {RoomFeature} from './RoomFeature';
@@ -57,6 +58,8 @@ export class PacketFactory {
         return new MessagePrivate(parsed.data);
       case 'MESSAGE_ACTION':
         return new MessageAction(parsed.data);
+      case 'MESSAGE_GAME':
+        return new MessageGame(parsed.data);
       case 'MESSAGE_PUBLIC':
         return new MessagePublic(parsed.data);
       default:

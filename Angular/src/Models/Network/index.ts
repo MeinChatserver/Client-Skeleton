@@ -31,3 +31,4 @@ export { Popup } from './Popup';
 export { MessagePublic } from './MessagePublic';
 export { MessagePrivate } from './MessagePrivate';
 export { MessageAction } from './MessageAction';
+export { MessageGame } from './MessageGame';

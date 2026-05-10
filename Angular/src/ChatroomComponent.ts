@@ -75,6 +75,8 @@ export const CHATROOM_STYLES = `
     padding: 0px 5px;
   }
 
+  main ui-output ui-messages ui-text[data-type="game"] {}
+
   main ui-output ui-messages ui-text[data-type="action"] {
     color: var(--room-blue);
   }
@@ -775,6 +777,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     let html: string;
 
     switch(message.type) {
+      case ChatMessageType.GAME:
       case ChatMessageType.ACTION:
         html = message.message ?? '';
         break;

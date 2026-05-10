@@ -3,7 +3,8 @@ import { User } from './Models';
 export enum ChatMessageType {
   ACTION = 'ACTION',
   PUBLIC = 'PUBLIC',
-  PRIVATE = 'PRIVATE'
+  PRIVATE = 'PRIVATE',
+  GAME = 'GAME'
 }
 
 export class ChatMessage {

@@ -30,6 +30,7 @@ import {
   RoomUserFeature,
   RoomUserRemove,
   MessagePrivate,
+  MessageGame,
   MessageAction,
   MessagePublic,
   WindowInit
@@ -673,6 +674,34 @@ export class Client implements OnInit, OnDestroy {
             });
 
           /* Publish on single room */
+          } else {
+            frame = this.windowManager.getChatroom(roomName);
+
+            if(frame !== null) {
+              frame.addMessage(chatMessage);
+            }
+          }
+        break;
+        case 'MESSAGE_GAME':
+          roomName    = null;
+          message     = packet as MessageGame;
+          chatMessage = new ChatMessage({
+            type:       ChatMessageType.GAME,
+            message:    message.getText(),
+            timestamp:  new Date()
+          });
+
+          if(message.hasRoom() && !message.forAll()) {
+            roomName = message.getRoom();
+          }
+
+          /* Publish on all rooms */
+          if(roomName === null) {
+            this.windowManager.getAllChatrooms().forEach((frame) => {
+              frame.addMessage(chatMessage);
+            });
+
+            /* Publish on single room */
           } else {
             frame = this.windowManager.getChatroom(roomName);
 
