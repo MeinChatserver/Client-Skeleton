@@ -7,6 +7,7 @@ export function registerCustomElements(targetWindow: Window | null): void {
 
   injectStyles(targetWindow);
   defineUiLink(targetWindow);
+  defineUiColor(targetWindow);
 
   registeredWindows.add(targetWindow);
 }
@@ -124,5 +125,92 @@ function defineUiLink(targetWindow: Window): void {
     targetWindow.customElements.define('ui-link', UiLink as unknown as CustomElementConstructor);
   } catch(error) {
     console.warn('[Elements] Konnte <ui-link> nicht registrieren:', error);
+  }
+}
+
+function parseColor(raw: string | null): string | null {
+  if(!raw) {
+    return null;
+  }
+
+  const value = raw.trim();
+
+  if(!value) {
+    return null;
+  }
+
+  if(value.startsWith('#')) {
+    return value;
+  }
+
+  const lower = value.toLowerCase();
+
+  if(lower.startsWith('rgb')) {
+    return value;
+  }
+
+  const parts = value.split(',').map(part => part.trim()).filter(part => part.length > 0);
+
+  if(parts.length === 3) {
+    const [r, g, b] = parts.map(part => clampByte(parseFloat(part)));
+    return `rgb(${r}, ${g}, ${b})`;
+  }
+
+  if(parts.length === 4) {
+    const [r, g, b] = parts.slice(0, 3).map(part => clampByte(parseFloat(part)));
+    const alphaPct  = Math.max(0, Math.min(100, parseFloat(parts[3])));
+    const alpha     = Math.round((alphaPct / 100) * 1000) / 1000;
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+
+  return null;
+}
+
+function clampByte(n: number): number {
+  if(Number.isNaN(n)) {
+    return 0;
+  }
+
+  return Math.max(0, Math.min(255, Math.round(n)));
+}
+
+function defineUiColor(targetWindow: Window): void {
+  if(targetWindow.customElements.get('ui-color')) {
+    return;
+  }
+
+  const HTMLElementCtor = (targetWindow as any).HTMLElement as typeof HTMLElement;
+
+  class UiColor extends HTMLElementCtor {
+    static get observedAttributes(): string[] {
+      return ['value'];
+    }
+
+    connectedCallback(): void {
+      this.applyColor();
+    }
+
+    attributeChangedCallback(name: string): void {
+      if(name === 'value') {
+        this.applyColor();
+      }
+    }
+
+    private applyColor(): void {
+      const host  = this as unknown as HTMLElement;
+      const color = parseColor(host.getAttribute('value'));
+
+      if(color) {
+        host.style.color = color;
+      } else {
+        host.style.removeProperty('color');
+      }
+    }
+  }
+
+  try {
+    targetWindow.customElements.define('ui-color', UiColor as unknown as CustomElementConstructor);
+  } catch(error) {
+    console.warn('[Elements] Konnte <ui-color> nicht registrieren:', error);
   }
 }
