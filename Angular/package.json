@@ -3,7 +3,13 @@
   "version": "2.0.0",
   "license": "MIT",
   "description": "OpenSource Angular & TypeScript based Client for Mein-ChatServer.",
-  "keywords": [ "chat", "client", "angular", "typescript", "mein-chatserver"],
+  "keywords": [
+    "chat",
+    "client",
+    "angular",
+    "typescript",
+    "mein-chatserver"
+  ],
   "homepage": "https://mein-chatserver.de/",
   "bugs": {
     "url": "https://github.com/MeinChatserver/Client-Skeleton/issues",
@@ -39,6 +45,7 @@
     "@angular/common": "^21.2.12",
     "@angular/compiler": "^21.2.12",
     "@angular/core": "^21.2.12",
+    "@angular/elements": "^21.2.12",
     "@angular/forms": "^21.2.12",
     "@angular/platform-browser": "^21.2.12",
     "@angular/router": "^21.2.12",

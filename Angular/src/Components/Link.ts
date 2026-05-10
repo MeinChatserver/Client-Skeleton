@@ -1,4 +1,4 @@
-import {Component, Input, forwardRef} from '@angular/core';
+import {Component, Input, Output, EventEmitter, ElementRef, forwardRef, OnInit} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
 
@@ -19,20 +19,63 @@ export enum LinkTarget {
       multi: true
     }
   ],
-  template: `<a [href]="url" (click)="onClick($event)"><ng-content /></a>`,
+  template: `<a [attr.href]="url || null" [class.action]="!!action" (click)="onClick($event)"><ng-content /></a>`,
   styles: [`
-    a {
+   :host a {
       cursor: pointer;
-      text-decoration: underline;
+      position: relative;
+      display: inline-block;
+      text-decoration: none;
+      color: var(--room-blue);
     }
+
+   :host a::after {
+      content: "";
+      background: var(--room-blue);
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 3px;
+      height: 1px;
+    }
+
+   :host a:hover {
+      color: var(--room-foreground);
+    }
+
+   :host a::after:hover {
+     background: var(--room-foreground);
+   }
   `]
 })
-export class Link implements ControlValueAccessor {
+export class Link implements ControlValueAccessor, OnInit {
   @Input() url: string = '';
   @Input() target: LinkTarget = LinkTarget.DEFAULT;
+  @Input() action: string = '';
+  @Output() command = new EventEmitter<string>();
+
+  constructor(private hostRef: ElementRef<HTMLElement>) {}
 
   private onChangeFn = (value: string) => {};
   private onTouchedFn = () => {};
+
+  ngOnInit(): void {
+    if(!this.action) {
+      const dataAction = this.hostRef.nativeElement.getAttribute('data-action');
+
+      if(dataAction) {
+        this.action = dataAction;
+      }
+    }
+
+    if(!this.url) {
+      const urlAttr = this.hostRef.nativeElement.getAttribute('url');
+
+      if(urlAttr) {
+        this.url = urlAttr;
+      }
+    }
+  }
 
   writeValue(value: string): void {
     this.url = value;
@@ -52,6 +95,20 @@ export class Link implements ControlValueAccessor {
   }
 
   onClick(event: MouseEvent): void {
+    if(this.action.length > 0) {
+      event.preventDefault();
+
+      this.command.emit(this.action);
+
+      this.hostRef.nativeElement.dispatchEvent(new CustomEvent('ui-command', {
+        detail:   this.action,
+        bubbles:  true,
+        composed: true
+      }));
+
+      return;
+    }
+
     if(this.url.length === 0) {
       event.preventDefault();
       return;

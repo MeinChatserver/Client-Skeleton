@@ -8,9 +8,11 @@ import {
   ViewChild,
   ViewEncapsulation,
   CUSTOM_ELEMENTS_SCHEMA,
+  inject,
   signal
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { FormsModule } from '@angular/forms';
 import { MessageInput } from './Components';
 import { Client } from './Client';
@@ -96,6 +98,7 @@ export class PrivateComponent implements AfterViewChecked {
   @ViewChild('messageInput') messageInput?: any;
 
   messages = signal<ChatMessage[]>([]);
+  private sanitizer = inject(DomSanitizer);
   private pendingScroll = false;
 
   initMessages(messages: ChatMessage[]): void {
@@ -141,16 +144,21 @@ export class PrivateComponent implements AfterViewChecked {
     return message.type.toLowerCase();
   }
 
-  getMessageContent(message: ChatMessage): string {
+  getMessageContent(message: ChatMessage): SafeHtml {
+    let html: string;
+
     switch(message.type) {
       case ChatMessageType.ACTION:
-        return message.message ?? '';
+        html = message.message ?? '';
+        break;
       case ChatMessageType.PUBLIC:
-        return `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
       case ChatMessageType.PRIVATE:
-        return `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
+        html = `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
+        break;
       default:
-        return message.message ?? '';
+        html = message.message ?? '';
     }
+
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 }

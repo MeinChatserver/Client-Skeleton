@@ -1,4 +1,5 @@
 import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, Type } from '@angular/core';
+import { registerCustomElements } from './Components/Elements';
 
 export interface FrameConfig {
   id: string;
@@ -130,6 +131,7 @@ export class Frame {
     this.isDocumentInitialized = true;
     this.copyParentStyles();
     this.setupThemeWatcher();
+    registerCustomElements(this.frameWindow);
   }
 
   protected copyParentStyles(): void {

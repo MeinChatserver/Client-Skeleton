@@ -1,11 +1,12 @@
 import {
   Component, Input, Output, EventEmitter,
   signal, computed, effect, CUSTOM_ELEMENTS_SCHEMA,
-  ViewEncapsulation, ViewChild, ElementRef,
+  ViewEncapsulation, ViewChild, ElementRef, HostListener,
   AfterViewChecked, OnDestroy, inject,
   ApplicationRef, EnvironmentInjector
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { Client, ConnectionStatus } from './Client';
 import {List, Select, MessageInput, Button} from './Components';
@@ -257,6 +258,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   private userFeatureServices: Map<string, FeatureService> = new Map();
   private activeUserFeatures: Set<string> = new Set();
   private elementRef = inject(ElementRef);
+  private sanitizer = inject(DomSanitizer);
   private canvasWasInitialized = false;
   private pendingFeatures: string[] = [];
 
@@ -571,6 +573,25 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     }
   }
 
+  @HostListener('ui-command', ['$event'])
+  onUiCommand(event: Event): void {
+    const command = ((event as CustomEvent<string>).detail || '').trim();
+
+    if(!command) {
+      return;
+    }
+
+    event.stopPropagation();
+
+    this.client.send({
+      operation: 'ROOM_MESSAGE',
+      data: {
+        room: this.frame.getRoomName(),
+        text: command
+      }
+    });
+  }
+
   onUserSelect(item: ListItem): void {
     this.client.send(new ProfileOpen(item.label));
   }
@@ -731,12 +752,16 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     return message.type.toLowerCase();
   }
 
-  getMessageContent(message: ChatMessage): string {
+  getMessageContent(message: ChatMessage): SafeHtml {
+    let html: string;
+
     switch(message.type) {
       case ChatMessageType.ACTION:
-        return message.message ?? '';
+        html = message.message ?? '';
+        break;
       case ChatMessageType.PUBLIC:
-        return `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
+        html = `<span class="sender">${message.getUsername()}:</span> ${message.message}`;
+        break;
       case ChatMessageType.PRIVATE: {
         let target = '';
 
@@ -746,9 +771,14 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
           ).join(', ');
         }
 
-        return `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
+        html = `<span class="sender">${message.getUsername()} (privat${target}):</span> ${message.message}`;
+        break;
       }
+      default:
+        html = message.message ?? '';
     }
+
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
 
   onReconnect(): void {
