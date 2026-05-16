@@ -364,7 +364,17 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
   }
 
   messagePlaceholder = computed(() => {
-    return this.isConnected() ? 'Gebe eine Nachricht ein...' : 'Verbindung verloren';
+    if(this.isConnected()) {
+      return 'Gebe eine Nachricht ein...';
+    }
+
+    const reason = this.client?.disconnectMessage();
+
+    if(reason) {
+      return `Verbindung zum Chatserver verloren: ${reason}`;
+    }
+
+    return 'Verbindung verloren';
   });
 
   chatrooms = computed(() => {

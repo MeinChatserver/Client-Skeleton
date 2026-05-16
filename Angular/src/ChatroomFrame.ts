@@ -3,6 +3,7 @@ import { Frame, FrameConfig } from './Frame';
 import { ChatroomComponent, CHATROOM_STYLES } from './ChatroomComponent';
 import { MESSAGE_INPUT_STYLES } from './Components/MessageInput';
 import { SELECT_STYLES } from './Components/Select';
+import { BUTTON_STYLES } from './Components/Button';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { User, RoomStyle } from './Models';
@@ -61,6 +62,13 @@ export class ChatroomFrame extends Frame {
       const style = this.frameDocument.createElement('style');
       style.id                    = 'select-styles';
       style.textContent           = SELECT_STYLES;
+      this.frameDocument.head.appendChild(style);
+    }
+
+    if(this.frameDocument && !this.frameDocument.getElementById('button-styles')) {
+      const style = this.frameDocument.createElement('style');
+      style.id                    = 'button-styles';
+      style.textContent           = BUTTON_STYLES;
       this.frameDocument.head.appendChild(style);
     }
 

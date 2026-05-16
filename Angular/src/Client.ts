@@ -191,9 +191,11 @@ export class Client implements OnInit, OnDestroy {
   socket: WebSocket | null              = null;
   connectionStatus = signal<ConnectionStatus>(ConnectionStatus.DISCONNECTED);
   reconnectCountdown = signal<number>(0);
+  disconnectMessage = signal<string | null>(null);
   private reconnectAttempts: number     = 0;
   private maxReconnectAttempts: number  = 5;
   private reconnectCountdownInterval: number | null = null;
+  private preventReconnect: boolean = false;
   chatRooms = signal<Room[]>([]);
   categories = signal<Category[]>([]);
   private lastLoginData: { username: string; password: string; chatroom: string } | null = null;
@@ -363,6 +365,8 @@ export class Client implements OnInit, OnDestroy {
     this.connectionStatus.set(ConnectionStatus.CONNECTED);
     this.reconnectAttempts  = 0;
     this.reconnectCountdown.set(0);
+    this.disconnectMessage.set(null);
+    this.preventReconnect = false;
 
     if(this.reconnectCountdownInterval) {
       clearInterval(this.reconnectCountdownInterval);
@@ -413,6 +417,13 @@ export class Client implements OnInit, OnDestroy {
     });
 
     this.disconnect();
+
+    if(this.preventReconnect) {
+      this.preventReconnect = false;
+      console.warn('WebSocket: onClose (Reconnect unterdrückt durch Server-DISCONNECT)');
+      return;
+    }
+
     this.attemptReconnect();
 
     console.warn('WebSocket: onClose');
@@ -504,6 +515,13 @@ export class Client implements OnInit, OnDestroy {
         break;
         case 'ALERT':
           alert(packet.getData() as string);
+        break;
+        case 'DISCONNECT':
+          const disconnect = packet as Disconnect;
+          this.disconnectMessage.set(disconnect.getMessage());
+          this.preventReconnect = true;
+          // Socket schließen, onClose kümmert sich um State-Update; preventReconnect verhindert Reconnect.
+          this.disconnect();
         break;
         case 'POPUP':
           this.windowManager.createPopup(packet as Popup);
@@ -885,6 +903,8 @@ export class Client implements OnInit, OnDestroy {
 
   reconnect() {
     this.reconnectAttempts = 0;
+    this.preventReconnect = false;
+    this.disconnectMessage.set(null);
     this.connect();
   }
 

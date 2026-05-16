@@ -6,6 +6,7 @@ import {Popup} from './Popup';
 import {Ping} from './Ping';
 import {Pong} from './Pong';
 import {Alert} from './Alert';
+import {Disconnect} from './Disconnect';
 import {WindowRoom} from './WindowRoom';
 import {WindowRoomUpdate} from './WindowRoomUpdate';
 import {RoomUpdate} from './RoomUpdate';
@@ -37,6 +38,8 @@ export class PacketFactory {
         return new Pong(parsed.data);
       case 'ALERT':
         return new Alert(parsed.data);
+      case 'DISCONNECT':
+        return new Disconnect(parsed.data);
       case 'POPUP':
         return new Popup(parsed.data);
       case 'WINDOW_ROOM':

@@ -1,10 +1,23 @@
-import {Component, Input, forwardRef} from '@angular/core';
+import {Component, Input, forwardRef, ViewEncapsulation} from '@angular/core';
 import {CommonModule} from '@angular/common';
 import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/forms';
+
+export const BUTTON_STYLES = `
+  ui-button {
+    display: flex;
+    flex: 1 1 auto;
+  }
+
+  ui-button button {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+  }`;
 
 @Component({
   selector: 'ui-button',
   standalone: true,
+  encapsulation: ViewEncapsulation.None,
   imports: [CommonModule, FormsModule],
   providers: [
     {
@@ -14,17 +27,7 @@ import {FormsModule, ControlValueAccessor, NG_VALUE_ACCESSOR} from '@angular/for
     }
   ],
   template: `<button (change)="onChange($event)" [disabled]="disabled">{{ text }}</button>`,
-  styles: [`
-    :host {
-      display: flex;
-      flex: 1 1 auto;
-    }
-
-    button {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-    }`]
+  styles: [BUTTON_STYLES]
 })
 export class Button implements ControlValueAccessor {
   @Input() text: string = '';
