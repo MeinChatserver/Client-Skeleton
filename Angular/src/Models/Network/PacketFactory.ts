@@ -39,7 +39,8 @@ export class PacketFactory {
       case 'ALERT':
         return new Alert(parsed.data);
       case 'DISCONNECT':
-        return new Disconnect(parsed.data);
+        // DISCONNECT trägt "message" auf Top-Level (nicht in data).
+        return new Disconnect(parsed);
       case 'POPUP':
         return new Popup(parsed.data);
       case 'WINDOW_ROOM':

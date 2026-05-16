@@ -405,7 +405,7 @@ export class Client implements OnInit, OnDestroy {
     }
   }
 
-  private onClose() {
+  private onClose(event?: CloseEvent) {
     if(this.pingInterval) {
       clearInterval(this.pingInterval);
     }
@@ -418,15 +418,30 @@ export class Client implements OnInit, OnDestroy {
 
     this.disconnect();
 
+    console.warn('[WebSocket] onClose', {
+      code:      event?.code,
+      reason:    event?.reason,
+      wasClean:  event?.wasClean,
+      preventReconnect: this.preventReconnect
+    });
+
+    // Fallback: Wenn der Server den Grund über das Close-Frame mitgibt (socket.close(code, reason)),
+    // wird die DISCONNECT-Nachricht garantiert geliefert. Eine reine JSON-Nachricht direkt vor
+    // socket.close() kann race-bedingt vom Browser verworfen werden.
+    const closeReason = event?.reason?.trim();
+
+    if(closeReason && !this.preventReconnect) {
+      this.disconnectMessage.set(closeReason);
+      this.preventReconnect = true;
+    }
+
     if(this.preventReconnect) {
       this.preventReconnect = false;
-      console.warn('WebSocket: onClose (Reconnect unterdrückt durch Server-DISCONNECT)');
+      console.warn('[WebSocket] Reconnect unterdrückt durch Server-DISCONNECT');
       return;
     }
 
     this.attemptReconnect();
-
-    console.warn('WebSocket: onClose');
   }
 
   private onError(error: any) {
@@ -518,9 +533,23 @@ export class Client implements OnInit, OnDestroy {
         break;
         case 'DISCONNECT':
           const disconnect = packet as Disconnect;
-          this.disconnectMessage.set(disconnect.getMessage());
-          this.preventReconnect = true;
-          // Socket schließen, onClose kümmert sich um State-Update; preventReconnect verhindert Reconnect.
+
+          // Nur bei vorhandener Message keinen Reconnect (Kick/Ban/Timeout).
+          // Ohne Message ist es ein einfacher Verbindungsabbau; Auto-Reconnect bleibt aktiv.
+          if(disconnect.hasMessage()) {
+            this.disconnectMessage.set(disconnect.getMessage());
+            this.preventReconnect = true;
+
+            // Falls onClose bereits ausgelöst hat (z.B. Server schließt direkt nach Senden),
+            // einen bereits laufenden Reconnect-Countdown sofort stoppen.
+            if(this.reconnectCountdownInterval) {
+              clearInterval(this.reconnectCountdownInterval);
+              this.reconnectCountdownInterval = null;
+            }
+
+            this.reconnectCountdown.set(0);
+          }
+
           this.disconnect();
         break;
         case 'POPUP':
@@ -853,6 +882,10 @@ export class Client implements OnInit, OnDestroy {
   }
 
   private attemptReconnect(): void {
+    if(this.preventReconnect) {
+      return;
+    }
+
     if (this.reconnectAttempts < this.maxReconnectAttempts) {
       this.reconnectAttempts++;
       const delay = Math.min(1000 * Math.pow(2, this.reconnectAttempts), 30000);
@@ -867,6 +900,16 @@ export class Client implements OnInit, OnDestroy {
       }
 
       this.reconnectCountdownInterval = window.setInterval(() => {
+        // DISCONNECT kann während des Countdowns eintreffen (Reihenfolge onClose/onMessage nicht garantiert)
+        if(this.preventReconnect) {
+          if(this.reconnectCountdownInterval) {
+            clearInterval(this.reconnectCountdownInterval);
+            this.reconnectCountdownInterval = null;
+          }
+          this.reconnectCountdown.set(0);
+          return;
+        }
+
         const current = this.reconnectCountdown();
         if(current > 1) {
           this.reconnectCountdown.set(current - 1);
