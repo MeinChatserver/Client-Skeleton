@@ -28,6 +28,7 @@ import {
   RoomUpdate,
   RoomUserAdd,
   RoomUserFeature,
+  RoomUserIcon,
   RoomUserRemove,
   MessagePrivate,
   MessageGame,
@@ -628,6 +629,25 @@ export class Client implements OnInit, OnDestroy {
 
           if(frame !== null && userFeature.getName()) {
             frame.addUserFeature(userFeature.getName() ?? '', userFeature.getReference() ?? '');
+          }
+        break;
+        case 'ROOM_USER_ICON':
+          const userIcon    = packet as RoomUserIcon;
+          frame             = this.windowManager.getChatroom(userIcon.getRoom() ?? '');
+          const iconUser    = userIcon.getUser();
+          const iconData    = userIcon.getIcon();
+
+          if(frame !== null && iconUser && iconData) {
+            const userId = iconUser.username;
+
+            switch(userIcon.getType()) {
+              case 'ADD':
+                frame.addUserIcon(userId, iconData);
+              break;
+              case 'REMOVE':
+                frame.removeUserIcon(userId, iconData);
+              break;
+            }
           }
         break;
         case 'MESSAGE_PRIVATE':

@@ -14,8 +14,12 @@ import {ListItem} from '../Models';
         (click)="onItemClick($event, item)"
         (contextmenu)="onItemRightClick($event, item)">
 
-        @if (item.prefixIcon) {
-            <i [class]="item.prefixIcon" class="prefix-icon"></i>
+        @if (item.prefixIcons?.length) {
+          <span class="icons icons-prefix">
+            @for (icon of item.prefixIcons; track $index) {
+              <img class="user-icon" [src]="icon.url" alt="" />
+            }
+          </span>
         }
 
         <span class="label" [style.color]="getRankColor(item.rank)">{{ item.label }}</span>
@@ -24,8 +28,12 @@ import {ListItem} from '../Models';
           <small class="count">({{ item.number }})</small>
         }
 
-        @if (item.suffixIcon) {
-            <i [class]="item.suffixIcon" class="suffix-icon"></i>
+        @if (item.suffixIcons?.length) {
+          <span class="icons icons-suffix">
+            @for (icon of item.suffixIcons; track $index) {
+              <img class="user-icon" [src]="icon.url" alt="" />
+            }
+          </span>
         }
       </div>
     }
@@ -86,11 +94,6 @@ import {ListItem} from '../Models';
       cursor: text;
     }
 
-    .prefix-icon {
-      margin-right: 8px;
-      color: #666;
-    }
-
     .label {
       font-size: 14px;
     }
@@ -101,9 +104,22 @@ import {ListItem} from '../Models';
       margin-left: 4px;
     }
 
-    .suffix-icon {
-      margin-left: 8px;
-      color: #666;
+    .icons {
+      display: inline-flex;
+      gap: 2px;
+      vertical-align: middle;
+    }
+
+    .icons-prefix {
+      margin-right: 4px;
+    }
+
+    .icons-suffix {
+      margin-left: 4px;
+    }
+
+    .icons .user-icon {
+      pointer-events: none;
     }
   `]
 })

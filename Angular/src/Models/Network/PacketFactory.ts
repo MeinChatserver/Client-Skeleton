@@ -18,6 +18,7 @@ import {MessagePublic} from './MessagePublic';
 import {WindowRoomClose} from './WindowRoomClose';
 import {RoomFeature} from './RoomFeature';
 import {RoomUserFeature} from './RoomUserFeature';
+import {RoomUserIcon} from './RoomUserIcon';
 
 export class PacketFactory {
   static fromJson(json: string | any): Packet {
@@ -54,6 +55,8 @@ export class PacketFactory {
         return new RoomUserRemove(parsed.data);
       case 'ROOM_USER_FEATURE':
         return new RoomUserFeature(parsed.data);
+      case 'ROOM_USER_ICON':
+        return new RoomUserIcon(parsed.data);
       case 'MESSAGE_PRIVATE':
         return new MessagePrivate(parsed.data);
       case 'MESSAGE_ACTION':

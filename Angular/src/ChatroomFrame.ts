@@ -6,6 +6,7 @@ import { SELECT_STYLES } from './Components/Select';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { User, RoomStyle } from './Models';
+import { Icon } from './Models/Icon';
 export { ChatMessage, ChatMessageType } from './ChatMessage';
 
 export interface ChatroomConfig extends FrameConfig {
@@ -270,6 +271,18 @@ export class ChatroomFrame extends Frame {
   public addUserFeature(type: string, userId: string): void {
     if(this.componentRef) {
       (this.componentRef.instance as ChatroomComponent).addUserFeature(type, userId);
+    }
+  }
+
+  public addUserIcon(userId: string, icon: Icon): void {
+    if(this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).addUserIcon(userId, icon);
+    }
+  }
+
+  public removeUserIcon(userId: string, icon: Icon): void {
+    if(this.componentRef) {
+      (this.componentRef.instance as ChatroomComponent).removeUserIcon(userId, icon);
     }
   }
 

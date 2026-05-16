@@ -10,7 +10,8 @@ import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { Client, ConnectionStatus } from './Client';
 import {List, Select, MessageInput, Button} from './Components';
-import { ListItem, User } from './Models';
+import { ListItem, ListItemIcon, User } from './Models';
+import { Icon } from './Models/Icon';
 import {ProfileOpen} from './Models/Network/ProfileOpen';
 import { FeatureService, FeatureType, ListBurnFeature, ListGlowFeature } from './Features';
 import {FormsModule} from '@angular/forms';
@@ -286,6 +287,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   messages = signal<ChatMessage[]>([]);
   users = signal<User[]>([]);
+  userIcons = signal<Map<string, Icon[]>>(new Map());
   selectedUsers = signal<User[]>([]);
   isConnected = signal<boolean>(true);
   private pendingScroll = false;
@@ -300,9 +302,66 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     });
   }
 
-  userItems = computed((): ListItem[] =>
-    this.users().map(user => ({ id: user.id, label: user.username, rank: user.rank }))
-  );
+  userItems = computed((): ListItem[] => {
+    const icons = this.userIcons();
+
+    return this.users().map(user => {
+      const list = icons.get(user.username);
+      return {
+        id:           user.id,
+        label:        user.username,
+        rank:         user.rank,
+        prefixIcons:  this.buildItemIcons(list, 'prefix'),
+        suffixIcons:  this.buildItemIcons(list, 'suffix')
+      };
+    });
+  });
+
+  private buildItemIcons(list: Icon[] | undefined, side: 'prefix' | 'suffix'): ListItemIcon[] | undefined {
+    if(!list || list.length === 0) {
+      return undefined;
+    }
+
+    const host = this.client?.getHostname();
+    const items: ListItemIcon[] = [];
+
+    list.forEach(icon => {
+      const path = icon.getPath();
+      const position = icon.getPosition() ?? 0;
+
+      if(!path) {
+        return;
+      }
+
+      if(side === 'prefix' && position >= 0) {
+        return;
+      }
+
+      if(side === 'suffix' && position < 0) {
+        return;
+      }
+
+      const url = /^https?:\/\//i.test(path) ? path : `https://${host}${path}`;
+      items.push({ url, position });
+    });
+
+    if(items.length === 0) {
+      return undefined;
+    }
+
+    if(side === 'prefix') {
+      // -3, -2, -1 → -3 ganz links, -1 direkt vor dem Namen
+      return items.sort((a, b) => a.position - b.position);
+    }
+
+    // Suffix: zuerst positive Slots (1, 2, 3 ...), dann die 0er (auto-append) in Einfügereihenfolge
+    return items.sort((a, b) => {
+      if(a.position === 0 && b.position === 0) return 0;
+      if(a.position === 0) return 1;
+      if(b.position === 0) return -1;
+      return a.position - b.position;
+    });
+  }
 
   messagePlaceholder = computed(() => {
     return this.isConnected() ? 'Gebe eine Nachricht ein...' : 'Verbindung verloren';
@@ -546,6 +605,17 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   setUsers(users: User[]): void {
     this.users.set([...users]);
+
+    const allowed = new Set(users.map(u => u.username));
+    this.userIcons.update(map => {
+      const next = new Map<string, Icon[]>();
+      map.forEach((icons, username) => {
+        if(allowed.has(username)) {
+          next.set(username, icons);
+        }
+      });
+      return next;
+    });
   }
 
   addUser(user: User): void {
@@ -560,6 +630,15 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   removeUser(user: User): void {
     this.users.update(users => users.filter(u => u.id !== user.id));
+    this.userIcons.update(map => {
+      if(!map.has(user.username)) {
+        return map;
+      }
+
+      const next = new Map(map);
+      next.delete(user.username);
+      return next;
+    });
   }
 
   onSendMessage(): void {
@@ -675,6 +754,57 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
     }
   }
 
+  removeUserIcon(userId: string, icon: Icon): void {
+    const user = this.users().find(u => u.username === userId || String(u.id) === userId);
+    const path = icon.getPath();
+
+    if(!user || !path) {
+      return;
+    }
+
+    this.userIcons.update(map => {
+      const list = map.get(user.username);
+
+      if(!list) {
+        return map;
+      }
+
+      const nextList = list.filter(existing => existing.getPath() !== path);
+
+      if(nextList.length === list.length) {
+        return map;
+      }
+
+      const next = new Map(map);
+
+      if(nextList.length === 0) {
+        next.delete(user.username);
+      } else {
+        next.set(user.username, nextList);
+      }
+
+      return next;
+    });
+  }
+
+  addUserIcon(userId: string, icon: Icon): void {
+    const user = this.users().find(u => u.username === userId || String(u.id) === userId);
+    const path = icon.getPath();
+
+    if(!user || !path) {
+      return;
+    }
+
+    this.userIcons.update(map => {
+      const next = new Map(map);
+      // Path ist eindeutig: bestehendes Icon mit gleichem Path entfernen, dann neu anhängen
+      const list = (next.get(user.username) ?? []).filter(existing => existing.getPath() !== path);
+      list.push(icon);
+      next.set(user.username, list);
+      return next;
+    });
+  }
+
   addUserFeature(type: string, userId: string): void {
     const featureType = type.toUpperCase();
     const user = this.users().find(u => u.username === userId || String(u.id) === userId);
@@ -714,19 +844,22 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
       return;
     }
 
-    if (featureType === 'BURN') {
-      const burnFeature = new ListBurnFeature();
-      const dummyCanvas = doc.createElement('canvas');
-      burnFeature.onInit(dummyCanvas, null as any, listItem);
-      burnFeature.onStart();
-      this.startUserFeatureAnimation(user.username, burnFeature, listItem);
-      this.activeUserFeatures.add(featureKey);
-    } else if (featureType === 'GLOW') {
-      const glowFeature = new ListGlowFeature();
-      const dummyCanvas = doc.createElement('canvas');
-      glowFeature.onInit(dummyCanvas, null as any, listItem);
-      glowFeature.onStart();
-      this.startUserFeatureAnimation(user.username, glowFeature, listItem);
+    let feature = null;
+    const dummyCanvas = doc.createElement('canvas');
+
+    switch(featureType) {
+      case 'BURN':
+        feature = new ListBurnFeature();
+      break;
+      case 'GLOW':
+        feature = new ListGlowFeature();
+      break;
+    }
+
+    if(feature != null) {
+      feature.onInit(dummyCanvas, null as any, listItem);
+      feature.onStart();
+      this.startUserFeatureAnimation(user.username, feature, listItem);
       this.activeUserFeatures.add(featureKey);
     }
   }

@@ -1,8 +1,13 @@
+export interface ListItemIcon {
+  url: string;
+  position: number;
+}
+
 export interface ListItem {
   id?: string | number;
   label: string;
   number?: number;
-  prefixIcon?: string;
-  suffixIcon?: string;
+  prefixIcons?: ListItemIcon[];
+  suffixIcons?: ListItemIcon[];
   rank?: number;
 }
