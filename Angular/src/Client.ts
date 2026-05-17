@@ -199,6 +199,7 @@ export class Client implements OnInit, OnDestroy {
   chatRooms = signal<Room[]>([]);
   categories = signal<Category[]>([]);
   private lastLoginData: { username: string; password: string; chatroom: string } | null = null;
+  private pendingRestoreRooms: string[] = [];
 
   constructor(
     private cdr: ChangeDetectorRef,
@@ -592,6 +593,25 @@ export class Client implements OnInit, OnDestroy {
           chatroom.updateRoomName(windowRoom.getName());
 
           this.send(new WindowInit(chatroom.getId()));
+
+          /* Nach Relogin: sobald der Primärraum wieder offen ist, die zuvor
+             geöffneten Zusatzräume per "/go +<Name>" nachfordern. */
+          if(this.pendingRestoreRooms.length > 0
+              && this.lastLoginData
+              && windowRoom.getName() === this.lastLoginData.chatroom) {
+            const toRestore = this.pendingRestoreRooms;
+            this.pendingRestoreRooms = [];
+
+            toRestore.forEach(name => {
+              this.send({
+                operation: 'ROOM_MESSAGE',
+                data: {
+                  room: this.lastLoginData!.chatroom,
+                  text: `/go +${name}`
+                }
+              });
+            });
+          }
         break;
         case 'WINDOW_ROOM_CLOSE':
           const closing = packet as WindowRoomClose;
@@ -991,6 +1011,14 @@ export class Client implements OnInit, OnDestroy {
     if(!this.lastLoginData) {
       return;
     }
+
+    /* Vor dem Relogin alle aktuell offenen Chatraum-Fenster außer dem
+       Primärraum merken. Nach dem ersten WINDOW_ROOM des Primärraumes
+       werden diese Räume per "/go +<Name>" wiederhergestellt. */
+    const primary = this.lastLoginData.chatroom;
+    this.pendingRestoreRooms = this.windowManager.getAllChatrooms()
+      .map(frame => frame.getId())
+      .filter(name => name && name !== primary);
 
     this.send({
       operation: 'LOGIN',

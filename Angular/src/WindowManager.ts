@@ -71,8 +71,32 @@ export class WindowManager {
   * @return ChatroomFrame
   */
   createChatroom(packet: WindowRoom, client: Client): ChatroomFrame {
-    let config: PopupConfig = {
-      id:     packet.getName() ?? 'chatroom-' + Math.random().toString(36).substr(2, 9),
+    const name    = packet.getName() ?? 'chatroom-' + Math.random().toString(36).substr(2, 9);
+    const existing = this.getChatroom(name);
+
+    if(existing) {
+      if(existing.isOpen()) {
+        /* Bestehendes Fenster wiederverwenden (z.B. nach Reconnect/Relogin),
+           damit nicht für denselben Raum ein zweites Popup entsteht.
+           Listener werden geleert, damit der Caller seine Subscriptions
+           sauber neu registrieren kann. */
+        existing.clearEventListeners();
+        existing.clearMessages();
+        existing.removeAllFeatures();
+        existing.resetCanvas();
+        existing.setConnected(true);
+        existing.focus();
+        return existing;
+      }
+
+      /* Frame ist registriert, das Popup-Fenster aber zu — sauber wegräumen
+         bevor ein neues erzeugt wird. */
+      existing.close();
+      this.frames.delete(name);
+    }
+
+    const config: PopupConfig = {
+      id:     name,
       width:  800,
       height: 600
     };

@@ -8,6 +8,7 @@ import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { User, RoomStyle } from './Models';
 import { Icon } from './Models/Icon';
+import { WindowClose } from './Models/Network/WindowClose';
 export { ChatMessage, ChatMessageType } from './ChatMessage';
 
 export interface ChatroomConfig extends FrameConfig {
@@ -336,6 +337,10 @@ export class ChatroomFrame extends Frame {
     this.eventListeners.get(eventName)!.push(callback);
   }
 
+  public clearEventListeners(): void {
+    this.eventListeners.clear();
+  }
+
   public off(eventName: string, callback?: Function): void {
     if(!callback) {
       this.eventListeners.delete(eventName);
@@ -359,5 +364,15 @@ export class ChatroomFrame extends Frame {
     if(listeners) {
       listeners.forEach(callback => callback(data));
     }
+  }
+
+  protected override handleWindowClosed(): void {
+    if(this.client && this.client.isConnected()) {
+      this.client.send(new WindowClose(this.getId()));
+    }
+
+    this.client?.windowManager?.removeFrame(this.getId());
+
+    super.handleWindowClosed();
   }
 }

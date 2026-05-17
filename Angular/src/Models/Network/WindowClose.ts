@@ -6,17 +6,11 @@ import {Packet} from './Packet';
  * @docs https://github.com/MeinChatserver/Documentation/blob/main/Protocol/Packets/WINDOW_CLOSE.md
  **/
 export class WindowClose extends Packet {
-  protected name: string | null = null;
-
-  constructor(data: any = null) {
-    super('WINDOW_CLOSE', data);
-
-    if(data) {
-      this.name = data;
-    }
+  constructor(name: string | null = null) {
+    super('WINDOW_CLOSE', name);
   }
 
-  getName() {
-    return this.name;
+  getName(): string | null {
+    return this.getData();
   }
 }

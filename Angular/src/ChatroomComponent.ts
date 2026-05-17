@@ -220,6 +220,7 @@ export const CHATROOM_STYLES = `
   standalone: true,
   encapsulation: ViewEncapsulation.None,
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
+  providers: [FeatureService],
   imports: [CommonModule, List, Select, MessageInput, FormsModule, Button],
   template: `
     <ui-loading class="hidden"></ui-loading>

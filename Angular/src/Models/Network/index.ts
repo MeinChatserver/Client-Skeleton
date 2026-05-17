@@ -23,6 +23,7 @@ export { ChatroomInfo } from './ChatroomInfo';
 
 // Windows
 export { WindowRoom } from './WindowRoom';
+export { WindowClose } from './WindowClose';
 export { WindowRoomClose } from './WindowRoomClose';
 export { WindowRoomUpdate } from './WindowRoomUpdate';
 export { WindowInit } from './WindowInit';
