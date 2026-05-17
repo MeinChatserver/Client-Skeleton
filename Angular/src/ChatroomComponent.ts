@@ -32,6 +32,7 @@ export const CHATROOM_STYLES = `
   }
 
   main {
+    position: relative;
     flex: 1;
     display: flex;
     flex-direction: column;
@@ -147,6 +148,16 @@ export const CHATROOM_STYLES = `
     color: #FFFFFF !important;
   }
 
+  aside .reconnect-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+  }
+
   aside ui-list::after {
     content: "";
     position: sticky;
@@ -197,7 +208,7 @@ export const CHATROOM_STYLES = `
     padding: 10px;
   }
 
-  main ui-output .reconnect-overlay {
+  main > .reconnect-overlay {
     position: absolute;
     top: 0;
     left: 0;
@@ -210,7 +221,7 @@ export const CHATROOM_STYLES = `
     z-index: 1000;
   }
 
-  main ui-output .reconnect-content {
+  main > .reconnect-overlay .reconnect-content {
     text-align: center;
   }
 `;
@@ -232,19 +243,22 @@ export const CHATROOM_STYLES = `
           }
         </ui-messages>
         <canvas #featureCanvas style="width: 100%; height: 100%; position: absolute; top: 0; left: 0;"></canvas>
-        @if(!isConnected()) {
-          <div class="reconnect-overlay">
-            <div class="reconnect-content">
-              <ui-button (click)="onReconnect()" text="Erneut Verbinden" />
-            </div>
-          </div>
-        }
       </ui-output>
       <ui-message-input #messageInput [placeholder]="messagePlaceholder()" [disabled]="!isConnected()" (keydown.enter)="onSendMessage()"></ui-message-input>
+      @if(!isConnected()) {
+        <div class="reconnect-overlay">
+          <div class="reconnect-content">
+            <ui-button (click)="onReconnect()" text="Erneut Verbinden" />
+          </div>
+        </div>
+      }
     </main>
     <aside>
       <ui-list [items]="userItems()" [multiselect]="true" (itemClick)="onUserSelect($event)" (itemRightClick)="onUserPrivate($event)" (selectionChange)="onUserSelectionChange($event)"></ui-list>
       <ui-select name="chatrooms" [(ngModel)]="selectedChatroom" [options]="chatrooms()" valueKey="id" labelKey="name" [disabled]="!isConnected()"></ui-select>
+      @if(!isConnected()) {
+        <div class="reconnect-overlay"></div>
+      }
     </aside>
   `,
   styles: []  // Styles werden von ChatroomFrame injiziert!

@@ -879,6 +879,13 @@ export class Client implements OnInit, OnDestroy {
       this.reconnectCountdownInterval = null;
     }
 
+    /* Frames sofort als getrennt markieren, damit Inputs/Buttons unmittelbar
+       disabled werden — unabhängig davon, ob/wann onClose async feuert. */
+    this.connectionStatus.set(ConnectionStatus.DISCONNECTED);
+    this.windowManager.getAllChatrooms().forEach((frame) => {
+      frame.setConnected(false);
+    });
+
     /* Close the Socket */
     if(this.socket !== null) {
       if(this.socket.readyState === WebSocket.OPEN) {

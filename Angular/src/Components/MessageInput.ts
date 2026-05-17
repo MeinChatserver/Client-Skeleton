@@ -11,6 +11,12 @@ export const MESSAGE_INPUT_STYLES = `
     width: 100%;
     font-size: 16px !important;
     padding: 6px 5px !important;
+  }
+
+  ui-message-input input:disabled {
+    background-color: #e6e6e6 !important;
+    color: #888888 !important;
+    cursor: not-allowed !important;
   }`;
 
 @Component({
