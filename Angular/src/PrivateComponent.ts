@@ -18,6 +18,7 @@ import { MessageInput } from './Components';
 import { Client } from './Client';
 import { ChatMessage, ChatMessageType } from './ChatMessage';
 import { PrivateFrame } from './PrivateFrame';
+import { ProfileOpen } from './Models/Network/ProfileOpen';
 
 export const PRIVATE_STYLES = `
   body {
@@ -67,6 +68,15 @@ export const PRIVATE_STYLES = `
   body main ui-output ui-messages ui-text[data-type="public"] .sender {
     font-weight: bold;
   }
+
+  body main ui-output ui-messages [data-action] {
+    cursor: pointer;
+  }
+
+  body main ui-output ui-messages [data-action]:hover {
+    color: var(--room-red);
+    text-decoration: underline;
+  }
 `;
 
 @Component({
@@ -78,7 +88,7 @@ export const PRIVATE_STYLES = `
   template: `
     <main>
       <ui-output>
-        <ui-messages #messagesContainer>
+        <ui-messages #messagesContainer (click)="onMessageClick($event)">
           @for (message of messages(); track $index) {
             <ui-text [attr.data-type]="getMessageType(message)" [innerHTML]="getMessageContent(message)"></ui-text>
           }
@@ -125,6 +135,29 @@ export class PrivateComponent implements AfterViewChecked {
     if(value) {
       this.sendMessage.emit(value);
       (this.messageInput as any).sendMessage();
+    }
+  }
+
+  onMessageClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+
+    if(!target) {
+      return;
+    }
+
+    const el = target.closest('[data-action]') as HTMLElement | null;
+
+    if(!el) {
+      return;
+    }
+
+    const action = el.getAttribute('data-action') || '';
+    const [name, value] = action.split(':', 2);
+
+    if(name.toLowerCase() === 'profile' && value) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.client.send(new ProfileOpen(value));
     }
   }
 

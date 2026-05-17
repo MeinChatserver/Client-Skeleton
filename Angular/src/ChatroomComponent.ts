@@ -91,9 +91,13 @@ export const CHATROOM_STYLES = `
     color: var(--room-red);
   }
 
-  main ui-output ui-messages ui-text[data-type="private"] .sender {
-    font-weight: bold;
+  main ui-output ui-messages [data-action] {
+    cursor: pointer;
+  }
+
+  main ui-output ui-messages [data-action]:hover {
     color: var(--room-red);
+    text-decoration: underline;
   }
 
   main ui-message-input {
@@ -221,7 +225,7 @@ export const CHATROOM_STYLES = `
     <ui-loading class="hidden"></ui-loading>
     <main>
       <ui-output data-position="CENTERED">
-        <ui-messages #messagesContainer>
+        <ui-messages #messagesContainer (click)="onMessageClick($event)">
           @for (message of messages(); track $index) {
             <ui-text [attr.data-type]="getMessageType(message)" [innerHTML]="getMessageContent(message)"></ui-text>
           }
@@ -705,6 +709,29 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
 
   onUserSelect(item: ListItem): void {
     this.client.send(new ProfileOpen(item.label));
+  }
+
+  onMessageClick(event: MouseEvent): void {
+    const target = event.target as HTMLElement | null;
+
+    if(!target) {
+      return;
+    }
+
+    const el = target.closest('[data-action]') as HTMLElement | null;
+
+    if(!el) {
+      return;
+    }
+
+    const action = el.getAttribute('data-action') || '';
+    const [name, value] = action.split(':', 2);
+
+    if(name.toLowerCase() === 'profile' && value) {
+      event.preventDefault();
+      event.stopPropagation();
+      this.client.send(new ProfileOpen(value));
+    }
   }
 
   onUserPrivate(item: ListItem): void {
