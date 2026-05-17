@@ -22,7 +22,7 @@ import {ListItem} from '../Models';
           </span>
         }
 
-        <span class="label" [style.color]="getRankColor(item.rank)">{{ item.label }}</span>
+        <span class="label" [style.color]="getRankColor(item.rank)" [style.fontWeight]="item.bold ? 'bold' : null">{{ item.label }}</span>
 
         @if(item.number != null) {
           <small class="count">({{ item.number }})</small>

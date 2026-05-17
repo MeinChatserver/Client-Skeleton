@@ -10,4 +10,5 @@ export interface ListItem {
   prefixIcons?: ListItemIcon[];
   suffixIcons?: ListItemIcon[];
   rank?: number;
+  bold?: boolean;
 }

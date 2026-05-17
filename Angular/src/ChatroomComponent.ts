@@ -311,6 +311,7 @@ export class ChatroomComponent implements AfterViewChecked, OnDestroy {
         id:           user.id,
         label:        user.username,
         rank:         user.rank,
+        bold:         user.style?.bold === true,
         prefixIcons:  this.buildItemIcons(list, 'prefix'),
         suffixIcons:  this.buildItemIcons(list, 'suffix')
       };
