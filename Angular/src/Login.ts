@@ -264,6 +264,13 @@ export class Login {
       return;
     }
 
+    const status = this.client.connectionStatus();
+
+    if(status === ConnectionStatus.DISCONNECTED || status === ConnectionStatus.FAILED || status === ConnectionStatus.ERROR) {
+      this.client.reconnect();
+      return;
+    }
+
     this.client.storeLoginData(this.username, this.password, this.chatroom);
 
     this.client.send({

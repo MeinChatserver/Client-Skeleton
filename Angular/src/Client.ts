@@ -945,9 +945,41 @@ export class Client implements OnInit, OnDestroy {
   }
 
   reconnect() {
+    console.log('[Client] Manueller Reconnect ausgelöst');
+
+    /* Laufenden Auto-Reconnect-Countdown abbrechen */
+    if(this.reconnectCountdownInterval) {
+      clearInterval(this.reconnectCountdownInterval);
+      this.reconnectCountdownInterval = null;
+    }
+
+    /* Reconnect-Status komplett zurücksetzen */
     this.reconnectAttempts = 0;
+    this.reconnectCountdown.set(0);
     this.preventReconnect = false;
     this.disconnectMessage.set(null);
+    this.connectionStatus.set(ConnectionStatus.CONNECTING);
+
+    /* Eventuell noch hängenden Socket abklemmen, ohne dass sein onClose
+       den frischen Reconnect-Versuch wieder durch attemptReconnect ersetzt. */
+    if(this.socket !== null) {
+      const stale = this.socket;
+      this.socket = null;
+
+      try {
+        stale.onopen    = null;
+        stale.onclose   = null;
+        stale.onerror   = null;
+        stale.onmessage = null;
+
+        if(stale.readyState === WebSocket.OPEN || stale.readyState === WebSocket.CONNECTING) {
+          stale.close();
+        }
+      } catch(error) {
+        console.warn('[Client] Fehler beim Aufräumen alter Verbindung:', error);
+      }
+    }
+
     this.connect();
   }
 
