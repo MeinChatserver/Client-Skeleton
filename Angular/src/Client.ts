@@ -231,6 +231,43 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
       this.disconnect(true);
     });
 
+    /* Preview-Flag zusätzlich aus der eigenen URL lesen (funktioniert unabhängig von
+       Cross-Origin, da nur die eigene location gelesen wird, kein Zugriff auf das
+       Eltern-Dokument nötig ist). Live-Updates kommen danach per postMessage. */
+    try {
+      const previewParam = new URLSearchParams(window.location.search).get('preview');
+      if(previewParam) {
+        this.updateConfigurations('preview', previewParam);
+      }
+    } catch (e) {
+      /* Do Nothing */
+    }
+
+    /* Live-Vorschau-Updates ohne Reload (z.B. Admin-Panel): funktioniert
+       Cross-Origin, da postMessage keine Same-Origin-Policy voraussetzt. */
+    window.addEventListener('message', (event: MessageEvent) => {
+      if(!this.isPreview) {
+        return;
+      }
+
+      const data = event.data;
+      if(!data || data.type !== 'mc-preview-update' || typeof data.params !== 'object') {
+        return;
+      }
+
+      Object.entries(data.params as Record<string, unknown>).forEach(([name, value]) => {
+        if(typeof value !== 'string') {
+          return;
+        }
+
+        try {
+          this.updateConfigurations(name, value);
+        } catch (paramError) {
+          console.warn(`Failed to apply live preview parameter "${name}":`, paramError);
+        }
+      });
+    });
+
     /* Load Defaults */
     try {
       Object.entries(window.Defaults.style).forEach(([name, value]) => {

@@ -26,6 +26,7 @@
     "build": "ng build",
     "build:move": "node scripts/build-move.mjs",
     "build:deploy": "npm run build && npm run build:move",
+    "serve:dist": "node scripts/serve-dist.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
