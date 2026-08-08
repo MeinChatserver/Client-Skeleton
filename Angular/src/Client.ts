@@ -3,6 +3,7 @@ import {
   Component,
   OnInit,
   OnDestroy,
+  AfterViewInit,
   ViewChild,
   ChangeDetectorRef,
   HostBinding,
@@ -180,12 +181,15 @@ export enum ConnectionStatus {
     }
   `]
 })
-export class Client implements OnInit, OnDestroy {
+export class Client implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(Login) loginComponent!: Login;
   @HostBinding('class.embedded')
   isEmbedded: boolean                   = false;
   /* Wenn true: keine WebSocket-Verbindung aufbauen (nur Design-Vorschau, z.B. im Admin-Panel) */
   isPreview: boolean                    = false;
+  /* chatroom kann vor ngAfterViewInit() ankommen (Defaults/Parameter werden in ngOnInit
+     gelesen), @ViewChild loginComponent existiert dann aber noch nicht */
+  private pendingSuggestion: string | null = null;
   hostname: string | null               = null;
   port: number                          = 2710;
   pingInterval: number | null           = null;
@@ -240,7 +244,7 @@ export class Client implements OnInit, OnDestroy {
       this.port = window.Defaults.port;
 
       if(window.Defaults.suggestion) {
-        this.loginComponent.chatroom = window.Defaults.suggestion;
+        this.updateConfigurations('suggestion', window.Defaults.suggestion);
       }
     } catch (e) {
       /* Do Nothing */
@@ -261,7 +265,12 @@ export class Client implements OnInit, OnDestroy {
             let value   = param.getAttribute('value');
 
             if(name && value) {
-              this.updateConfigurations(name, value);
+              // Ein einzelner fehlerhafter Parameter darf nicht alle nachfolgenden blockieren
+              try {
+                this.updateConfigurations(name, value);
+              } catch (paramError) {
+                console.warn(`Failed to apply parameter "${name}":`, paramError);
+              }
             }
           });
         }
@@ -277,6 +286,13 @@ export class Client implements OnInit, OnDestroy {
 
     /* Prepare Socket */
     this.connect();
+  }
+
+  ngAfterViewInit(): void {
+    if(this.pendingSuggestion) {
+      this.loginComponent.chatroom = this.pendingSuggestion;
+      this.pendingSuggestion = null;
+    }
   }
 
   ngOnDestroy(): void {
@@ -296,7 +312,12 @@ export class Client implements OnInit, OnDestroy {
       break;
       case 'suggestion':
         if(value) {
-          this.loginComponent.chatroom = value;
+          if(this.loginComponent) {
+            this.loginComponent.chatroom = value;
+          } else {
+            // @ViewChild ist vor ngAfterViewInit() noch nicht gesetzt
+            this.pendingSuggestion = value;
+          }
         }
       break;
       case 'backgroundImage':
