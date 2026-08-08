@@ -63,7 +63,11 @@ import {LinkTarget} from './Components/Link';
         <label><span>Räume</span></label>
       }
 
-      @if(this.client.connectionStatus() === ConnectionStatus.CONNECTING) {
+      @if(client.isPreview) {
+        <ui-panel class="preview">
+          <ui-label name="preview" text="Vorschau" />
+        </ui-panel>
+      } @else if(this.client.connectionStatus() === ConnectionStatus.CONNECTING) {
         <ui-panel class="connecting">
           <ui-label name="connecting" text="Verbinde" />
         </ui-panel>
@@ -192,7 +196,7 @@ import {LinkTarget} from './Components/Link';
       height: auto;
     }
 
-    aside .reconnecting, aside .error, aside .connecting {
+    aside .reconnecting, aside .error, aside .connecting, aside .preview {
       display: flex;
       flex: 1;
       flex-direction: column;
@@ -284,10 +288,18 @@ export class Login {
   }
 
   canLogin(): boolean {
+    if(this.client.isPreview) {
+      return false;
+    }
+
     return this.client.connectionStatus() !== ConnectionStatus.CONNECTING;
   }
 
   getButtonText(): string {
+    if(this.client.isPreview) {
+      return 'Vorschau';
+    }
+
     const status = this.client.connectionStatus();
 
     if(status === ConnectionStatus.CONNECTING) {

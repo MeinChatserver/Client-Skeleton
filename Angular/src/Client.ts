@@ -184,6 +184,8 @@ export class Client implements OnInit, OnDestroy {
   @ViewChild(Login) loginComponent!: Login;
   @HostBinding('class.embedded')
   isEmbedded: boolean                   = false;
+  /* Wenn true: keine WebSocket-Verbindung aufbauen (nur Design-Vorschau, z.B. im Admin-Panel) */
+  isPreview: boolean                    = false;
   hostname: string | null               = null;
   port: number                          = 2710;
   pingInterval: number | null           = null;
@@ -268,6 +270,11 @@ export class Client implements OnInit, OnDestroy {
       console.warn('Could not access parent document (same-origin policy):', error);
     }
 
+    /* Preview-Modus (z.B. Design-Vorschau im Admin-Panel): keine Verbindung aufbauen */
+    if(this.isPreview) {
+      return;
+    }
+
     /* Prepare Socket */
     this.connect();
   }
@@ -281,6 +288,9 @@ export class Client implements OnInit, OnDestroy {
     const style = doc.style;
 
     switch(name) {
+      case 'preview':
+        this.isPreview = (value === 'true' || value === '1');
+      break;
       case 'port':
         this.port = Number(value);
       break;
