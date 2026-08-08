@@ -27,7 +27,10 @@
               }
             ],
             "styles": [
-              "public/CSS/Globals.css"
+              "public/CSS/Globals.css",
+              "public/Themes/Gradient.css",
+              "public/Themes/Modern.css",
+              "public/Themes/Comic.css"
             ]
           },
           "configurations": {
