@@ -24,6 +24,7 @@
     "ng": "ng",
     "start": "ng serve Angular",
     "build": "ng build",
+    "build:move": "node scripts/build-move.mjs",
     "watch": "ng build --watch --configuration development",
     "test": "ng test"
   },
