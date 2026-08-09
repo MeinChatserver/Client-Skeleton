@@ -185,10 +185,7 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
   @ViewChild(Login) loginComponent!: Login;
   @HostBinding('class.embedded')
   isEmbedded: boolean                   = false;
-  /* Wenn true: keine WebSocket-Verbindung aufbauen (nur Design-Vorschau, z.B. im Admin-Panel) */
   isPreview: boolean                    = false;
-  /* chatroom kann vor ngAfterViewInit() ankommen (Defaults/Parameter werden in ngOnInit
-     gelesen), @ViewChild loginComponent existiert dann aber noch nicht */
   private pendingSuggestion: string | null = null;
   hostname: string | null               = null;
   port: number                          = 2710;
@@ -230,10 +227,7 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
       this.windowManager.closeAll();
       this.disconnect(true);
     });
-
-    /* Preview-Flag zusätzlich aus der eigenen URL lesen (funktioniert unabhängig von
-       Cross-Origin, da nur die eigene location gelesen wird, kein Zugriff auf das
-       Eltern-Dokument nötig ist). Live-Updates kommen danach per postMessage. */
+	
     try {
       const previewParam = new URLSearchParams(window.location.search).get('preview');
       if(previewParam) {
@@ -242,9 +236,7 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
     } catch (e) {
       /* Do Nothing */
     }
-
-    /* Live-Vorschau-Updates ohne Reload (z.B. Admin-Panel): funktioniert
-       Cross-Origin, da postMessage keine Same-Origin-Policy voraussetzt. */
+	
     window.addEventListener('message', (event: MessageEvent) => {
       if(!this.isPreview) {
         return;
@@ -302,7 +294,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
             let value   = param.getAttribute('value');
 
             if(name && value) {
-              // Ein einzelner fehlerhafter Parameter darf nicht alle nachfolgenden blockieren
               try {
                 this.updateConfigurations(name, value);
               } catch (paramError) {
@@ -316,7 +307,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
       console.warn('Could not access parent document (same-origin policy):', error);
     }
 
-    /* Preview-Modus (z.B. Design-Vorschau im Admin-Panel): keine Verbindung aufbauen */
     if(this.isPreview) {
       return;
     }
@@ -352,7 +342,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
           if(this.loginComponent) {
             this.loginComponent.chatroom = value;
           } else {
-            // @ViewChild ist vor ngAfterViewInit() noch nicht gesetzt
             this.pendingSuggestion = value;
           }
         }
@@ -376,8 +365,7 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
         if(value) {
           document.documentElement.dataset['theme'] = value;
           console.log('[Theme] Set to LOGIN:', value);
-
-          // Auch auf alle offenen Frames setzen
+		  
           const frames = this.windowManager.getAllChatrooms();
           console.log('[Theme] Found frames:', frames.length);
 
@@ -494,9 +482,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
       preventReconnect: this.preventReconnect
     });
 
-    // Fallback: Wenn der Server den Grund über das Close-Frame mitgibt (socket.close(code, reason)),
-    // wird die DISCONNECT-Nachricht garantiert geliefert. Eine reine JSON-Nachricht direkt vor
-    // socket.close() kann race-bedingt vom Browser verworfen werden.
     const closeReason = event?.reason?.trim();
 
     if(closeReason && !this.preventReconnect) {
@@ -603,14 +588,10 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
         case 'DISCONNECT':
           const disconnect = packet as Disconnect;
 
-          // Nur bei vorhandener Message keinen Reconnect (Kick/Ban/Timeout).
-          // Ohne Message ist es ein einfacher Verbindungsabbau; Auto-Reconnect bleibt aktiv.
           if(disconnect.hasMessage()) {
             this.disconnectMessage.set(disconnect.getMessage());
             this.preventReconnect = true;
 
-            // Falls onClose bereits ausgelöst hat (z.B. Server schließt direkt nach Senden),
-            // einen bereits laufenden Reconnect-Countdown sofort stoppen.
             if(this.reconnectCountdownInterval) {
               clearInterval(this.reconnectCountdownInterval);
               this.reconnectCountdownInterval = null;
@@ -661,9 +642,7 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
           chatroom.updateRoomName(windowRoom.getName());
 
           this.send(new WindowInit(chatroom.getId()));
-
-          /* Nach Relogin: sobald der Primärraum wieder offen ist, die zuvor
-             geöffneten Zusatzräume per "/go +<Name>" nachfordern. */
+		  
           if(this.pendingRestoreRooms.length > 0
               && this.lastLoginData
               && windowRoom.getName() === this.lastLoginData.chatroom) {
@@ -796,15 +775,12 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
             timestamp:  new Date()
           });
 
-          /* Wenn ein PrivateFrame existiert, dorthin routen */
           const sender = message.getSender();
           const senderName = typeof sender === 'string' ? sender : (sender as any)?.username;
           const recipients = message.getUsers() || [];
-
-          // Kandidaten: Sender (für Empfang) + Empfänger (für eigene Nachrichten)
           const candidates = [senderName, ...recipients.map((u: any) => typeof u === 'string' ? u : u?.username)].filter(Boolean);
-
           let privateFrame = null;
+		  
           for(const name of candidates) {
             const f = this.windowManager.getPrivate(name);
             if(f && f.isOpen()) {
@@ -947,8 +923,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
       this.reconnectCountdownInterval = null;
     }
 
-    /* Frames sofort als getrennt markieren, damit Inputs/Buttons unmittelbar
-       disabled werden — unabhängig davon, ob/wann onClose async feuert. */
     this.connectionStatus.set(ConnectionStatus.DISCONNECTED);
     this.windowManager.getAllChatrooms().forEach((frame) => {
       frame.setConnected(false);
@@ -995,7 +969,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
       }
 
       this.reconnectCountdownInterval = window.setInterval(() => {
-        // DISCONNECT kann während des Countdowns eintreffen (Reihenfolge onClose/onMessage nicht garantiert)
         if(this.preventReconnect) {
           if(this.reconnectCountdownInterval) {
             clearInterval(this.reconnectCountdownInterval);
@@ -1055,8 +1028,6 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
     this.disconnectMessage.set(null);
     this.connectionStatus.set(ConnectionStatus.CONNECTING);
 
-    /* Eventuell noch hängenden Socket abklemmen, ohne dass sein onClose
-       den frischen Reconnect-Versuch wieder durch attemptReconnect ersetzt. */
     if(this.socket !== null) {
       const stale = this.socket;
       this.socket = null;
@@ -1082,14 +1053,16 @@ export class Client implements OnInit, OnDestroy, AfterViewInit {
     this.lastLoginData = { username, password, chatroom };
   }
 
+  forgetLogin(): void {
+    this.lastLoginData = null;
+    this.pendingRestoreRooms = [];
+  }
+
   private relogin(): void {
     if(!this.lastLoginData) {
       return;
     }
-
-    /* Vor dem Relogin alle aktuell offenen Chatraum-Fenster außer dem
-       Primärraum merken. Nach dem ersten WINDOW_ROOM des Primärraumes
-       werden diese Räume per "/go +<Name>" wiederhergestellt. */
+	
     const primary = this.lastLoginData.chatroom;
     this.pendingRestoreRooms = this.windowManager.getAllChatrooms()
       .map(frame => frame.getId())

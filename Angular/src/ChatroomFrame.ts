@@ -163,7 +163,6 @@ export class ChatroomFrame extends Frame {
   public setStyle(style: any): void {
     const newStyle = style instanceof RoomStyle ? style : (style ? new RoomStyle(style) : null);
 
-    // Merge: Wenn neue ranks leer sind, behalte alte
     if(newStyle && this.style) {
       const newRanks = newStyle.getRanks();
       const oldRanks = this.style.getRanks();
@@ -232,7 +231,6 @@ export class ChatroomFrame extends Frame {
 
     element.textContent = `:root { ${vars.join(' ')} }`;
 
-    // Setze auch die Background-Position CSS-Regel
     if(bg?.getImage()?.getPosition()) {
       this.applyBackgroundPositionStyle(bg.getImage(), imageFile);
     }
@@ -255,7 +253,6 @@ export class ChatroomFrame extends Frame {
       this.frameDocument.head.appendChild(element);
     }
 
-    // Höhere Spezifität: main ui-output[data-position="..."] statt nur [data-position="..."]
     const cssProps: string[] = [];
     Object.entries(style).forEach(([key, value]) => {
       const cssKey = key.replace(/([A-Z])/g, '-$1').toLowerCase();
@@ -264,7 +261,6 @@ export class ChatroomFrame extends Frame {
 
     element.textContent = `main ui-output[data-position="${position}"] { ${cssProps.join(' ')} }`;
 
-    // Setze auch das data-position Attribut auf dem ui-output Element
     const uiOutput = this.frameDocument.querySelector('main ui-output') as HTMLElement | null;
     if(uiOutput) {
       uiOutput.setAttribute('data-position', position);
@@ -372,6 +368,10 @@ export class ChatroomFrame extends Frame {
     }
 
     this.client?.windowManager?.removeFrame(this.getId());
+
+    if(this.client?.windowManager && this.client.windowManager.getAllChatrooms().length === 0) {
+      this.client.forgetLogin();
+    }
 
     super.handleWindowClosed();
   }
