@@ -79,9 +79,10 @@ export class WindowManager {
         /* Bestehendes Fenster wiederverwenden (z.B. nach Reconnect/Relogin),
            damit nicht für denselben Raum ein zweites Popup entsteht.
            Listener werden geleert, damit der Caller seine Subscriptions
-           sauber neu registrieren kann. */
+           sauber neu registrieren kann. Der bisherige Chatverlauf bleibt
+           dabei bewusst erhalten - nur Features/Canvas werden zurückgesetzt,
+           da das flüchtiger visueller Zustand ist. */
         existing.clearEventListeners();
-        existing.clearMessages();
         existing.removeAllFeatures();
         existing.resetCanvas();
         existing.setConnected(true);
