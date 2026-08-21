@@ -577,7 +577,11 @@ export class PopupRenderer {
 
     const link = this.frameDocument!.createElement('a');
     link.href = element.url ?? '#';
-    link.textContent = element.label ?? 'Link';
+    // Ohne Label steht das Ziel selbst als Text - sonst waere der Link
+    // unsichtbar. `??` griff hier nicht: Ein leeres Label ist nicht nullish.
+    // Gilt auch fuer Befehle (z.B. /help), die im url-Feld anstelle einer
+    // Adresse stehen koennen.
+    link.textContent = element.label?.trim() || element.url || 'Link';
     link.className = 'popup-link';
 
     if (element.target) {
