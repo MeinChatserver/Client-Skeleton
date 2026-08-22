@@ -1,6 +1,7 @@
 import { ApplicationRef, ComponentRef, createComponent, EnvironmentInjector, Type } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 import { Button, Calendar, Label, Line, Select, Textfield, CheckBox } from './Components';
+import { setSafeHtml } from './SafeHtml';
 
 export class PopupRenderer {
   private componentRefs: Map<string, ComponentRef<any>> = new Map();
@@ -282,7 +283,12 @@ export class PopupRenderer {
     const wrapper = this.frameDocument!.createElement('div');
     wrapper.className = 'popup-content-wrapper';
 
-    wrapper.innerHTML = element.content ?? '';
+    // Nicht innerHTML: Der Inhalt ist von einem Administrator geschrieben, wird
+    // aber jedem Besucher des Chats angezeigt. Ein <img src=x onerror=...> waere
+    // damit keine Frage der Administration mehr. Gefiltert wird zwar schon beim
+    // Speichern, das hier ist die Linie fuer Bestandsdaten und fuer alles, was
+    // an der API vorbei in die Tabelle kommt.
+    setSafeHtml(wrapper, element.content);
 
     container.appendChild(wrapper);
   }
@@ -510,7 +516,7 @@ export class PopupRenderer {
       tabPanel.id = `tab-${element.name}-${index}`;
 
       if (typeof tab === 'object' && tab.content) {
-        tabPanel.innerHTML = tab.content;
+        setSafeHtml(tabPanel, tab.content);
       }
 
       if (typeof tab === 'object' && tab.elements && Array.isArray(tab.elements)) {
